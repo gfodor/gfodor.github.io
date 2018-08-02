@@ -13,14 +13,14 @@
 
     <!-- HACK: this has to run after A-Frame but before our bundle, since A-Frame blows away the local storage setting -->
     <script src="https://cdn.rawgit.com/gfodor/ba8f88d9f34fe9cbe59a01ce3c48420d/raw/03e31f0ef7b9eac5e947bd39e440f34df0701f75/naf-janus-adapter-logging.js" integrity="sha384-4q1V8Q88oeCFriFefFo5uEUtMzbw6K116tFyC9cwbiPr6wEe7050l5HoJUxMvnzj" crossorigin="anonymous"></script>
-<meta http-equiv="origin-trial" data-feature="WebVR (For Chrome M62+)" data-expires="2018-08-21" content="AmTuFlYFGJ4KEbPVE20U0qoWZI3NZuaO8bjjcQvQI4OvDVC4Iyun5gkD8lwtNbrEzh617m5nig0+8QC+Pz6powYAAABVeyJvcmlnaW4iOiJodHRwczovL2h1YnMubW96aWxsYS5jb206NDQzIiwiZmVhdHVyZSI6IldlYlZSMS4xTTYyIiwiZXhwaXJ5IjoxNTM0ODg3ODE1fQ=="><link href="https://gfodor.github.io/assets/stylesheets/hub-382cd3e8252eecfb2c99.css" rel="stylesheet"><script type="text/javascript" src="https://gfodor.github.io/assets/js/vendor-211a353041f76918389a.js"></script><script type="text/javascript" src="https://gfodor.github.io/assets/js/engine-8da17d3ab1932b2b36de.js"></script><script type="text/javascript" src="https://gfodor.github.io/assets/js/hub-27b086887b4308d8de46.js"></script></head>
+<meta http-equiv="origin-trial" data-feature="WebVR (For Chrome M62+)" data-expires="2018-08-21" content="AmTuFlYFGJ4KEbPVE20U0qoWZI3NZuaO8bjjcQvQI4OvDVC4Iyun5gkD8lwtNbrEzh617m5nig0+8QC+Pz6powYAAABVeyJvcmlnaW4iOiJodHRwczovL2h1YnMubW96aWxsYS5jb206NDQzIiwiZmVhdHVyZSI6IldlYlZSMS4xTTYyIiwiZXhwaXJ5IjoxNTM0ODg3ODE1fQ=="><link href="/assets/stylesheets/hub-3d1002d7d2eae011bdd1.css" rel="stylesheet"><script type="text/javascript" src="/assets/js/vendor-211a353041f76918389a.js"></script><script type="text/javascript" src="/assets/js/engine-8da17d3ab1932b2b36de.js"></script><script type="text/javascript" src="/assets/js/hub-49a13cede23fd4a6ef16.js"></script></head>
 
 <body>
     <audio id="test-tone">
-        <source src="https://gfodor.github.io/assets/sfx/tone-624e72d19fe0cea1b85ca174cb6be256.webm" type="audio/webm"/>
-        <source src="https://gfodor.github.io/assets/sfx/tone-3fa0defb5172b2533fedcc1929605799.mp3" type="audio/mpeg"/>
-        <source src="https://gfodor.github.io/assets/sfx/tone-78ae5a60f0e336f384919eee9f5a2e18.ogg" type="audio/ogg"/>
-        <source src="https://gfodor.github.io/assets/sfx/tone-4604a4c98f36f3e0c6980295bc5c7ffe.wav" type="audio/wav"/>
+        <source src="/assets/sfx/tone-624e72d19fe0cea1b85ca174cb6be256.webm" type="audio/webm"/>
+        <source src="/assets/sfx/tone-3fa0defb5172b2533fedcc1929605799.mp3" type="audio/mpeg"/>
+        <source src="/assets/sfx/tone-78ae5a60f0e336f384919eee9f5a2e18.ogg" type="audio/ogg"/>
+        <source src="/assets/sfx/tone-4604a4c98f36f3e0c6980295bc5c7ffe.wav" type="audio/wav"/>
     </audio>
 
     <a-scene
@@ -45,19 +45,19 @@
     >
 
         <a-assets>
-            <img id="tooltip" crossorigin="anonymous" src="https://gfodor.github.io/assets/hud/tooltip.9-0d85679e9995e14e2c8c1d8e996eb43a.png">
-            <img id="mute-off" crossorigin="anonymous" src="https://gfodor.github.io/assets/hud/mute_off-2c466a516681066572663973edaadbf7.png">
-            <img id="mute-off-hover" crossorigin="anonymous" src="https://gfodor.github.io/assets/hud/mute_off-hover-d0778cd40f6a62d84550956a9eb2f802.png">
-            <img id="mute-on" crossorigin="anonymous" src="https://gfodor.github.io/assets/hud/mute_on-3977ff9e514f05e48ef5095c90a1c3ad.png">
-            <img id="mute-on-hover" crossorigin="anonymous" src="https://gfodor.github.io/assets/hud/mute_on-hover-e0f6fda97fe9c876c9bd27b022f9a7cd.png">
-            <img id="bubble-off" crossorigin="anonymous" src="https://gfodor.github.io/assets/hud/bubble_off-fdd52ceb047cd6d4630a21133d494cce.png">
-            <img id="bubble-off-hover" crossorigin="anonymous" src="https://gfodor.github.io/assets/hud/bubble_off-hover-7ca95a6626495863af6e4f7b9ebc04f8.png">
-            <img id="bubble-on" crossorigin="anonymous" src="https://gfodor.github.io/assets/hud/bubble_on-7470866ad35dd91067de4e68456f4d27.png">
-            <img id="bubble-on-hover" crossorigin="anonymous" src="https://gfodor.github.io/assets/hud/bubble_on-hover-0983414d57ef280d60bcffc5c42496d3.png">
-            <img id="freeze-off" crossorigin="anonymous" src="https://gfodor.github.io/assets/hud/freeze_off-43648bae6c3c542fe81e01a7d4ee7ad3.png">
-            <img id="freeze-off-hover" crossorigin="anonymous" src="https://gfodor.github.io/assets/hud/freeze_off-hover-1f7a8ef93ec2eb2f66aef8258529c068.png">
-            <img id="freeze-on" crossorigin="anonymous" src="https://gfodor.github.io/assets/hud/freeze_on-2adcc566824bedffd1e1dcdd5020b1c1.png">
-            <img id="freeze-on-hover" crossorigin="anonymous" src="https://gfodor.github.io/assets/hud/freeze_on-hover-fc009e972eed2da7d42906595b34d7c4.png">
+            <img id="tooltip" crossorigin="anonymous" src="/assets/hud/tooltip.9-0d85679e9995e14e2c8c1d8e996eb43a.png">
+            <img id="mute-off" crossorigin="anonymous" src="/assets/hud/mute_off-2c466a516681066572663973edaadbf7.png">
+            <img id="mute-off-hover" crossorigin="anonymous" src="/assets/hud/mute_off-hover-d0778cd40f6a62d84550956a9eb2f802.png">
+            <img id="mute-on" crossorigin="anonymous" src="/assets/hud/mute_on-3977ff9e514f05e48ef5095c90a1c3ad.png">
+            <img id="mute-on-hover" crossorigin="anonymous" src="/assets/hud/mute_on-hover-e0f6fda97fe9c876c9bd27b022f9a7cd.png">
+            <img id="bubble-off" crossorigin="anonymous" src="/assets/hud/bubble_off-fdd52ceb047cd6d4630a21133d494cce.png">
+            <img id="bubble-off-hover" crossorigin="anonymous" src="/assets/hud/bubble_off-hover-7ca95a6626495863af6e4f7b9ebc04f8.png">
+            <img id="bubble-on" crossorigin="anonymous" src="/assets/hud/bubble_on-7470866ad35dd91067de4e68456f4d27.png">
+            <img id="bubble-on-hover" crossorigin="anonymous" src="/assets/hud/bubble_on-hover-0983414d57ef280d60bcffc5c42496d3.png">
+            <img id="freeze-off" crossorigin="anonymous" src="/assets/hud/freeze_off-43648bae6c3c542fe81e01a7d4ee7ad3.png">
+            <img id="freeze-off-hover" crossorigin="anonymous" src="/assets/hud/freeze_off-hover-1f7a8ef93ec2eb2f66aef8258529c068.png">
+            <img id="freeze-on" crossorigin="anonymous" src="/assets/hud/freeze_on-2adcc566824bedffd1e1dcdd5020b1c1.png">
+            <img id="freeze-on-hover" crossorigin="anonymous" src="/assets/hud/freeze_on-hover-fc009e972eed2da7d42906595b34d7c4.png">
 
             <a-asset-item id="botdefault" response-type="arraybuffer" src="https://asset-bundles-prod.reticulum.io/bots/BotDefault_Avatar-9f71f8ff22.gltf"></a-asset-item>
             <a-asset-item id="botbobo" response-type="arraybuffer" src="https://asset-bundles-prod.reticulum.io/bots/BotBobo_Avatar-f9740a010b.gltf"></a-asset-item>
@@ -70,13 +70,13 @@
             <a-asset-item id="botrobert" response-type="arraybuffer" src="https://asset-bundles-prod.reticulum.io/bots/BotRobert_Avatar-e9554880f3.gltf"></a-asset-item>
             <a-asset-item id="botwoody" response-type="arraybuffer" src="https://asset-bundles-prod.reticulum.io/bots/BotWoody_Avatar-0140485a23.gltf"></a-asset-item>
 
-            <a-asset-item id="watch-model" response-type="arraybuffer" src="https://gfodor.github.io/assets/hud/watch-6dcfde1754099e7daaebc0104b833465.glb"></a-asset-item>
+            <a-asset-item id="watch-model" response-type="arraybuffer" src="/assets/hud/watch-6dcfde1754099e7daaebc0104b833465.glb"></a-asset-item>
             <a-asset-item id="interactable-duck" response-type="arraybuffer" src="https://asset-bundles-prod.reticulum.io/interactables/Ducky/DuckyMesh-438ff8e022.gltf"></a-asset-item>
 
-            <a-asset-item id="quack" src="https://gfodor.github.io/assets/sfx/quack-1f18502834f8f1db43990b769c2ab193.mp3" response-type="arraybuffer" preload="auto"></a-asset-item>
-            <a-asset-item id="specialquack" src="https://gfodor.github.io/assets/sfx/specialquack-6d1a192a6092e8dfed5d3de063755ee2.mp3" response-type="arraybuffer" preload="auto"></a-asset-item>
+            <a-asset-item id="quack" src="/assets/sfx/quack-1f18502834f8f1db43990b769c2ab193.mp3" response-type="arraybuffer" preload="auto"></a-asset-item>
+            <a-asset-item id="specialquack" src="/assets/sfx/specialquack-6d1a192a6092e8dfed5d3de063755ee2.mp3" response-type="arraybuffer" preload="auto"></a-asset-item>
 
-            <img id="water-normal-map" crossorigin="anonymous" src="https://gfodor.github.io/assets/waternormals-4418dde3f6abc21dc32506acf5f5b093.jpg">
+            <img id="water-normal-map" crossorigin="anonymous" src="/assets/waternormals-4418dde3f6abc21dc32506acf5f5b093.jpg">
 
             <!-- Templates -->
             <template id="video-template">
