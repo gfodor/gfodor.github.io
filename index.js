@@ -58140,8 +58140,8 @@
       window.save = async () => {
         const html = prettifyXml(new XMLSerializer().serializeToString(document));
         const github = new import_octokat.default({ token: localStorage.getItem("token") });
-        const repoUser = document.location.host.split(".")[0];
-        const repoName = document.location.host;
+        const repoUser = "gfodor";
+        const repoName = "gfodor.github.io";
         console.log(repoUser, repoName);
         const repo = await github.repos(repoUser, repoName);
         console.log(repo);
