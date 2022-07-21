@@ -35,8 +35,7 @@ const STATE_EXPIRATION_MS = 5 * 60 * 1000;
 const REFRESH_WINDOW_MS = 30000;
 
 const ROOM_ID = "room123";
-//const WORKER_URL = "https://signalling.minddrop.workers.dev"
-const WORKER_URL = "http://localhost:8787"
+const WORKER_URL = "https://signalling.minddrop.workers.dev"
 
 const hexToBase64 = (hex) => {
   const d = [];
