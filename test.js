@@ -36,6 +36,7 @@ const REFRESH_WINDOW_MS = 30000;
 
 const ROOM_ID = "room123";
 const WORKER_URL = "https://signalling.minddrop.workers.dev"
+//const WORKER_URL = "http://localhost:8787"
 
 const hexToBase64 = (hex) => {
   const d = [];
@@ -257,6 +258,8 @@ console.log("contextId", contextId, hexToBase64(contextId));
       }
     }
 
+    isSymmetric = true;
+
     if (isSymmetric) {
       // Need TURN
       iceServers = udpEnabled ? [
@@ -374,6 +377,7 @@ console.log("contextId", contextId, hexToBase64(contextId));
             if (peers.has(remoteClientId)) continue;
 
             // I am peer A, I only care if packages have been published to me.
+            console.log("I am peer A");
 
             const pc = new RTCPeerConnection({ iceServers, certificates: [ localDtlsCert ] });
             pc.createDataChannel("signal");
@@ -384,10 +388,13 @@ console.log("contextId", contextId, hexToBase64(contextId));
               let pkg = [remoteClientBase64, localClientBase64, /* lfrag */null, /* lpwd */null, /* ldtls */null, /* remote ufrag */ null, /* remote Pwd */ null, []];
               const pkgCandidates = pkg[pkg.length - 1];
 
+              console.log("Wiring up");
+
               pc.onicecandidate = e => {
                 if (!e.candidate) {
                   // If any relay candidates were found, push it in the next step
                   if (pkgCandidates.length > 0) {
+                    console.log("Dual case pushing from A", pkg);
                     localPackages.push(pkg);
                   }
 
@@ -466,6 +473,8 @@ console.log("contextId", contextId, hexToBase64(contextId));
             pc.createDataChannel("signal");
             peers.set(remoteClientId, pc);
 
+            console.log("I am peer B, saved peer", remoteClientId);
+
             const remoteUfrag = generateRandomString(12);
             const remotePwd = generateRandomString(32);
             const remoteSdp = createSdp(false, remoteUfrag, remotePwd, remoteDtlsFingerprintBase64);
@@ -478,6 +487,7 @@ console.log("contextId", contextId, hexToBase64(contextId));
             pc.onicecandidate = e => {
               // Push package onto the given package list, so it will be sent in next polling step.
               if (!e.candidate) {
+                console.log("Pushing candidates from B", pkg);
                 return localPackages.push(pkg);
               }
 
@@ -546,6 +556,7 @@ console.log("contextId", contextId, hexToBase64(contextId));
 
               if (remoteCandidates.length > 0) {
                 for (const candidate of remoteCandidates) {
+                  console.log("dual case, adding to B", candidate);
                   pc.addIceCandidate({ candidate, sdpMLineIndex: 0 });
                 }
 
@@ -638,5 +649,5 @@ console.log("contextId", contextId, hexToBase64(contextId));
 
   step();
 
-  setInterval(step, 2000);
+  setInterval(step, 1000);
 })();
