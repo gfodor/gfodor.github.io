@@ -231,6 +231,7 @@ domWrite("contextId", contextId, hexToBase64(contextId));
   const getNetworkSettings = async (dbData) => {
     let dtlsFingerprint = null;
     const candidates = [];
+    const reflexiveIps = new Set();
 
     let iceServers = STUN_ICE;
 
@@ -272,6 +273,8 @@ domWrite("contextId", contextId, hexToBase64(contextId));
       if (c[0] !== CANDIDATE_TYPES.srflx) continue;
       udpEnabled = true;
 
+      reflexiveIps.add(c[CANDIDATE_IDX.IP]);
+
       for (const d of candidates) {
         if (d[0] !== CANDIDATE_TYPES.srflx) continue;
         if (c === d) continue;
@@ -309,14 +312,14 @@ domWrite("contextId", contextId, hexToBase64(contextId));
       pc.close();
     }
 
-    return [udpEnabled, isSymmetric, dtlsFingerprint];
+    return [udpEnabled, isSymmetric, reflexiveIps, dtlsFingerprint];
   };
 
   const dbData = await getDbData();
 
   domWrite("Performing ICE");
   const t0 = performance.now();
-  const [udpEnabled, isSymmetric, dtlsFingerprint] = await getNetworkSettings(dbData); 
+  const [udpEnabled, isSymmetric, reflexiveIps, dtlsFingerprint] = await getNetworkSettings(dbData); 
   domWrite("Done in", Math.floor(performance.now() - t0), "ms symmetric: ", isSymmetric, " udp: ", udpEnabled);
 
   const createSdp = (isOffer, iceUFrag, icePwd, dtlsFingerprintBase64) => {
@@ -367,7 +370,7 @@ domWrite("contextId", contextId, hexToBase64(contextId));
       console.log("incoming peers", JSON.stringify(remotePeerDatas));
 
       for (const remotePeerData of remotePeerDatas) {
-        const [remoteClientBase64, remoteSymmetric, remoteDtlsFingerprintBase64, remoteJoinedAtTimestamp] = remotePeerData;
+        const [remoteClientBase64, remoteSymmetric, remoteDtlsFingerprintBase64, remoteJoinedAtTimestamp, remoteReflexiveIps] = remotePeerData;
         const remoteClientId = base64ToHex(remoteClientBase64);
 
         console.log("local vs remote", localClientId, localJoinedAtTimestamp, remoteClientId, remoteJoinedAtTimestamp, localSymmetric === remoteSymmetric);
@@ -504,6 +507,8 @@ domWrite("contextId", contextId, hexToBase64(contextId));
           //   - Generate ufrag + pwd
           //   - Generate remote SDP using the dtls fingerprint for A, and my generated ufrag + pwd
           //   - Set remote description
+          //   - Add an srflx candidate for each of the reflexive IPs for A (on a random port) to hole punch
+          //     so peer reflexive candidates for it show up.
           //   - Let trickle run, then once trickle finishes send a package for A to pick up = [my client id, my offer sdp, generated ufrag/pwd, dtls fingerprint, ice candidates]
           //   - keep the icecandidate listener active, and add the pfrlx candidates when they arrive (but don't send another package)
           if (!peers.has(remoteClientId)) {
@@ -521,6 +526,15 @@ domWrite("contextId", contextId, hexToBase64(contextId));
             // This is the 'package' sent to peer B that it needs to start ICE
             let pkg = [remoteClientBase64, localClientBase64, /* lfrag */null, /* lpwd */null, /* ldtls */null, remoteUfrag, remotePwd, []];
             const pkgCandidates = pkg[pkg.length - 1];
+
+            for (let i = 0; i < remoteReflexiveIps.length; i++) {
+              domWrite("Adding reflexive ", remoteReflexiveIps[i]);
+
+              pc.addIceCandidate({ 
+                `a=candidate:0 1 udp ${i + 1} ${remoteReflexiveIps[i]} 30000 typ srflx`,
+                sdpMLineIndex: 0 }
+              );
+            }
 
             pc.onicecandidate = e => {
               // Push package onto the given package list, so it will be sent in next polling step.
@@ -631,7 +645,8 @@ domWrite("contextId", contextId, hexToBase64(contextId));
           hexToBase64(clientId),
           isSymmetric,
           localDtlsFingerprintBase64,
-          joinedAtTimestamp
+          joinedAtTimestamp,
+          [...reflexiveIps]
         ];
 
         const payload = { r: ROOM_ID, k: hexToBase64(contextId) };
