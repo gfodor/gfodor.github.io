@@ -424,6 +424,8 @@ domWrite("contextId", contextId, hexToBase64(contextId));
                   return;
                 }
 
+                pc.addIceCandidate(e.candidate);
+
                 if (!e.candidate.candidate) return;
                 if (!e.candidate.candidate.indexOf("relay") === -1) return;
                 pkgCandidates.push(e.candidate.candidate);
@@ -524,6 +526,8 @@ domWrite("contextId", contextId, hexToBase64(contextId));
                 domWrite("Pushing candidates from B", pkg);
                 return localPackages.push(pkg);
               }
+
+              pc.addIceCandidate(e.candidate);
 
               if (!e.candidate.candidate) return;
               pkgCandidates.push(e.candidate.candidate);
