@@ -258,8 +258,6 @@ console.log("contextId", contextId, hexToBase64(contextId));
       }
     }
 
-    isSymmetric = true;
-
     if (isSymmetric) {
       // Need TURN
       iceServers = udpEnabled ? [
@@ -303,7 +301,7 @@ console.log("contextId", contextId, hexToBase64(contextId));
   console.log("Performing ICE");
   const t0 = performance.now();
   const [iceServers, isSymmetric, dtlsFingerprint] = await getIceServersSymmetricAndDtlsFingerprint(dbData); 
-  console.log("Done in", Math.floor(performance.now() - t0), "ms");
+  console.log("Done in", Math.floor(performance.now() - t0), "ms symmetric: ", isSymmetric);
 
   const createSdp = (isOffer, iceUFrag, icePwd, dtlsFingerprintBase64) => {
     const dtlsHex = base64ToHex(dtlsFingerprintBase64);
@@ -349,6 +347,8 @@ console.log("contextId", contextId, hexToBase64(contextId));
     return (localPeerData, localDtlsCert, localDtlsFingerprintBase64, localPackages, remotePeerDatas, remotePackages) => {
       const [localClientBase64, localSymmetric] = localPeerData;
       const localClientId = base64ToHex(localClientBase64);
+
+      console.log(remotePeerDatas.map(p => p[0]))
 
       for (const remotePeerData of remotePeerDatas) {
         const [remoteClientBase64, remoteSymmetric, remoteDtlsFingerprintBase64] = remotePeerData;
