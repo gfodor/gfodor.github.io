@@ -28,7 +28,7 @@ const CANDIDATE_IDX = {
 
 const STUN_ICE = [
   {urls: 'stun:stun1.l.google.com:19302'},
-  {urls: 'stun:stun2.l.google.com:19302'}
+  {urls: 'stun:global.stun.twilio.com:3478'}
 ];
 
 const TURN_UDP_ICE = [
@@ -60,7 +60,7 @@ const STATE_EXPIRATION_MS = 5 * 60 * 1000;
 // How long until expiration do we refresh
 const REFRESH_WINDOW_MS = 30000;
 
-const ROOM_ID = "room127";
+const ROOM_ID = "room129";
 const WORKER_URL = "https://signalling.minddrop.workers.dev"
 //const WORKER_URL = "http://localhost:8787"
 
@@ -385,7 +385,7 @@ domWrite("contextId", contextId, hexToBase64(contextId));
         //
         // - Peer A will *also* push packages with candidates (relay)
         // - Peer B should check for packages for itself
-        const isDualSymmetric = localSymmetric && remoteSymmetric;
+        const isDualSymmetric = true; //localSymmetric && remoteSymmetric;
 
         // If both sides are symmetric, we need to use a TURN server for these peers.
         const iceServers = localSymmetric && remoteSymmetric ? (udpEnabled ? TURN_UDP_ICE : TURN_TCP_ICE) : STUN_ICE;
@@ -419,7 +419,7 @@ domWrite("contextId", contextId, hexToBase64(contextId));
                 if (!e.candidate) {
                   // If any relay candidates were found, push it in the next step
                   if (pkgCandidates.length > 0) {
-                    console.log("Dual case pushing from A", pkg);
+                    domWrite("Dual case pushing from A", pkg);
                     localPackages.push(pkg);
                   }
 
@@ -596,7 +596,7 @@ domWrite("contextId", contextId, hexToBase64(contextId));
 
               if (remoteCandidates.length > 0) {
                 for (const candidate of remoteCandidates) {
-                  console.log("dual case, adding to B", candidate);
+                  domWrite("dual case, adding to B", candidate);
                   pc.addIceCandidate({ candidate, sdpMLineIndex: 0 });
                 }
 
