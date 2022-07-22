@@ -404,8 +404,11 @@ domWrite("contextId", contextId, hexToBase64(contextId));
             domWrite("I am peer A for ", remoteClientId,  " is dual: ", isDualSymmetric, " with candidates: ", JSON.stringify(remoteCandidates));
 
             const pc = new RTCPeerConnection({ iceServers, certificates: [ localDtlsCert ] });
+            domWrite("A");
             pc.createDataChannel("signal");
+            domWrite("B");
             peers.set(remoteClientId, pc);
+            domWrite("C");
 
             // Special case if both behind sym NAT: peer A needs to send its relay candidates as well.
             if (isDualSymmetric) {
@@ -429,6 +432,7 @@ domWrite("contextId", contextId, hexToBase64(contextId));
               };
             }
 
+            domWrite("D");
             pc.oniceconnectionstatechange = () => {
               const iceConnectionState = pc.iceConnectionState;
               const iceGatheringState = pc.iceGatheringState;
@@ -456,10 +460,13 @@ domWrite("contextId", contextId, hexToBase64(contextId));
               console.log("signalingstatechange", signalingState);
             }
 
+            domWrite("E");
             const remoteSdp = createSdp(true, remoteIceUFrag, remoteIcePwd, remoteDtlsFingerprintBase64);
+            domWrite("F");
 
             pc.setRemoteDescription({ type: "offer", sdp: remoteSdp });
 
+            domWrite("G");
             pc.createAnswer().then(answer => {
               const lines = [];
               domWrite("Got answer");
