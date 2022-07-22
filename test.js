@@ -401,7 +401,7 @@ domWrite("contextId", contextId, hexToBase64(contextId));
             if (peers.has(remoteClientId)) continue;
 
             // I am peer A, I only care if packages have been published to me.
-            domWrite("I am peer A for ", remoteClientId,  " is dual: ", isDualSymmetric);
+            domWrite("I am peer A for ", remoteClientId,  " is dual: ", isDualSymmetric, " with candidates: ", JSON.stringify(remoteCandidates));
 
             const pc = new RTCPeerConnection({ iceServers, certificates: [ localDtlsCert ] });
             pc.createDataChannel("signal");
@@ -476,7 +476,6 @@ domWrite("contextId", contextId, hexToBase64(contextId));
               pc.setLocalDescription({ type: "answer", sdp: lines.join("\r\n") });
               
               for (const candidate of remoteCandidates) {
-                domWrite("adding candidate for ", remoteClientId, candidate);
                 pc.addIceCandidate({ candidate, sdpMLineIndex: 0 });
               }
             });
