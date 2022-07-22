@@ -60,7 +60,7 @@ const STATE_EXPIRATION_MS = 5 * 60 * 1000;
 // How long until expiration do we refresh
 const REFRESH_WINDOW_MS = 30000;
 
-const ROOM_ID = "room126";
+const ROOM_ID = "room127";
 const WORKER_URL = "https://signalling.minddrop.workers.dev"
 //const WORKER_URL = "http://localhost:8787"
 
@@ -71,6 +71,8 @@ const domWrite = (...args) => {
     document.body.appendChild(el);
   }, 1000);
 };
+
+domWrite("room: ", ROOM_ID)
 
 const hexToBase64 = (hex) => {
   const d = [];
