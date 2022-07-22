@@ -483,10 +483,12 @@ domWrite("contextId", contextId, hexToBase64(contextId));
 
               pc.setLocalDescription({ type: "answer", sdp: lines.join("\r\n") });
               
-              domWrite("Saving candidates", remoteCandidates.length);
+              domWrite("2Saving candidates", remoteCandidates.length);
 
               for (const candidate of remoteCandidates) {
-                pc.addIceCandidate({ candidate, sdpMLineIndex: 0 }, () => domWrite("SUCCESS"), (e) => domWrite("ERROR", e.toString()));
+                pc.addIceCandidate({ candidate, sdpMLineIndex: 0 }).catch(e => {
+                  domWrite("Failure during addIceCandidate(): " + e.name);
+                });
               }
             });
           }
