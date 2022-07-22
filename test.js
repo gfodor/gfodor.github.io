@@ -258,6 +258,10 @@ console.log("contextId", contextId, hexToBase64(contextId));
       }
     }
 
+    if (document.location.toString().indexOf("?symtest") >= 0) {
+      isSymmetric = true;
+    }
+
     if (isSymmetric) {
       // Need TURN
       iceServers = udpEnabled ? [
