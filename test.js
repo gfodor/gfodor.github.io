@@ -409,7 +409,7 @@ domWrite("contextId", contextId, hexToBase64(contextId));
             domWrite("C");
 
             // Special case if both behind sym NAT: peer A needs to send its relay candidates as well.
-            //if (isDualSymmetric) {
+            if (isDualSymmetric) {
               let pkg = [remoteClientBase64, localClientBase64, /* lfrag */null, /* lpwd */null, /* ldtls */null, /* remote ufrag */ null, /* remote Pwd */ null, []];
               const pkgCandidates = pkg[pkg.length - 1];
 
@@ -430,7 +430,7 @@ domWrite("contextId", contextId, hexToBase64(contextId));
                 if (!e.candidate.candidate.indexOf("relay") === -1) return;
                 pkgCandidates.push(e.candidate.candidate);
               };
-            //}
+            }
 
             domWrite("D");
             pc.oniceconnectionstatechange = () => {
@@ -581,7 +581,7 @@ domWrite("contextId", contextId, hexToBase64(contextId));
             });
           }
 
-          //if (isDualSymmetric) {
+          if (isDualSymmetric) {
             // Peer B will also receive relay candidates if both sides are symmetric.
             for (const [, remoteClientIdBase64, , , , , , remoteCandidates] of remotePackages) {
               const remoteClientId = base64ToHex(remoteClientBase64);
@@ -601,7 +601,7 @@ domWrite("contextId", contextId, hexToBase64(contextId));
                 dualSymmetricBPeersAdded.add(remoteClientId);
               }
             }
-          //}
+          }
         }
       }
     };
