@@ -525,15 +525,6 @@ domWrite("contextId", contextId, hexToBase64(contextId));
             let pkg = [remoteClientBase64, localClientBase64, /* lfrag */null, /* lpwd */null, /* ldtls */null, remoteUfrag, remotePwd, []];
             const pkgCandidates = pkg[pkg.length - 1];
 
-            for (let i = 0; i < remoteReflexiveIps.length; i++) {
-              domWrite("Adding reflexive ", remoteReflexiveIps[i]);
-
-              pc.addIceCandidate({ 
-                candidate: `a=candidate:0 1 udp ${i + 1} ${remoteReflexiveIps[i]} 30000 typ srflx`,
-                sdpMLineIndex: 0
-              });
-            }
-
             pc.onicecandidate = e => {
               // Push package onto the given package list, so it will be sent in next polling step.
               if (!e.candidate) {
@@ -589,6 +580,11 @@ domWrite("contextId", contextId, hexToBase64(contextId));
                     pkg[4] = hexToBase64(l.substring(22).replaceAll(":",""))
                     break;
                 }
+              }
+
+              for (let i = 0; i < remoteReflexiveIps.length; i++) {
+                domWrite("Adding reflexive ", remoteReflexiveIps[i]);
+                remoteSdp += `a=candidate:0 1 udp ${i + 1} ${remoteReflexiveIps[i]} 30000 typ srflx\r\n`;
               }
 
               pc.setRemoteDescription({ type: "answer", sdp: remoteSdp });
