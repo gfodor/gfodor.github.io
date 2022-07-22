@@ -361,7 +361,7 @@ domWrite("contextId", contextId, hexToBase64(contextId));
     const peers = new Map();
     const remotePeerRoles = new Map(); // true if offer, false if answer
     const remoteSdps = new Map();
-    const dualSymmetricBPeersAdded = new Set();
+    const secondarySignalingReceivedPeers = new Set();
 
     return (localJoinedAtTimestamp, localPeerData, localDtlsCert, localDtlsFingerprintBase64, localPackages, remotePeerDatas, remotePackages) => {
       const [localClientBase64, localSymmetric] = localPeerData;
@@ -384,11 +384,9 @@ domWrite("contextId", contextId, hexToBase64(contextId));
         const isPeerA = localSymmetric === remoteSymmetric ? localJoinedAtTimestamp > remoteJoinedAtTimestamp : localSymmetric;
         console.log("Checking for peer type", localSymmetric === remoteSymmetric, localSymmetric, remoteSymmetric, localJoinedAtTimestamp > remoteJoinedAtTimestamp)
 
-        // If both sides are symmetric:
-        //
-        // - Peer A will *also* push packages with candidates (relay)
-        // - Peer B should check for packages for itself
-        const isDualSymmetric = true; //localSymmetric && remoteSymmetric;
+        // If either side is symmetric, direct connection won't work if one side is at least
+        // port restricted (which can can't check) so we have to send candidates in a second message:
+        const sendSecondarySignallingMessage = localSymmetric || remoteSymmetric;
 
         // If both sides are symmetric, we need to use a TURN server for these peers.
         const iceServers = localSymmetric && remoteSymmetric ? (udpEnabled ? TURN_UDP_ICE : TURN_TCP_ICE) : STUN_ICE;
@@ -404,7 +402,7 @@ domWrite("contextId", contextId, hexToBase64(contextId));
             if (peers.has(remoteClientId)) continue;
 
             // I am peer A, I only care if packages have been published to me.
-            domWrite("I am peer A for ", remoteClientId,  " is dual: ", isDualSymmetric, " with candidates: ", JSON.stringify(remoteCandidates));
+            domWrite("I am peer A for ", remoteClientId,  " sending secondary: ", sendSecondarySignallingMessage, " with candidates: ", JSON.stringify(remoteCandidates));
 
             const pc = new RTCPeerConnection({ iceServers, certificates: [ localDtlsCert ] });
             domWrite("A");
@@ -414,7 +412,7 @@ domWrite("contextId", contextId, hexToBase64(contextId));
             domWrite("C");
 
             // Special case if both behind sym NAT: peer A needs to send its relay candidates as well.
-            if (isDualSymmetric) {
+            if (sendSecondarySignallingMessage) {
               let pkg = [remoteClientBase64, localClientBase64, /* lfrag */null, /* lpwd */null, /* ldtls */null, /* remote ufrag */ null, /* remote Pwd */ null, []];
               const pkgCandidates = pkg[pkg.length - 1];
 
@@ -422,7 +420,7 @@ domWrite("contextId", contextId, hexToBase64(contextId));
                 if (!e.candidate) {
                   // If any relay candidates were found, push it in the next step
                   if (pkgCandidates.length > 0) {
-                    domWrite("Dual case pushing from A", pkg);
+                    domWrite("double signal case pushing from A", pkg);
                     localPackages.push(pkg);
                   }
 
@@ -516,7 +514,7 @@ domWrite("contextId", contextId, hexToBase64(contextId));
             pc.createDataChannel("signal");
             peers.set(remoteClientId, pc);
 
-            domWrite("I am peer B for ", remoteClientId, " is dual: ", isDualSymmetric);
+            domWrite("I am peer B for ", remoteClientId, " sending second: ", sendSecondarySignallingMessage);
 
             const remoteUfrag = generateRandomString(12);
             const remotePwd = generateRandomString(32);
@@ -532,8 +530,8 @@ domWrite("contextId", contextId, hexToBase64(contextId));
 
               pc.addIceCandidate({ 
                 candidate: `a=candidate:0 1 udp ${i + 1} ${remoteReflexiveIps[i]} 30000 typ srflx`,
-                sdpMLineIndex: 0 }
-              );
+                sdpMLineIndex: 0
+              });
             }
 
             pc.onicecandidate = e => {
@@ -597,24 +595,24 @@ domWrite("contextId", contextId, hexToBase64(contextId));
             });
           }
 
-          if (isDualSymmetric) {
+          if (sendSecondarySignallingMessage) {
             // Peer B will also receive relay candidates if both sides are symmetric.
             for (const [, remoteClientIdBase64, , , , , , remoteCandidates] of remotePackages) {
               const remoteClientId = base64ToHex(remoteClientBase64);
 
               // If we already added the relay candidates from A, skip
-              if (dualSymmetricBPeersAdded.has(remoteClientId)) continue;
+              if (secondarySignalingReceivedPeers.has(remoteClientId)) continue;
 
               if (!peers.has(remoteClientId)) continue;
               const pc = peers.get(remoteClientId);
 
               if (remoteCandidates.length > 0) {
                 for (const candidate of remoteCandidates) {
-                  domWrite("dual case, adding to B", candidate);
+                  domWrite("double signal case, adding to B", candidate);
                   pc.addIceCandidate({ candidate, sdpMLineIndex: 0 });
                 }
 
-                dualSymmetricBPeersAdded.add(remoteClientId);
+                secondarySignalingReceivedPeers.add(remoteClientId);
               }
             }
           }
