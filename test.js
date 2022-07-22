@@ -242,6 +242,7 @@ domWrite("contextId", contextId, hexToBase64(contextId));
         }
 
         if (e.candidate.candidate) {
+          domWrite("STUN: ", e.candidate.candidate);
           candidates.push(parseCandidate(e.candidate.candidate));
         }
       };
