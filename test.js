@@ -372,10 +372,11 @@ domWrite("contextId", contextId, hexToBase64(contextId));
 
         //Peer A is:
         //  - if both not symmetric or both symmetric, whoever has the most recent data is peer A, since we want Peer B created faster,
-        //    and the KV store latency will be best with older data.
-        //  - if one is and one isn't, if this peer is the non-symmetric one, since the prflx candidates must go to the symmetric one (B)
+        //    and the KV store latency will be best with older data. if they're both symmetric, use TURN
+        //  - if one is and one isn't, the non symmetric one is the only one who has valid candidates, so the symmetric one is peer A
         
-        const isPeerA = localSymmetric === remoteSymmetric ? localJoinedAtTimestamp > remoteJoinedAtTimestamp : !localSymmetric;
+        const isPeerA = localSymmetric === remoteSymmetric ? localJoinedAtTimestamp > remoteJoinedAtTimestamp : localSymmetric;
+        console.log("Checking for peer type", localSymmetric === remoteSymmetric, localSymmetric, remoteSymmetric, localJoinedAtTimestamp > remoteJoinedAtTimestamp)
 
         // If both sides are symmetric:
         //
