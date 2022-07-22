@@ -531,7 +531,7 @@ domWrite("contextId", contextId, hexToBase64(contextId));
               domWrite("Adding reflexive ", remoteReflexiveIps[i]);
 
               pc.addIceCandidate({ 
-                `a=candidate:0 1 udp ${i + 1} ${remoteReflexiveIps[i]} 30000 typ srflx`,
+                candidate: `a=candidate:0 1 udp ${i + 1} ${remoteReflexiveIps[i]} 30000 typ srflx`,
                 sdpMLineIndex: 0 }
               );
             }
