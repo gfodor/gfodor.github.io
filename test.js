@@ -64,6 +64,14 @@ const ROOM_ID = "room126";
 //const WORKER_URL = "https://signalling.minddrop.workers.dev"
 const WORKER_URL = "http://localhost:8787"
 
+const domWrite = (...args) => {
+  const el = document.createElement("div");
+  el.innerText = args.join(" ");
+  setTimeout(() => {
+    document.body.appendChild(el);
+  }, 1000);
+};
+
 const hexToBase64 = (hex) => {
   const d = [];
 
@@ -171,8 +179,8 @@ if (!history.state?.contextId) {
 
 const contextId = history.state.contextId;
 
-console.log("clientId", clientId, hexToBase64(clientId));
-console.log("contextId", contextId, hexToBase64(contextId));
+domWrite("clientId", clientId, hexToBase64(clientId));
+domWrite("contextId", contextId, hexToBase64(contextId));
 
 (async function() {
   const getDbData = async () => {
@@ -308,10 +316,10 @@ console.log("contextId", contextId, hexToBase64(contextId));
 
   const dbData = await getDbData();
 
-  console.log("Performing ICE");
+  domWrite("Performing ICE");
   const t0 = performance.now();
   const [udpEnabled, isSymmetric, dtlsFingerprint] = await getNetworkSettings(dbData); 
-  console.log("Done in", Math.floor(performance.now() - t0), "ms symmetric: ", isSymmetric);
+  domWrite("Done in", Math.floor(performance.now() - t0), "ms symmetric: ", isSymmetric, " udp: ", udpEnabled);
 
   const createSdp = (isOffer, iceUFrag, icePwd, dtlsFingerprintBase64) => {
     const dtlsHex = base64ToHex(dtlsFingerprintBase64);
@@ -393,7 +401,7 @@ console.log("contextId", contextId, hexToBase64(contextId));
             if (peers.has(remoteClientId)) continue;
 
             // I am peer A, I only care if packages have been published to me.
-            console.log("I am peer A for ", remoteClientId);
+            domWrite("I am peer A for ", remoteClientId,  " is dual: ", isDualSymmetric);
 
             const pc = new RTCPeerConnection({ iceServers, certificates: [ localDtlsCert ] });
             pc.createDataChannel("signal");
@@ -487,7 +495,7 @@ console.log("contextId", contextId, hexToBase64(contextId));
             pc.createDataChannel("signal");
             peers.set(remoteClientId, pc);
 
-            console.log("I am peer B for ", remoteClientId);
+            domWrite("I am peer B for ", remoteClientId, " is dual: ", isDualSymmetric);
 
             const remoteUfrag = generateRandomString(12);
             const remotePwd = generateRandomString(32);
