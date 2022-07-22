@@ -270,24 +270,18 @@ domWrite("contextId", contextId, hexToBase64(contextId));
       if (c[0] !== CANDIDATE_TYPES.srflx) continue;
       udpEnabled = true;
 
-      let found = false;
-
       for (const d of candidates) {
         if (d[0] !== CANDIDATE_TYPES.srflx) continue;
         if (c === d) continue;
 
-        if (c[CANDIDATE_IDX.RELATED_PORT] &&
-            d[CANDIDATE_IDX.RELATED_PORT] &&
+        if (typeof(c[CANDIDATE_IDX.RELATED_PORT]) === "number" &&
+            typeof(d[CANDIDATE_IDX.RELATED_PORT]) === "number" &&
             c[CANDIDATE_IDX.RELATED_PORT] === d[CANDIDATE_IDX.RELATED_PORT] &&
             c[CANDIDATE_IDX.PORT] !== d[CANDIDATE_IDX.PORT]) { // check port and related port
           // Symmetric, continue
-          found = true;
+          isSymmetric = true;
+          break;
         }
-      }
-
-      if (found) {
-        isSymmetric = true;
-        break;
       }
     }
 
