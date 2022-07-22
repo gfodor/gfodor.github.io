@@ -285,8 +285,9 @@ domWrite("contextId", contextId, hexToBase64(contextId));
         }
       }
 
-      if (!found) {
-        isSymmetric = false;
+      if (found) {
+        isSymmetric = true;
+        break;
       }
     }
 
