@@ -462,6 +462,7 @@ domWrite("contextId", contextId, hexToBase64(contextId));
 
             pc.createAnswer().then(answer => {
               const lines = [];
+              domWrite("Got answer");
 
               for (const l of answer.sdp.split("\r\n")) {
                 if (l.startsWith("a=ice-ufrag")) {
@@ -475,6 +476,8 @@ domWrite("contextId", contextId, hexToBase64(contextId));
 
               pc.setLocalDescription({ type: "answer", sdp: lines.join("\r\n") });
               
+              domWrite("Saving candidates", remoteCandidates.length);
+
               for (const candidate of remoteCandidates) {
                 pc.addIceCandidate({ candidate, sdpMLineIndex: 0 }, () => domWrite("SUCCESS"), (e) => domWrite("ERROR", e.toString()));
               }
