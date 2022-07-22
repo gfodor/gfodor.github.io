@@ -504,8 +504,8 @@ domWrite("contextId", contextId, hexToBase64(contextId));
           //   - Set local description as-is
           //   - Generate ufrag + pwd
           //   - Generate remote SDP using the dtls fingerprint for A, and my generated ufrag + pwd
-          //   - Set remote description
           //   - Add an srflx candidate for each of the reflexive IPs for A (on a random port) to hole punch
+          //   - Set remote description
           //     so peer reflexive candidates for it show up.
           //   - Let trickle run, then once trickle finishes send a package for A to pick up = [my client id, my offer sdp, generated ufrag/pwd, dtls fingerprint, ice candidates]
           //   - keep the icecandidate listener active, and add the pfrlx candidates when they arrive (but don't send another package)
@@ -518,7 +518,7 @@ domWrite("contextId", contextId, hexToBase64(contextId));
 
             const remoteUfrag = generateRandomString(12);
             const remotePwd = generateRandomString(32);
-            const remoteSdp = createSdp(false, remoteUfrag, remotePwd, remoteDtlsFingerprintBase64);
+            let remoteSdp = createSdp(false, remoteUfrag, remotePwd, remoteDtlsFingerprintBase64);
             let trickleDone = false;
 
             // This is the 'package' sent to peer B that it needs to start ICE
