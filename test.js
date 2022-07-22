@@ -375,6 +375,7 @@ domWrite("contextId", contextId, hexToBase64(contextId));
         //    and the KV store latency will be best with older data. if they're both symmetric, use TURN
         //  - if one is and one isn't, the non symmetric one is the only one who has valid candidates, so the symmetric one is peer A
         
+        // TODO check for port restricted cone, in which case we should use TURN if the other side is symmetric, or if we are symmetric and the other side is restricted port cone
         const isPeerA = localSymmetric === remoteSymmetric ? localJoinedAtTimestamp > remoteJoinedAtTimestamp : localSymmetric;
         console.log("Checking for peer type", localSymmetric === remoteSymmetric, localSymmetric, remoteSymmetric, localJoinedAtTimestamp > remoteJoinedAtTimestamp)
 
@@ -408,7 +409,7 @@ domWrite("contextId", contextId, hexToBase64(contextId));
             domWrite("C");
 
             // Special case if both behind sym NAT: peer A needs to send its relay candidates as well.
-            if (isDualSymmetric) {
+            //if (isDualSymmetric) {
               let pkg = [remoteClientBase64, localClientBase64, /* lfrag */null, /* lpwd */null, /* ldtls */null, /* remote ufrag */ null, /* remote Pwd */ null, []];
               const pkgCandidates = pkg[pkg.length - 1];
 
@@ -427,7 +428,7 @@ domWrite("contextId", contextId, hexToBase64(contextId));
                 if (!e.candidate.candidate.indexOf("relay") === -1) return;
                 pkgCandidates.push(e.candidate.candidate);
               };
-            }
+            //}
 
             domWrite("D");
             pc.oniceconnectionstatechange = () => {
@@ -576,7 +577,7 @@ domWrite("contextId", contextId, hexToBase64(contextId));
             });
           }
 
-          if (isDualSymmetric) {
+          //if (isDualSymmetric) {
             // Peer B will also receive relay candidates if both sides are symmetric.
             for (const [, remoteClientIdBase64, , , , , , remoteCandidates] of remotePackages) {
               const remoteClientId = base64ToHex(remoteClientBase64);
@@ -596,7 +597,7 @@ domWrite("contextId", contextId, hexToBase64(contextId));
                 dualSymmetricBPeersAdded.add(remoteClientId);
               }
             }
-          }
+          //}
         }
       }
     };
