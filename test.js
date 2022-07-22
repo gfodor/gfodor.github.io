@@ -476,6 +476,7 @@ domWrite("contextId", contextId, hexToBase64(contextId));
               pc.setLocalDescription({ type: "answer", sdp: lines.join("\r\n") });
               
               for (const candidate of remoteCandidates) {
+                domWrite("adding candidate for ", remoteClientId, candidate);
                 pc.addIceCandidate({ candidate, sdpMLineIndex: 0 });
               }
             });
@@ -509,7 +510,7 @@ domWrite("contextId", contextId, hexToBase64(contextId));
             pc.onicecandidate = e => {
               // Push package onto the given package list, so it will be sent in next polling step.
               if (!e.candidate) {
-                console.log("Pushing candidates from B", pkg);
+                domWrite("Pushing candidates from B", pkg);
                 return localPackages.push(pkg);
               }
 
