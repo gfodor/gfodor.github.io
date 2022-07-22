@@ -26,6 +26,32 @@ const CANDIDATE_IDX = {
   TCP_TYPE: 6
 }
 
+const STUN_ICE = [
+  {urls: 'stun:stun1.l.google.com:19302'},
+  {urls: 'stun:stun2.l.google.com:19302'}
+];
+
+const TURN_UDP_ICE = [
+  {
+    urls: "turn:openrelay.metered.ca:80",
+    username: "openrelayproject",
+    credential: "openrelayproject",
+  },
+  {
+    urls: "turn:openrelay.metered.ca:443",
+    username: "openrelayproject",
+    credential: "openrelayproject",
+  }
+];
+
+const TURN_TCP_ICE = [
+  {
+    urls: "turn:openrelay.metered.ca:443?transport=tcp",
+    username: "openrelayproject",
+    credential: "openrelayproject",
+  }
+];
+
 const POLL_INTERVAL_MS = 5000;
 
 // How long until we expire entries in KV
@@ -34,9 +60,9 @@ const STATE_EXPIRATION_MS = 5 * 60 * 1000;
 // How long until expiration do we refresh
 const REFRESH_WINDOW_MS = 30000;
 
-const ROOM_ID = "room123";
-const WORKER_URL = "https://signalling.minddrop.workers.dev"
-//const WORKER_URL = "http://localhost:8787"
+const ROOM_ID = "room126";
+//const WORKER_URL = "https://signalling.minddrop.workers.dev"
+const WORKER_URL = "http://localhost:8787"
 
 const hexToBase64 = (hex) => {
   const d = [];
@@ -192,14 +218,11 @@ console.log("contextId", contextId, hexToBase64(contextId));
     return dbData;
   };
 
-  const getIceServersSymmetricAndDtlsFingerprint = async (dbData) => {
+  const getNetworkSettings = async (dbData) => {
     let dtlsFingerprint = null;
     const candidates = [];
 
-    let iceServers = [
-      {urls: 'stun:stun1.l.google.com:19302'},
-      {urls: 'stun:stun2.l.google.com:19302'}
-    ];
+    let iceServers = STUN_ICE;
 
     const pc = new RTCPeerConnection({ iceServers, certificates: [ dbData[SIGNAL_DB_KEYS.DTLS_CERT] ] });
     pc.createDataChannel("foo");
@@ -264,24 +287,7 @@ console.log("contextId", contextId, hexToBase64(contextId));
 
     if (isSymmetric) {
       // Need TURN
-      iceServers = udpEnabled ? [
-        {
-          urls: "turn:openrelay.metered.ca:80",
-          username: "openrelayproject",
-          credential: "openrelayproject",
-        },
-        {
-          urls: "turn:openrelay.metered.ca:443",
-          username: "openrelayproject",
-          credential: "openrelayproject",
-        }
-      ] : [
-        {
-          urls: "turn:openrelay.metered.ca:443?transport=tcp",
-          username: "openrelayproject",
-          credential: "openrelayproject",
-        }
-      ];
+      iceServers = udpEnabled ? TURN_UDP_ICE : TURN_TCP_ICE;
 
       const pc = new RTCPeerConnection({iceServers});
       pc.createDataChannel("foo");
@@ -297,15 +303,15 @@ console.log("contextId", contextId, hexToBase64(contextId));
       pc.close();
     }
 
-    return [iceServers, isSymmetric, dtlsFingerprint];
+    return [udpEnabled, isSymmetric, dtlsFingerprint];
   };
 
   const dbData = await getDbData();
 
   console.log("Performing ICE");
   const t0 = performance.now();
-  const [iceServers, isSymmetric, dtlsFingerprint] = await getIceServersSymmetricAndDtlsFingerprint(dbData); 
-  console.log("Done in", Math.floor(performance.now() - t0), "ms symmetric: ", isSymmetric, iceServers);
+  const [udpEnabled, isSymmetric, dtlsFingerprint] = await getNetworkSettings(dbData); 
+  console.log("Done in", Math.floor(performance.now() - t0), "ms symmetric: ", isSymmetric);
 
   const createSdp = (isOffer, iceUFrag, icePwd, dtlsFingerprintBase64) => {
     const dtlsHex = base64ToHex(dtlsFingerprintBase64);
@@ -348,27 +354,33 @@ console.log("contextId", contextId, hexToBase64(contextId));
     const remoteSdps = new Map();
     const dualSymmetricBPeersAdded = new Set();
 
-    return (localPeerData, localDtlsCert, localDtlsFingerprintBase64, localPackages, remotePeerDatas, remotePackages) => {
+    return (localJoinedAtTimestamp, localPeerData, localDtlsCert, localDtlsFingerprintBase64, localPackages, remotePeerDatas, remotePackages) => {
       const [localClientBase64, localSymmetric] = localPeerData;
       const localClientId = base64ToHex(localClientBase64);
 
-      console.log(remotePeerDatas.map(p => p[0]))
+      console.log("incoming peers", JSON.stringify(remotePeerDatas));
 
       for (const remotePeerData of remotePeerDatas) {
-        const [remoteClientBase64, remoteSymmetric, remoteDtlsFingerprintBase64] = remotePeerData;
+        const [remoteClientBase64, remoteSymmetric, remoteDtlsFingerprintBase64, remoteJoinedAtTimestamp] = remotePeerData;
         const remoteClientId = base64ToHex(remoteClientBase64);
 
+        console.log("local vs remote", localClientId, localJoinedAtTimestamp, remoteClientId, remoteJoinedAtTimestamp, localSymmetric === remoteSymmetric);
+
         //Peer A is:
-        //  - if both not symmetric or both symmetric, whoever has lowest client id
+        //  - if both not symmetric or both symmetric, whoever has the most recent data is peer A, since we want Peer B created faster,
+        //    and the KV store latency will be best with older data.
         //  - if one is and one isn't, if this peer is the non-symmetric one, since the prflx candidates must go to the symmetric one (B)
         
-        const isPeerA = localSymmetric === remoteSymmetric ? localClientId < remoteClientId : !localSymmetric;
+        const isPeerA = localSymmetric === remoteSymmetric ? localJoinedAtTimestamp > remoteJoinedAtTimestamp : !localSymmetric;
 
         // If both sides are symmetric:
         //
         // - Peer A will *also* push packages with candidates (relay)
         // - Peer B should check for packages for itself
         const isDualSymmetric = localSymmetric && remoteSymmetric;
+
+        // If both sides are symmetric, we need to use a TURN server for these peers.
+        const iceServers = localSymmetric && remoteSymmetric ? (udpEnabled ? TURN_UDP_ICE : TURN_TCP_ICE) : STUN_ICE;
 
         if (isPeerA) {
           //  - I create PC
@@ -377,11 +389,11 @@ console.log("contextId", contextId, hexToBase64(contextId));
           //  - Set remote description via the received sdp
           //  - Add the ice candidates
 
-          for (const [ localClientId, remoteClientId, remoteIceUFrag, remoteIcePwd, remoteDtlsFingerprintBase64, localIceUFrag, localIcePwd, remoteCandidates] of remotePackages) {
+          for (const [ , remoteClientIdBase64, remoteIceUFrag, remoteIcePwd, remoteDtlsFingerprintBase64, localIceUFrag, localIcePwd, remoteCandidates] of remotePackages) {
             if (peers.has(remoteClientId)) continue;
 
             // I am peer A, I only care if packages have been published to me.
-            console.log("I am peer A");
+            console.log("I am peer A for ", remoteClientId);
 
             const pc = new RTCPeerConnection({ iceServers, certificates: [ localDtlsCert ] });
             pc.createDataChannel("signal");
@@ -391,8 +403,6 @@ console.log("contextId", contextId, hexToBase64(contextId));
             if (isDualSymmetric) {
               let pkg = [remoteClientBase64, localClientBase64, /* lfrag */null, /* lpwd */null, /* ldtls */null, /* remote ufrag */ null, /* remote Pwd */ null, []];
               const pkgCandidates = pkg[pkg.length - 1];
-
-              console.log("Wiring up");
 
               pc.onicecandidate = e => {
                 if (!e.candidate) {
@@ -477,7 +487,7 @@ console.log("contextId", contextId, hexToBase64(contextId));
             pc.createDataChannel("signal");
             peers.set(remoteClientId, pc);
 
-            console.log("I am peer B, saved peer", remoteClientId);
+            console.log("I am peer B for ", remoteClientId);
 
             const remoteUfrag = generateRandomString(12);
             const remotePwd = generateRandomString(32);
@@ -549,7 +559,7 @@ console.log("contextId", contextId, hexToBase64(contextId));
 
           if (isDualSymmetric) {
             // Peer B will also receive relay candidates if both sides are symmetric.
-            for (const [ , remoteClientIdBase64, , , , , , remoteCandidates] of remotePackages) {
+            for (const [, remoteClientIdBase64, , , , , , remoteCandidates] of remotePackages) {
               const remoteClientId = base64ToHex(remoteClientBase64);
 
               // If we already added the relay candidates from A, skip
@@ -579,6 +589,7 @@ console.log("contextId", contextId, hexToBase64(contextId));
     let packages = [];
     let lastPackagesLength = null;
     let sentFirstPoll = false;
+    let joinedAtTimestamp = new Date().getTime();
 
     return async () => {
       if (isSending) return;
@@ -593,7 +604,8 @@ console.log("contextId", contextId, hexToBase64(contextId));
         const localPeerInfo =  [
           hexToBase64(clientId),
           isSymmetric,
-          localDtlsFingerprintBase64
+          localDtlsFingerprintBase64,
+          joinedAtTimestamp
         ];
 
         const payload = { r: ROOM_ID, k: hexToBase64(contextId) };
@@ -642,7 +654,7 @@ console.log("contextId", contextId, hexToBase64(contextId));
 
         sentFirstPoll = true;
 
-        handlePeerInfos(localPeerInfo, dbData[SIGNAL_DB_KEYS.DTLS_CERT], localDtlsFingerprintBase64, packages, responsePeerList, responsePackages);
+        handlePeerInfos(joinedAtTimestamp, localPeerInfo, dbData[SIGNAL_DB_KEYS.DTLS_CERT], localDtlsFingerprintBase64, packages, responsePeerList, responsePackages);
       } catch (e) {
         console.error(e);
       } finally {
