@@ -486,7 +486,9 @@ domWrite("contextId", contextId, hexToBase64(contextId));
               domWrite("2Saving candidates", remoteCandidates.length);
 
               for (const candidate of remoteCandidates) {
-                pc.addIceCandidate({ candidate, sdpMLineIndex: 0 }).catch(e => {
+                pc.addIceCandidate({ candidate, sdpMLineIndex: 0 }).then(e => {
+                  domWrite("Candidate written", e);
+                }).catch(e => {
                   domWrite("Failure during addIceCandidate(): " + e.name);
                 });
               }
