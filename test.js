@@ -305,7 +305,7 @@ console.log("contextId", contextId, hexToBase64(contextId));
   console.log("Performing ICE");
   const t0 = performance.now();
   const [iceServers, isSymmetric, dtlsFingerprint] = await getIceServersSymmetricAndDtlsFingerprint(dbData); 
-  console.log("Done in", Math.floor(performance.now() - t0), "ms symmetric: ", isSymmetric);
+  console.log("Done in", Math.floor(performance.now() - t0), "ms symmetric: ", isSymmetric, iceServers);
 
   const createSdp = (isOffer, iceUFrag, icePwd, dtlsFingerprintBase64) => {
     const dtlsHex = base64ToHex(dtlsFingerprintBase64);
