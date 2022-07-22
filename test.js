@@ -476,7 +476,7 @@ domWrite("contextId", contextId, hexToBase64(contextId));
               pc.setLocalDescription({ type: "answer", sdp: lines.join("\r\n") });
               
               for (const candidate of remoteCandidates) {
-                pc.addIceCandidate({ candidate, sdpMLineIndex: 0 });
+                pc.addIceCandidate({ candidate, sdpMLineIndex: 0 }, () => domWrite("SUCCESS"), (e) => domWrite("ERROR", e.toString()));
               }
             });
           }
