@@ -364,9 +364,6 @@ domWrite("contextId", contextId, hexToBase64(contextId));
         const isPeerA = localSymmetric === remoteSymmetric ? localJoinedAtTimestamp > remoteJoinedAtTimestamp : localSymmetric;
         console.log("Checking for peer type", localSymmetric === remoteSymmetric, localSymmetric, remoteSymmetric, localJoinedAtTimestamp > remoteJoinedAtTimestamp)
 
-        // If we're not connected yet, might need a two way hole-punch.
-        let sendSecondarySignallingMessage = pc.iceConnectionState !== "connected";
-
         // If both sides are symmetric, we need to use a TURN server for these peers.
         const iceServers = localSymmetric && remoteSymmetric ? (udpEnabled ? TURN_UDP_ICE : TURN_TCP_ICE) : STUN_ICE;
 
@@ -387,29 +384,30 @@ domWrite("contextId", contextId, hexToBase64(contextId));
             pc.createDataChannel("signal");
             peers.set(remoteClientId, pc);
 
-            // Special case if both behind sym NAT: peer A needs to send its relay candidates as well.
-            if (sendSecondarySignallingMessage) {
-              let pkg = [remoteClientBase64, localClientBase64, /* lfrag */null, /* lpwd */null, /* ldtls */null, /* remote ufrag */ null, /* remote Pwd */ null, []];
-              const pkgCandidates = pkg[pkg.length - 1];
+            // Special case if both behind sym NAT or other hole punching isn't working: peer A needs to send its candidates as well.
+            let pkg = [remoteClientBase64, localClientBase64, /* lfrag */null, /* lpwd */null, /* ldtls */null, /* remote ufrag */ null, /* remote Pwd */ null, []];
+            const pkgCandidates = pkg[pkg.length - 1];
 
-              pc.onicecandidate = e => {
-                if (!e.candidate) {
-                  // If any relay candidates were found, push it in the next step
-                  if (pkgCandidates.length > 0) {
-                    domWrite("double signal case pushing from A", pkg);
-                    localPackages.push(pkg);
-                  }
-
-                  return;
+            pc.onicecandidate = e => {
+              if (!e.candidate) {
+                if (pkgCandidates.length > 0) {
+                  // If hole punch hasn't worked after one second, send these candidates back to B to help it punch through.
+                  setTimeout(() => {
+                    if (pc.iceConnectionState !== "connected") {
+                      domWrite("Peer A sending additional candidates to try to save connection.");
+                      localPackages.push(pkg);
+                    }
+                  }, 1000);
                 }
 
-                pc.addIceCandidate(e.candidate);
+                return;
+              }
 
-                if (!e.candidate.candidate) return;
-                if (!e.candidate.candidate.indexOf("relay") === -1) return;
-                pkgCandidates.push(e.candidate.candidate);
-              };
-            }
+              pc.addIceCandidate(e.candidate);
+
+              if (!e.candidate.candidate) return;
+              pkgCandidates.push(e.candidate.candidate);
+            };
 
             pc.oniceconnectionstatechange = () => {
               const iceConnectionState = pc.iceConnectionState;
@@ -557,7 +555,7 @@ domWrite("contextId", contextId, hexToBase64(contextId));
           for (const [, remoteClientIdBase64, , , , , , remoteCandidates] of remotePackages) {
             const remoteClientId = base64ToHex(remoteClientBase64);
 
-            // If we already added the relay candidates from A, skip
+            // If we already added the candidates from A, skip
             if (secondarySignalingReceivedPeers.has(remoteClientId)) continue;
 
             if (!peers.has(remoteClientId)) continue;
