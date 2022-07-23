@@ -60,7 +60,7 @@ const STATE_EXPIRATION_MS = 5 * 60 * 1000;
 // How long until expiration do we refresh
 const REFRESH_WINDOW_MS = 30000;
 
-const ROOM_ID = "room129";
+const ROOM_ID = "room130";
 const WORKER_URL = "https://signalling.minddrop.workers.dev"
 //const WORKER_URL = "http://localhost:8787"
 
@@ -292,24 +292,6 @@ domWrite("contextId", contextId, hexToBase64(contextId));
 
     if (document.location.toString().indexOf("?symtest") >= 0) {
       isSymmetric = true;
-    }
-
-    if (isSymmetric) {
-      // Need TURN
-      iceServers = udpEnabled ? TURN_UDP_ICE : TURN_TCP_ICE;
-
-      const pc = new RTCPeerConnection({iceServers});
-      pc.createDataChannel("foo");
-
-      const p = new Promise(res => {
-        pc.onicecandidate = e => {
-          if (!e.candidate) return res();
-        };
-      });
-
-      pc.createOffer().then(offer => pc.setLocalDescription(offer))
-      await p;
-      pc.close();
     }
 
     return [udpEnabled, isSymmetric, reflexiveIps, dtlsFingerprint];
@@ -577,25 +559,23 @@ domWrite("contextId", contextId, hexToBase64(contextId));
             });
           }
 
-          if (sendSecondarySignallingMessage) {
-            // Peer B will also receive relay candidates if both sides are symmetric.
-            for (const [, remoteClientIdBase64, , , , , , remoteCandidates] of remotePackages) {
-              const remoteClientId = base64ToHex(remoteClientBase64);
+          // Peer B will also receive candidates if both sides are symmetric.
+          for (const [, remoteClientIdBase64, , , , , , remoteCandidates] of remotePackages) {
+            const remoteClientId = base64ToHex(remoteClientBase64);
 
-              // If we already added the relay candidates from A, skip
-              if (secondarySignalingReceivedPeers.has(remoteClientId)) continue;
+            // If we already added the relay candidates from A, skip
+            if (secondarySignalingReceivedPeers.has(remoteClientId)) continue;
 
-              if (!peers.has(remoteClientId)) continue;
-              const pc = peers.get(remoteClientId);
+            if (!peers.has(remoteClientId)) continue;
+            const pc = peers.get(remoteClientId);
 
-              if (remoteCandidates.length > 0) {
-                for (const candidate of remoteCandidates) {
-                  domWrite("double signal case, adding to B", candidate);
-                  pc.addIceCandidate({ candidate, sdpMLineIndex: 0 });
-                }
-
-                secondarySignalingReceivedPeers.add(remoteClientId);
+            if (remoteCandidates.length > 0) {
+              for (const candidate of remoteCandidates) {
+                domWrite("double signal case, adding to B", candidate);
+                pc.addIceCandidate({ candidate, sdpMLineIndex: 0 });
               }
+
+              secondarySignalingReceivedPeers.add(remoteClientId);
             }
           }
         }
