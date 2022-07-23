@@ -392,12 +392,10 @@ domWrite("contextId", contextId, hexToBase64(contextId));
               if (!e.candidate) {
                 if (pkgCandidates.length > 0) {
                   // If hole punch hasn't worked after one second, send these candidates back to B to help it punch through.
-                  setTimeout(() => {
-                    if (pc.iceConnectionState !== "connected") {
-                      domWrite("Peer A sending additional candidates to try to save connection.");
-                      localPackages.push(pkg);
-                    }
-                  }, 1000);
+                  if (pc.iceConnectionState !== "connected") {
+                    domWrite("Peer A sending additional candidates to try to save connection.");
+                    localPackages.push(pkg);
+                  }
                 }
 
                 return;
