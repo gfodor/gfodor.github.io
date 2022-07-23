@@ -386,7 +386,7 @@ domWrite("contextId", contextId, hexToBase64(contextId));
 
         // If either side is symmetric, direct connection won't work if one side is at least
         // port restricted (which can can't check) so we have to send candidates in a second message:
-        const sendSecondarySignallingMessage = localSymmetric && remoteSymmetric;
+        const sendSecondarySignallingMessage = localSymmetric || remoteSymmetric;
 
         // If both sides are symmetric, we need to use a TURN server for these peers.
         const iceServers = localSymmetric && remoteSymmetric ? (udpEnabled ? TURN_UDP_ICE : TURN_TCP_ICE) : STUN_ICE;
