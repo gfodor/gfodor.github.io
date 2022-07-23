@@ -343,28 +343,25 @@ domWrite("contextId", contextId, hexToBase64(contextId));
     const peers = new Map();
     const remotePeerRoles = new Map(); // true if offer, false if answer
     const remoteSdps = new Map();
-    const secondarySignalingReceivedPeers = new Set();
+    const packageReceivedFromPeers = new Set();
 
     return (localJoinedAtTimestamp, localPeerData, localDtlsCert, localDtlsFingerprintBase64, localPackages, remotePeerDatas, remotePackages) => {
       const [localClientBase64, localSymmetric] = localPeerData;
       const localClientId = base64ToHex(localClientBase64);
-
-      console.log("incoming peers", JSON.stringify(remotePeerDatas));
+      const now = new Date().getTime();
 
       for (const remotePeerData of remotePeerDatas) {
         const [remoteClientBase64, remoteSymmetric, remoteDtlsFingerprintBase64, remoteJoinedAtTimestamp, remoteReflexiveIps] = remotePeerData;
         const remoteClientId = base64ToHex(remoteClientBase64);
-
-        console.log("local vs remote", localClientId, localJoinedAtTimestamp, remoteClientId, remoteJoinedAtTimestamp, localSymmetric === remoteSymmetric);
 
         //Peer A is:
         //  - if both not symmetric or both symmetric, whoever has the most recent data is peer A, since we want Peer B created faster,
         //    and latency will be lowest with older data.
         //  - if one is and one isn't, the non symmetric one is the only one who has valid candidates, so the symmetric one is peer A
         const isPeerA = localSymmetric === remoteSymmetric ? localJoinedAtTimestamp > remoteJoinedAtTimestamp : localSymmetric;
-        console.log("Checking for peer type", localSymmetric === remoteSymmetric, localSymmetric, remoteSymmetric, localJoinedAtTimestamp > remoteJoinedAtTimestamp)
 
         // If either side is symmetric, use TURN and hope we avoid connecting via relays
+        // We can't just use TURN if both sides are symmetric because one side might be port restricted and hence won't connect without a relay.
         const iceServers = localSymmetric || remoteSymmetric ? (udpEnabled ? TURN_UDP_ICE : TURN_TCP_ICE) : STUN_ICE;
 
         if (isPeerA) {
@@ -374,8 +371,12 @@ domWrite("contextId", contextId, hexToBase64(contextId));
           //  - Set remote description via the received sdp
           //  - Add the ice candidates
 
-          for (const [ , remoteClientIdBase64, remoteIceUFrag, remoteIcePwd, remoteDtlsFingerprintBase64, localIceUFrag, localIcePwd, remoteCandidates] of remotePackages) {
+          for (const [ , remoteClientIdBase64, remoteIceUFrag, remoteIcePwd, remoteDtlsFingerprintBase64, localIceUFrag, localIcePwd, sentAt, remoteCandidates] of remotePackages) {
             if (peers.has(remoteClientId)) continue;
+
+            // If we already added the candidates from B, skip. This check is not strictly necessary given the peer will exist.
+            if (packageReceivedFromPeers.has(remoteClientId)) continue;
+            packageReceivedFromPeers.add(remoteClientId);
 
             // I am peer A, I only care if packages have been published to me.
             domWrite("I am peer A for ", remoteClientId,  " with candidates: ", JSON.stringify(remoteCandidates));
@@ -385,7 +386,7 @@ domWrite("contextId", contextId, hexToBase64(contextId));
             peers.set(remoteClientId, pc);
 
             // Special case if both behind sym NAT or other hole punching isn't working: peer A needs to send its candidates as well.
-            let pkg = [remoteClientBase64, localClientBase64, /* lfrag */null, /* lpwd */null, /* ldtls */null, /* remote ufrag */ null, /* remote Pwd */ null, []];
+            let pkg = [remoteClientBase64, localClientBase64, /* lfrag */null, /* lpwd */null, /* ldtls */null, /* remote ufrag */ null, /* remote Pwd */ null, now, []];
             const pkgCandidates = pkg[pkg.length - 1];
 
             pc.onicecandidate = e => {
@@ -483,7 +484,7 @@ domWrite("contextId", contextId, hexToBase64(contextId));
             let trickleDone = false;
 
             // This is the 'package' sent to peer B that it needs to start ICE
-            let pkg = [remoteClientBase64, localClientBase64, /* lfrag */null, /* lpwd */null, /* ldtls */null, remoteUfrag, remotePwd, []];
+            let pkg = [remoteClientBase64, localClientBase64, /* lfrag */null, /* lpwd */null, /* ldtls */null, remoteUfrag, remotePwd, now, []];
             const pkgCandidates = pkg[pkg.length - 1];
 
             pc.onicecandidate = e => {
@@ -541,7 +542,6 @@ domWrite("contextId", contextId, hexToBase64(contextId));
               }
 
               for (let i = 0; i < remoteReflexiveIps.length; i++) {
-                domWrite("Adding reflexive ", remoteReflexiveIps[i]);
                 remoteSdp += `a=candidate:0 1 udp ${i + 1} ${remoteReflexiveIps[i]} 30000 typ srflx\r\n`;
               }
 
@@ -549,23 +549,22 @@ domWrite("contextId", contextId, hexToBase64(contextId));
             });
           }
 
-          // Peer B will also receive candidates if both sides are symmetric.
-          for (const [, remoteClientIdBase64, , , , , , remoteCandidates] of remotePackages) {
+          // Peer B will also receive candidates in the case where hole punch fails.
+          for (const [, remoteClientIdBase64, , , , , , , remoteCandidates] of remotePackages) {
             const remoteClientId = base64ToHex(remoteClientBase64);
 
             // If we already added the candidates from A, skip
-            if (secondarySignalingReceivedPeers.has(remoteClientId)) continue;
-
+            if (packageReceivedFromPeers.has(remoteClientId)) continue;
             if (!peers.has(remoteClientId)) continue;
+
             const pc = peers.get(remoteClientId);
 
             if (remoteCandidates.length > 0) {
               for (const candidate of remoteCandidates) {
-                domWrite("double signal case, adding to B", candidate);
                 pc.addIceCandidate({ candidate, sdpMLineIndex: 0 });
               }
 
-              secondarySignalingReceivedPeers.add(remoteClientId);
+              packageReceivedFromPeers.add(remoteClientId);
             }
           }
         }
@@ -603,14 +602,24 @@ domWrite("contextId", contextId, hexToBase64(contextId));
         const payload = { r: ROOM_ID, k: hexToBase64(contextId) };
         const expired = dataTimestamp === null || (now - dataTimestamp) >= STATE_EXPIRATION_MS - REFRESH_WINDOW_MS;
         const packagesChanged = lastPackagesLength !== packages.length;
-        lastPackagesLength = packages.length;
 
         if (expired || packagesChanged) {
           // This will force a write
           dataTimestamp = now;
           
-          // TODO compact packages here to reduce bandwidth
+          // Compact packages, expire any of them sent more than a minute ago. (ICE will timeout by then, even if KV latency fails us.)
+          for (let i = 0; i < packages.length; i++) {
+            const sentAt = packages[i][packages[i].length - 2];
+
+            if (now - sentAt > 60 * 1000) {
+              packages[i] = null;
+            }
+          }
+
+          packages = packages.filter(x => !!x);
         }
+
+        lastPackagesLength = packages.length;
 
         // The first poll should just be a read, no writes, to build up packages before we do a write
         // to reduce worker KV I/O. So don't include the data + packages on the first request.
