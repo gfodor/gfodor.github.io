@@ -386,7 +386,7 @@ domWrite("contextId", contextId, hexToBase64(contextId));
 
         // If either side is symmetric, direct connection won't work if one side is at least
         // port restricted (which can can't check) so we have to send candidates in a second message:
-        const sendSecondarySignallingMessage = localSymmetric || remoteSymmetric;
+        const sendSecondarySignallingMessage = localSymmetric && remoteSymmetric;
 
         // If both sides are symmetric, we need to use a TURN server for these peers.
         const iceServers = localSymmetric && remoteSymmetric ? (udpEnabled ? TURN_UDP_ICE : TURN_TCP_ICE) : STUN_ICE;
@@ -405,11 +405,8 @@ domWrite("contextId", contextId, hexToBase64(contextId));
             domWrite("I am peer A for ", remoteClientId,  " sending secondary: ", sendSecondarySignallingMessage, " with candidates: ", JSON.stringify(remoteCandidates));
 
             const pc = new RTCPeerConnection({ iceServers, certificates: [ localDtlsCert ] });
-            domWrite("A");
             pc.createDataChannel("signal");
-            domWrite("B");
             peers.set(remoteClientId, pc);
-            domWrite("C");
 
             // Special case if both behind sym NAT: peer A needs to send its relay candidates as well.
             if (sendSecondarySignallingMessage) {
@@ -435,7 +432,6 @@ domWrite("contextId", contextId, hexToBase64(contextId));
               };
             }
 
-            domWrite("D");
             pc.oniceconnectionstatechange = () => {
               const iceConnectionState = pc.iceConnectionState;
               const iceGatheringState = pc.iceGatheringState;
@@ -463,16 +459,12 @@ domWrite("contextId", contextId, hexToBase64(contextId));
               console.log("signalingstatechange", signalingState);
             }
 
-            domWrite("E");
             const remoteSdp = createSdp(true, remoteIceUFrag, remoteIcePwd, remoteDtlsFingerprintBase64);
-            domWrite("F");
 
             pc.setRemoteDescription({ type: "offer", sdp: remoteSdp });
 
-            domWrite("G");
             pc.createAnswer().then(answer => {
               const lines = [];
-              domWrite("Got answer");
 
               for (const l of answer.sdp.split("\r\n")) {
                 if (l.startsWith("a=ice-ufrag")) {
@@ -486,14 +478,8 @@ domWrite("contextId", contextId, hexToBase64(contextId));
 
               pc.setLocalDescription({ type: "answer", sdp: lines.join("\r\n") });
               
-              domWrite("2Saving candidates", remoteCandidates.length);
-
               for (const candidate of remoteCandidates) {
-                pc.addIceCandidate({ candidate, sdpMLineIndex: 0 }).then(e => {
-                  domWrite("Candidate written", e);
-                }).catch(e => {
-                  domWrite("Failure during addIceCandidate(): " + e.name);
-                });
+                pc.addIceCandidate({ candidate, sdpMLineIndex: 0 });
               }
             });
           }
@@ -527,10 +513,7 @@ domWrite("contextId", contextId, hexToBase64(contextId));
 
             pc.onicecandidate = e => {
               // Push package onto the given package list, so it will be sent in next polling step.
-              if (!e.candidate) {
-                domWrite("Pushing candidates from B", pkg);
-                return localPackages.push(pkg);
-              }
+              if (!e.candidate) return localPackages.push(pkg);
 
               pc.addIceCandidate(e.candidate);
 
