@@ -364,8 +364,8 @@ domWrite("contextId", contextId, hexToBase64(contextId));
         const isPeerA = localSymmetric === remoteSymmetric ? localJoinedAtTimestamp > remoteJoinedAtTimestamp : localSymmetric;
         console.log("Checking for peer type", localSymmetric === remoteSymmetric, localSymmetric, remoteSymmetric, localJoinedAtTimestamp > remoteJoinedAtTimestamp)
 
-        // If both sides are symmetric, we need to use a TURN server for these peers.
-        const iceServers = localSymmetric && remoteSymmetric ? (udpEnabled ? TURN_UDP_ICE : TURN_TCP_ICE) : STUN_ICE;
+        // If either side is symmetric, use TURN and hope we avoid connecting via relays
+        const iceServers = localSymmetric || remoteSymmetric ? (udpEnabled ? TURN_UDP_ICE : TURN_TCP_ICE) : STUN_ICE;
 
         if (isPeerA) {
           //  - I create PC
