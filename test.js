@@ -31,7 +31,7 @@ const STUN_ICE = [
   {urls: 'stun:global.stun.twilio.com:3478'}
 ];
 
-const TURN_UDP_ICE = [
+const TURN_ICE = [
   {
     urls: "turn:openrelay.metered.ca:80",
     username: "openrelayproject",
@@ -41,10 +41,7 @@ const TURN_UDP_ICE = [
     urls: "turn:openrelay.metered.ca:443",
     username: "openrelayproject",
     credential: "openrelayproject",
-  }
-];
-
-const TURN_TCP_ICE = [
+  },
   {
     urls: "turn:openrelay.metered.ca:443?transport=tcp",
     username: "openrelayproject",
@@ -294,24 +291,6 @@ domWrite("contextId", contextId, hexToBase64(contextId));
       isSymmetric = true;
     }
 
-    if (isSymmetric) {
-      // Need TURN
-      iceServers = udpEnabled ? TURN_UDP_ICE : TURN_TCP_ICE;
-
-      const pc = new RTCPeerConnection({iceServers});
-      pc.createDataChannel("foo");
-
-      const p = new Promise(res => {
-        pc.onicecandidate = e => {
-          if (!e.candidate) return res();
-        };
-      });
-
-      pc.createOffer().then(offer => pc.setLocalDescription(offer))
-      await p;
-      pc.close();
-    }
-
     return [udpEnabled, isSymmetric, reflexiveIps, dtlsFingerprint];
   };
 
@@ -385,11 +364,11 @@ domWrite("contextId", contextId, hexToBase64(contextId));
         console.log("Checking for peer type", localSymmetric === remoteSymmetric, localSymmetric, remoteSymmetric, localJoinedAtTimestamp > remoteJoinedAtTimestamp)
 
         // If either side is symmetric, direct connection won't work if one side is at least
-        // port restricted (which can can't check) so we have to send candidates in a second message:
-        const sendSecondarySignallingMessage = localSymmetric && remoteSymmetric;
+        // port restricted (which can can't check :P) so we have to send candidates in a second message just in case.
+        const sendSecondarySignallingMessage = localSymmetric || remoteSymmetric;
 
         // If both sides are symmetric, we need to use a TURN server for these peers.
-        const iceServers = localSymmetric && remoteSymmetric ? (udpEnabled ? TURN_UDP_ICE : TURN_TCP_ICE) : STUN_ICE;
+        const iceServers = (localSymmetric && remoteSymmetric) || !udpEnabled ? TURN_ICE : STUN_ICE;
 
         if (isPeerA) {
           //  - I create PC
@@ -408,14 +387,13 @@ domWrite("contextId", contextId, hexToBase64(contextId));
             pc.createDataChannel("signal");
             peers.set(remoteClientId, pc);
 
-            // Special case if both behind sym NAT: peer A needs to send its relay candidates as well.
             if (sendSecondarySignallingMessage) {
               let pkg = [remoteClientBase64, localClientBase64, /* lfrag */null, /* lpwd */null, /* ldtls */null, /* remote ufrag */ null, /* remote Pwd */ null, []];
               const pkgCandidates = pkg[pkg.length - 1];
 
               pc.onicecandidate = e => {
                 if (!e.candidate) {
-                  // If any relay candidates were found, push it in the next step
+                  // If any candidates were found, push it in the next step
                   if (pkgCandidates.length > 0) {
                     domWrite("double signal case pushing from A", pkg);
                     localPackages.push(pkg);
@@ -427,7 +405,6 @@ domWrite("contextId", contextId, hexToBase64(contextId));
                 pc.addIceCandidate(e.candidate);
 
                 if (!e.candidate.candidate) return;
-                if (!e.candidate.candidate.indexOf("relay") === -1) return;
                 pkgCandidates.push(e.candidate.candidate);
               };
             }
@@ -575,11 +552,10 @@ domWrite("contextId", contextId, hexToBase64(contextId));
           }
 
           if (sendSecondarySignallingMessage) {
-            // Peer B will also receive relay candidates if both sides are symmetric.
+            // Peer B will also receive candidates if one side is symmetric, in case both are or one is port restricted.
             for (const [, remoteClientIdBase64, , , , , , remoteCandidates] of remotePackages) {
               const remoteClientId = base64ToHex(remoteClientBase64);
 
-              // If we already added the relay candidates from A, skip
               if (secondarySignalingReceivedPeers.has(remoteClientId)) continue;
 
               if (!peers.has(remoteClientId)) continue;
