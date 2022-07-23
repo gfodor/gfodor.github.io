@@ -378,7 +378,7 @@ domWrite("contextId", contextId, hexToBase64(contextId));
             if (peers.has(remoteClientId)) continue;
 
             // I am peer A, I only care if packages have been published to me.
-            domWrite("I am peer A for ", remoteClientId,  " sending secondary: ", sendSecondarySignallingMessage, " with candidates: ", JSON.stringify(remoteCandidates));
+            domWrite("I am peer A for ", remoteClientId,  " with candidates: ", JSON.stringify(remoteCandidates));
 
             const pc = new RTCPeerConnection({ iceServers, certificates: [ localDtlsCert ] });
             pc.createDataChannel("signal");
@@ -477,7 +477,7 @@ domWrite("contextId", contextId, hexToBase64(contextId));
             pc.createDataChannel("signal");
             peers.set(remoteClientId, pc);
 
-            domWrite("I am peer B for ", remoteClientId, " sending second: ", sendSecondarySignallingMessage);
+            domWrite("I am peer B for ", remoteClientId);
 
             const remoteUfrag = generateRandomString(12);
             const remotePwd = generateRandomString(32);
