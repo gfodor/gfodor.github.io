@@ -60,7 +60,7 @@ const STATE_EXPIRATION_MS = 5 * 60 * 1000;
 // How long until expiration do we refresh
 const REFRESH_WINDOW_MS = 30000;
 
-const ROOM_ID = "room130";
+const ROOM_ID = "room132";
 const WORKER_URL = "https://signalling.minddrop.workers.dev"
 //const WORKER_URL = "http://localhost:8787"
 
@@ -580,15 +580,16 @@ domWrite("contextId", contextId, hexToBase64(contextId));
     let lastPackagesLength = null;
     let sentFirstPoll = false;
     let joinedAtTimestamp = new Date().getTime();
+    let nextStepTime = -1;
 
     return async () => {
-      if (isSending) return;
+      const now = new Date().getTime();
+      if (nextStepTime > now) return;
 
+      if (isSending) return;
       isSending = true;
 
       try {
-        const now = new Date().getTime();
-
         const localDtlsFingerprintBase64 = hexToBase64(dtlsFingerprint.replaceAll(":", ""));
 
         const localPeerInfo =  [
@@ -645,9 +646,15 @@ domWrite("contextId", contextId, hexToBase64(contextId));
 
         sentFirstPoll = true;
 
+        const hasPeers = responsePeerList.length > 0;
+
+        // Rate limit requests when room is empty.
+        nextStepTime = now + (hasPeers ? 2000 : 10000);
+
         handlePeerInfos(joinedAtTimestamp, localPeerInfo, dbData[SIGNAL_DB_KEYS.DTLS_CERT], localDtlsFingerprintBase64, packages, responsePeerList, responsePackages);
       } catch (e) {
         console.error(e);
+        nextStepTime = now + 1000;
       } finally {
         isSending = false;
       }
@@ -656,5 +663,5 @@ domWrite("contextId", contextId, hexToBase64(contextId));
 
   step();
 
-  setInterval(step, 1000);
+  setInterval(step, 500);
 })();
