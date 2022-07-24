@@ -756,7 +756,7 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
         if (now < stopFastPollingAt) {
           nextStepTime = now + 750;
         } else {
-          nextStepTime = now + hasPeers ? 2000 : 10000;
+          nextStepTime = now + hasPeers ? 5000 : 10000;
         }
 
       } catch (e) {
