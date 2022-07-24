@@ -513,10 +513,15 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
               }
 
               pc.setLocalDescription({ type: "answer", sdp: lines.join("\r\n") });
-              typeEl.innerText = "A:" + remoteCandidates.length;
               
-              for (const candidate of remoteCandidates) {
-                pc.addIceCandidate({ candidate, sdpMLineIndex: 0 });
+              if (pc.iceConnectionState !== "connected") {
+                typeEl.innerText = "A:" + remoteCandidates.length;
+
+                for (const candidate of remoteCandidates) {
+                  pc.addIceCandidate({ candidate, sdpMLineIndex: 0 });
+                }
+              } else {
+                typeEl.innerText = "A:*";
               }
             });
           }
@@ -644,10 +649,15 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
             const pc = peers.get(remoteClientId);
 
             if (pc.remoteDescription && remoteCandidates.length > 0) {
-              typeEl.innerText = "B:" + remoteCandidates.length;
 
-              for (const candidate of remoteCandidates) {
-                pc.addIceCandidate({ candidate, sdpMLineIndex: 0 });
+              if (pc.iceConnectionState !== "connected") {
+                typeEl.innerText = "B:" + remoteCandidates.length;
+
+                for (const candidate of remoteCandidates) {
+                  pc.addIceCandidate({ candidate, sdpMLineIndex: 0 });
+                }
+              } else {
+                typeEl.innerText = "B*" + remoteCandidates.length;
               }
 
               packageReceivedFromPeers.add(remoteClientId);
