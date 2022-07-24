@@ -60,7 +60,7 @@ const STATE_EXPIRATION_MS = 5 * 60 * 1000;
 // How long until expiration do we refresh
 const REFRESH_WINDOW_MS = 30000;
 
-const ROOM_ID = "room132";
+const ROOM_ID = "room134";
 const WORKER_URL = "https://signalling.minddrop.workers.dev"
 //const WORKER_URL = "http://localhost:8787"
 
@@ -79,7 +79,7 @@ const initPeerUi = (clientId) => {
   peerEl.style = "display: flex;"
 
   const name = document.createElement("div");
-  name.innerText = clientId.substring(0, 5) + " " + hexToBase64(clientId).substring(0, 5);
+  name.innerText = clientId.substring(0, 5);
 
   peerEl.appendChild(name);
 
@@ -213,7 +213,7 @@ if (!history.state?.contextId) {
 const contextId = history.state.contextId;
 
 setTimeout(() => document.getElementById("client").innerText = clientId.substring(0, 5), 500);
-
+ 
 (async function() {
   const getDbData = async () => {
     const dbreq = indexedDB.open("signal-db", 1);
@@ -376,13 +376,11 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
     const packageReceivedFromPeers = new Set();
 
     return (localJoinedAtTimestamp, localPeerData, localDtlsCert, localDtlsFingerprintBase64, localPackages, remotePeerDatas, remotePackages) => {
-      const [localClientBase64, localSymmetric] = localPeerData;
-      const localClientId = base64ToHex(localClientBase64);
+      const [localClientId, localSymmetric] = localPeerData;
       const now = new Date().getTime();
 
       for (const remotePeerData of remotePeerDatas) {
-        const [remoteClientBase64, remoteSymmetric, remoteDtlsFingerprintBase64, remoteJoinedAtTimestamp, remoteReflexiveIps] = remotePeerData;
-        const remoteClientId = base64ToHex(remoteClientBase64);
+        const [remoteClientId, remoteSymmetric, remoteDtlsFingerprintBase64, remoteJoinedAtTimestamp, remoteReflexiveIps] = remotePeerData;
 
         initPeerUi(remoteClientId);
 
@@ -409,7 +407,7 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
           //  - Set remote description via the received sdp
           //  - Add the ice candidates
 
-          for (const [ , remoteClientIdBase64, remoteIceUFrag, remoteIcePwd, remoteDtlsFingerprintBase64, localIceUFrag, localIcePwd, sentAt, remoteCandidates] of remotePackages) {
+          for (const [localClientId, remoteClientId, remoteIceUFrag, remoteIcePwd, remoteDtlsFingerprintBase64, localIceUFrag, localIcePwd, sentAt, remoteCandidates] of remotePackages) {
             if (peers.has(remoteClientId)) continue;
             typeEl.innerText = "A!";
 
@@ -425,7 +423,7 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
             peers.set(remoteClientId, pc);
 
             // Special case if both behind sym NAT or other hole punching isn't working: peer A needs to send its candidates as well.
-            const pkg = [remoteClientBase64, localClientBase64, /* lfrag */null, /* lpwd */null, /* ldtls */null, /* remote ufrag */ null, /* remote Pwd */ null, now, []];
+            const pkg = [remoteClientId, localClientId, /* lfrag */null, /* lpwd */null, /* ldtls */null, /* remote ufrag */ null, /* remote Pwd */ null, now, []];
             const pkgCandidates = pkg[pkg.length - 1];
 
             pc.onicecandidate = e => {
@@ -502,9 +500,9 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
               }
 
               pc.setLocalDescription({ type: "answer", sdp: lines.join("\r\n") });
+              typeEl.innerText = "A:" + remoteCandidates.length;
               
               for (const candidate of remoteCandidates) {
-                typeEl.innerText = "A:" + remoteCandidates.length;
                 pc.addIceCandidate({ candidate, sdpMLineIndex: 0 });
               }
             });
@@ -533,7 +531,7 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
             let trickleDone = false;
 
             // This is the 'package' sent to peer B that it needs to start ICE
-            const pkg = [remoteClientBase64, localClientBase64, /* lfrag */null, /* lpwd */null, /* ldtls */null, remoteUfrag, remotePwd, now, []];
+            const pkg = [remoteClientId, localClientId, /* lfrag */null, /* lpwd */null, /* ldtls */null, remoteUfrag, remotePwd, now, []];
             const pkgCandidates = pkg[pkg.length - 1];
 
             // The other peer posts its reflexive IPs to try to speed up hole punching.
@@ -612,9 +610,7 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
           }
 
           // Peer B will also receive candidates in the case where hole punch fails.
-          for (const [, remoteClientIdBase64, , , , , , , remoteCandidates] of remotePackages) {
-            const remoteClientId = base64ToHex(remoteClientBase64);
-
+          for (const [, remoteClientId, , , , , , , remoteCandidates] of remotePackages) {
             // If we already added the candidates from A, skip
             if (packageReceivedFromPeers.has(remoteClientId)) continue;
             if (!peers.has(remoteClientId)) continue;
@@ -656,14 +652,14 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
         const localDtlsFingerprintBase64 = hexToBase64(dtlsFingerprint.replaceAll(":", ""));
 
         const localPeerInfo =  [
-          hexToBase64(clientId),
+          clientId,
           isSymmetric,
           localDtlsFingerprintBase64,
           joinedAtTimestamp,
           [...reflexiveIps]
         ];
 
-        const payload = { r: ROOM_ID, k: hexToBase64(contextId) };
+        const payload = { r: ROOM_ID, k: contextId };
         const expired = dataTimestamp === null || (now - dataTimestamp) >= STATE_EXPIRATION_MS - REFRESH_WINDOW_MS;
         const packagesChanged = lastPackagesLength !== packages.length;
 
