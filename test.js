@@ -65,11 +65,42 @@ const WORKER_URL = "https://signalling.minddrop.workers.dev"
 //const WORKER_URL = "http://localhost:8787"
 
 const domWrite = (...args) => {
-  const el = document.createElement("div");
-  el.innerText = args.join(" ");
-  setTimeout(() => {
-    document.body.appendChild(el);
-  }, 1000);
+  //const el = document.createElement("div");
+  //el.innerText = args.join(" ");
+  //setTimeout(() => {
+  //  document.body.appendChild(el);
+  //}, 1000);
+};
+
+const initPeerUi = (clientId) => {
+  if (document.getElementById(clientId)) return;
+
+  const peerEl = document.createElement("div");
+  peerEl.style = "display: flex;"
+
+  const name = document.createElement("div");
+  name.innerText = clientId.substring(0, 5) + " " + hexToBase64(clientId).substring(0, 5);
+
+  peerEl.appendChild(name);
+
+  const st = document.createElement("div");
+  st.id = `${clientId}-ice-status`;
+  st.style = "width: 32px; height 32px; background-color: blue;";
+  peerEl.appendChild(st);
+
+  const cst = document.createElement("div");
+  cst.id = `${clientId}-conn-status`;
+  cst.style = "width: 32px; height 32px; background-color: blue;";
+  peerEl.appendChild(cst);
+
+  const type = document.createElement("div");
+  type.id = `${clientId}-type`;
+  type.innerText = "?";
+  peerEl.appendChild(type);
+
+  peerEl.id = clientId;
+
+  document.getElementById("peers").appendChild(peerEl);
 };
 
 domWrite("room: ", ROOM_ID)
@@ -181,8 +212,7 @@ if (!history.state?.contextId) {
 
 const contextId = history.state.contextId;
 
-domWrite("clientId", clientId, hexToBase64(clientId));
-domWrite("contextId", contextId, hexToBase64(contextId));
+setTimeout(() => document.getElementById("client").innerText = clientId.substring(0, 5), 500);
 
 (async function() {
   const getDbData = async () => {
@@ -354,6 +384,8 @@ domWrite("contextId", contextId, hexToBase64(contextId));
         const [remoteClientBase64, remoteSymmetric, remoteDtlsFingerprintBase64, remoteJoinedAtTimestamp, remoteReflexiveIps] = remotePeerData;
         const remoteClientId = base64ToHex(remoteClientBase64);
 
+        initPeerUi(remoteClientId);
+
         //Peer A is:
         //  - if both not symmetric or both symmetric, whoever has the most recent data is peer A, since we want Peer B created faster,
         //    and latency will be lowest with older data.
@@ -364,6 +396,12 @@ domWrite("contextId", contextId, hexToBase64(contextId));
         // We can't just use TURN if both sides are symmetric because one side might be port restricted and hence won't connect without a relay.
         const iceServers = localSymmetric || remoteSymmetric ? (udpEnabled ? TURN_UDP_ICE : TURN_TCP_ICE) : STUN_ICE;
 
+        const typeEl = document.getElementById(`${remoteClientId}-type`);
+
+        if (typeEl && typeEl.innerText === "?") {
+          typeEl.innerText = isPeerA ? "A" : "B"
+        }
+
         if (isPeerA) {
           //  - I create PC
           //  - I create an answer SDP, and munge the ufrag
@@ -373,6 +411,7 @@ domWrite("contextId", contextId, hexToBase64(contextId));
 
           for (const [ , remoteClientIdBase64, remoteIceUFrag, remoteIcePwd, remoteDtlsFingerprintBase64, localIceUFrag, localIcePwd, sentAt, remoteCandidates] of remotePackages) {
             if (peers.has(remoteClientId)) continue;
+            typeEl.innerText = "A!";
 
             // If we already added the candidates from B, skip. This check is not strictly necessary given the peer will exist.
             if (packageReceivedFromPeers.has(remoteClientId)) continue;
@@ -386,23 +425,21 @@ domWrite("contextId", contextId, hexToBase64(contextId));
             peers.set(remoteClientId, pc);
 
             // Special case if both behind sym NAT or other hole punching isn't working: peer A needs to send its candidates as well.
-            let pkg = [remoteClientBase64, localClientBase64, /* lfrag */null, /* lpwd */null, /* ldtls */null, /* remote ufrag */ null, /* remote Pwd */ null, now, []];
+            const pkg = [remoteClientBase64, localClientBase64, /* lfrag */null, /* lpwd */null, /* ldtls */null, /* remote ufrag */ null, /* remote Pwd */ null, now, []];
             const pkgCandidates = pkg[pkg.length - 1];
 
             pc.onicecandidate = e => {
               if (!e.candidate) {
                 if (pkgCandidates.length > 0) {
-                  // If hole punch hasn't worked after one second, send these candidates back to B to help it punch through.
+                  // If hole punch hasn't worked after two seconds, send these candidates back to B to help it punch through.
                   if (pc.iceConnectionState !== "connected") {
-                    domWrite("Peer A sending additional candidates to try to save connection.");
+                    domWrite("Peer A sending additional candidates to B given hole punch didn't work yet.");
                     localPackages.push(pkg);
                   }
                 }
 
                 return;
               }
-
-              pc.addIceCandidate(e.candidate);
 
               if (!e.candidate.candidate) return;
               pkgCandidates.push(e.candidate.candidate);
@@ -413,7 +450,11 @@ domWrite("contextId", contextId, hexToBase64(contextId));
               const iceGatheringState = pc.iceGatheringState;
 
               if (iceConnectionState === "connected") {
-                document.body.style = "background-color: green;";
+                document.getElementById(`${remoteClientId}-ice-status`).setAttribute('style', 'width: 32px; height: 32px; background-color: green;');
+              } else if (iceConnectionState === "failed") {
+                document.getElementById(`${remoteClientId}-ice-status`).setAttribute('style', 'width: 32px; height: 32px; background-color: red;');
+              } else {
+                document.getElementById(`${remoteClientId}-ice-status`).setAttribute('style', 'width: 32px; height: 32px; background-color: yellow;');
               }
 
               console.log("iceconnectionstatechange", iceConnectionState, iceGatheringState);
@@ -428,6 +469,14 @@ domWrite("contextId", contextId, hexToBase64(contextId));
             pc.onconnectionstatechange = () => {
               const connectionState = pc.connectionState;
               console.log("connectionstatechange", connectionState);
+
+              if (connectionState === "connected") {
+                document.getElementById(`${remoteClientId}-conn-status`).setAttribute('style', 'width: 32px; height: 32px; background-color: green;');
+              } else if (connectionState === "failed") {
+                document.getElementById(`${remoteClientId}-conn-status`).setAttribute('style', 'width: 32px; height: 32px; background-color: red;');
+              } else {
+                document.getElementById(`${remoteClientId}-conn-status`).setAttribute('style', 'width: 32px; height: 32px; background-color: yellow;');
+              }
             }
 
             pc.onsignalingstatechange = () => {
@@ -455,6 +504,7 @@ domWrite("contextId", contextId, hexToBase64(contextId));
               pc.setLocalDescription({ type: "answer", sdp: lines.join("\r\n") });
               
               for (const candidate of remoteCandidates) {
+                typeEl.innerText = "A:" + remoteCandidates.length;
                 pc.addIceCandidate({ candidate, sdpMLineIndex: 0 });
               }
             });
@@ -480,18 +530,22 @@ domWrite("contextId", contextId, hexToBase64(contextId));
 
             const remoteUfrag = generateRandomString(12);
             const remotePwd = generateRandomString(32);
-            let remoteSdp = createSdp(false, remoteUfrag, remotePwd, remoteDtlsFingerprintBase64);
             let trickleDone = false;
 
             // This is the 'package' sent to peer B that it needs to start ICE
-            let pkg = [remoteClientBase64, localClientBase64, /* lfrag */null, /* lpwd */null, /* ldtls */null, remoteUfrag, remotePwd, now, []];
+            const pkg = [remoteClientBase64, localClientBase64, /* lfrag */null, /* lpwd */null, /* ldtls */null, remoteUfrag, remotePwd, now, []];
             const pkgCandidates = pkg[pkg.length - 1];
+
+            // The other peer posts its reflexive IPs to try to speed up hole punching.
+            let remoteSdp = createSdp(false, remoteUfrag, remotePwd, remoteDtlsFingerprintBase64);
+
+            for (let i = 0; i < remoteReflexiveIps.length; i++) {
+              remoteSdp += `a=candidate:0 1 udp ${i + 1} ${remoteReflexiveIps[i]} 30000 typ srflx\r\n`;
+            }
 
             pc.onicecandidate = e => {
               // Push package onto the given package list, so it will be sent in next polling step.
               if (!e.candidate) return localPackages.push(pkg);
-
-              pc.addIceCandidate(e.candidate);
 
               if (!e.candidate.candidate) return;
               pkgCandidates.push(e.candidate.candidate);
@@ -502,7 +556,11 @@ domWrite("contextId", contextId, hexToBase64(contextId));
               const iceGatheringState = pc.iceGatheringState;
 
               if (iceConnectionState === "connected") {
-                document.body.style = "background-color: green;";
+                document.getElementById(`${remoteClientId}-ice-status`).setAttribute('style', 'width: 32px; height: 32px; background-color: green;');
+              } else if (iceConnectionState === "failed") {
+                document.getElementById(`${remoteClientId}-ice-status`).setAttribute('style', 'width: 32px; height: 32px; background-color: red;');
+              } else {
+                document.getElementById(`${remoteClientId}-ice-status`).setAttribute('style', 'width: 32px; height: 32px; background-color: yellow;');
               }
 
               console.log("iceconnectionstatechange", iceConnectionState, iceGatheringState);
@@ -517,6 +575,14 @@ domWrite("contextId", contextId, hexToBase64(contextId));
             pc.onconnectionstatechange = () => {
               const connectionState = pc.connectionState;
               console.log("connectionstatechange", connectionState);
+
+              if (connectionState === "connected") {
+                document.getElementById(`${remoteClientId}-conn-status`).setAttribute('style', 'width: 32px; height: 32px; background-color: green;');
+              } else if (connectionState === "failed") {
+                document.getElementById(`${remoteClientId}-conn-status`).setAttribute('style', 'width: 32px; height: 32px; background-color: red;');
+              } else {
+                document.getElementById(`${remoteClientId}-conn-status`).setAttribute('style', 'width: 32px; height: 32px; background-color: yellow;');
+              }
             }
 
             pc.onsignalingstatechange = () => {
@@ -541,10 +607,6 @@ domWrite("contextId", contextId, hexToBase64(contextId));
                 }
               }
 
-              for (let i = 0; i < remoteReflexiveIps.length; i++) {
-                remoteSdp += `a=candidate:0 1 udp ${i + 1} ${remoteReflexiveIps[i]} 30000 typ srflx\r\n`;
-              }
-
               pc.setRemoteDescription({ type: "answer", sdp: remoteSdp });
             });
           }
@@ -559,7 +621,9 @@ domWrite("contextId", contextId, hexToBase64(contextId));
 
             const pc = peers.get(remoteClientId);
 
-            if (remoteCandidates.length > 0) {
+            if (pc.remoteDescription && remoteCandidates.length > 0) {
+              typeEl.innerText = "B:" + remoteCandidates.length;
+
               for (const candidate of remoteCandidates) {
                 pc.addIceCandidate({ candidate, sdpMLineIndex: 0 });
               }
@@ -616,7 +680,9 @@ domWrite("contextId", contextId, hexToBase64(contextId));
             }
           }
 
-          packages = packages.filter(x => !!x);
+          while (packages.indexOf(null) >= 0) {
+            packages.splice(packages.indexOf(null), 1);
+          }
         }
 
         lastPackagesLength = packages.length;
