@@ -98,6 +98,11 @@ const initPeerUi = (clientId) => {
   type.innerText = "?";
   peerEl.appendChild(type);
 
+  const icetype = document.createElement("div");
+  icetype.id = `${clientId}-ice-type`;
+  icetype.innerText = "";
+  peerEl.appendChild(icetype);
+
   peerEl.id = clientId;
 
   document.getElementById("peers").appendChild(peerEl);
@@ -393,6 +398,12 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
         // If either side is symmetric, use TURN and hope we avoid connecting via relays
         // We can't just use TURN if both sides are symmetric because one side might be port restricted and hence won't connect without a relay.
         const iceServers = localSymmetric || remoteSymmetric ? (udpEnabled ? TURN_UDP_ICE : TURN_TCP_ICE) : STUN_ICE;
+
+        const iceTypeEl = document.getElementById(`${remoteClientId}-ice-type`);
+
+        if (iceTypeEl) {
+          typeEl.innerText = iceServers === TURN_UDP_ICE ? "TU" : iceServers === TURN_TCP_ICE ? "TT" : "S";
+        }
 
         if (isPeerA) {
           //  - I create PC
