@@ -394,12 +394,6 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
         // We can't just use TURN if both sides are symmetric because one side might be port restricted and hence won't connect without a relay.
         const iceServers = localSymmetric || remoteSymmetric ? (udpEnabled ? TURN_UDP_ICE : TURN_TCP_ICE) : STUN_ICE;
 
-        const typeEl = document.getElementById(`${remoteClientId}-type`);
-
-        if (typeEl && typeEl.innerText === "?") {
-          typeEl.innerText = isPeerA ? "A" : "B"
-        }
-
         if (isPeerA) {
           //  - I create PC
           //  - I create an answer SDP, and munge the ufrag
@@ -409,6 +403,12 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
 
           for (const [localClientId, remoteClientId, remoteIceUFrag, remoteIcePwd, remoteDtlsFingerprintBase64, localIceUFrag, localIcePwd, sentAt, remoteCandidates] of remotePackages) {
             if (peers.has(remoteClientId)) continue;
+            const typeEl = document.getElementById(`${remoteClientId}-type`);
+
+            if (typeEl && typeEl.innerText === "?") {
+              typeEl.innerText = isPeerA ? "A" : "B"
+            }
+
             typeEl.innerText = "A!";
 
             // If we already added the candidates from B, skip. This check is not strictly necessary given the peer will exist.
@@ -508,6 +508,12 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
             });
           }
         } else {
+          const typeEl = document.getElementById(`${remoteClientId}-type`);
+
+          if (typeEl && typeEl.innerText === "?") {
+            typeEl.innerText = isPeerA ? "A" : "B"
+          }
+
           // I am peer B, I need to create a peer first if none exists, and send a package.
           //   - Create PC
           //   - Create offer
@@ -614,6 +620,12 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
             // If we already added the candidates from A, skip
             if (packageReceivedFromPeers.has(remoteClientId)) continue;
             if (!peers.has(remoteClientId)) continue;
+
+            const typeEl = document.getElementById(`${remoteClientId}-type`);
+
+            if (typeEl && typeEl.innerText === "?") {
+              typeEl.innerText = isPeerA ? "A" : "B"
+            }
 
             const pc = peers.get(remoteClientId);
 
