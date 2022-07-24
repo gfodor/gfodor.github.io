@@ -750,8 +750,10 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
         }
 
         if (now < stopFastPollingAt) {
+          document.getElementById("speed").innerText = "Fast";
           nextStepTime = now + 750;
         } else {
+          document.getElementById("speed").innerText = hasPeers ? "Med" : "Slow";
           nextStepTime = now + (hasPeers ? 5000 : 10000);
         }
 
