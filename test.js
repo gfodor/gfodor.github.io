@@ -376,7 +376,7 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
     const packageReceivedFromPeers = new Set();
 
     return (localJoinedAtTimestamp, localPeerData, localDtlsCert, localDtlsFingerprintBase64, localPackages, remotePeerDatas, remotePackages) => {
-      let hadSideEffect = false;
+      let addedPeer = false;
 
       const [localClientId, localSymmetric] = localPeerData;
       const now = new Date().getTime();
@@ -405,7 +405,7 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
 
           for (const [localClientId, remoteClientId, remoteIceUFrag, remoteIcePwd, remoteDtlsFingerprintBase64, localIceUFrag, localIcePwd, sentAt, remoteCandidates] of remotePackages) {
             if (peers.has(remoteClientId)) continue;
-            hadSideEffect = true;
+            addedPeer = true;
 
             const typeEl = document.getElementById(`${remoteClientId}-type`);
 
@@ -436,7 +436,6 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
                   // If hole punch hasn't worked after two seconds, send these candidates back to B to help it punch through.
                   if (pc.iceConnectionState !== "connected") {
                     domWrite("Peer A sending additional candidates to B given hole punch didn't work yet.");
-                    hadSideEffect = true;
                     localPackages.push(pkg);
                   }
                 }
@@ -508,7 +507,6 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
               typeEl.innerText = "A:" + remoteCandidates.length;
               
               for (const candidate of remoteCandidates) {
-                hadSideEffect = true;
                 pc.addIceCandidate({ candidate, sdpMLineIndex: 0 });
               }
             });
@@ -532,7 +530,7 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
           //   - Let trickle run, then once trickle finishes send a package for A to pick up = [my client id, my offer sdp, generated ufrag/pwd, dtls fingerprint, ice candidates]
           //   - keep the icecandidate listener active, and add the pfrlx candidates when they arrive (but don't send another package)
           if (!peers.has(remoteClientId)) {
-            hadSideEffect = true;
+            addedPeer = true;
 
             const pc = new RTCPeerConnection({ iceServers, certificates: [ localDtlsCert ] });
             pc.createDataChannel("signal");
@@ -629,8 +627,6 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
             if (packageReceivedFromPeers.has(remoteClientId)) continue;
             if (!peers.has(remoteClientId)) continue;
 
-            hadSideEffect = true;
-
             const typeEl = document.getElementById(`${remoteClientId}-type`);
 
             if (typeEl && typeEl.innerText === "?") {
@@ -652,7 +648,7 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
         }
       }
 
-      return hadSideEffect;
+      return addedPeer;
     };
   })();
 
@@ -744,15 +740,15 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
 
         const hasPeers = responsePeerList.length > 0;
 
-        const hadSideEffectAtLastUpdate = handlePeerInfos(joinedAtTimestamp, localPeerInfo, dbData[SIGNAL_DB_KEYS.DTLS_CERT], localDtlsFingerprintBase64, packages, responsePeerList, responsePackages);
-
-        // Begin fast polling when things are changing to avoid ICE timeouts.
-        if (hadSideEffectAtLastUpdate) {
-          stopFastPollingAt = now + 7500
-        }
+        // This returns true if we added a peer, candidate, or other side effect in the last run.
+        const addedPeer = handlePeerInfos(joinedAtTimestamp, localPeerInfo, dbData[SIGNAL_DB_KEYS.DTLS_CERT], localDtlsFingerprintBase64, packages, responsePeerList, responsePackages);
 
         // Rate limit requests when room is empty, or look for new joins 
         // Go faster when things are changing to avoid ICE timeouts
+        if (addedPeer) {
+          stopFastPollingAt = now + 7500
+        }
+
         if (now < stopFastPollingAt) {
           nextStepTime = now + 750;
         } else {
