@@ -402,7 +402,7 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
         const iceTypeEl = document.getElementById(`${remoteClientId}-ice-type`);
 
         if (iceTypeEl) {
-          typeEl.innerText = iceServers === TURN_UDP_ICE ? "TU" : iceServers === TURN_TCP_ICE ? "TT" : "S";
+          iceTypeEl.innerText = iceServers === TURN_UDP_ICE ? "TU" : iceServers === TURN_TCP_ICE ? "TT" : "S";
         }
 
         if (isPeerA) {
