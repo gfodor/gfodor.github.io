@@ -376,6 +376,8 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
     const packageReceivedFromPeers = new Set();
 
     return (localJoinedAtTimestamp, localPeerData, localDtlsCert, localDtlsFingerprintBase64, localPackages, remotePeerDatas, remotePackages) => {
+      let hadSideEffect = false;
+
       const [localClientId, localSymmetric] = localPeerData;
       const now = new Date().getTime();
 
@@ -403,6 +405,8 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
 
           for (const [localClientId, remoteClientId, remoteIceUFrag, remoteIcePwd, remoteDtlsFingerprintBase64, localIceUFrag, localIcePwd, sentAt, remoteCandidates] of remotePackages) {
             if (peers.has(remoteClientId)) continue;
+            hadSideEffect = true;
+
             const typeEl = document.getElementById(`${remoteClientId}-type`);
 
             if (typeEl && typeEl.innerText === "?") {
@@ -432,6 +436,7 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
                   // If hole punch hasn't worked after two seconds, send these candidates back to B to help it punch through.
                   if (pc.iceConnectionState !== "connected") {
                     domWrite("Peer A sending additional candidates to B given hole punch didn't work yet.");
+                    hadSideEffect = true;
                     localPackages.push(pkg);
                   }
                 }
@@ -503,6 +508,7 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
               typeEl.innerText = "A:" + remoteCandidates.length;
               
               for (const candidate of remoteCandidates) {
+                hadSideEffect = true;
                 pc.addIceCandidate({ candidate, sdpMLineIndex: 0 });
               }
             });
@@ -526,6 +532,8 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
           //   - Let trickle run, then once trickle finishes send a package for A to pick up = [my client id, my offer sdp, generated ufrag/pwd, dtls fingerprint, ice candidates]
           //   - keep the icecandidate listener active, and add the pfrlx candidates when they arrive (but don't send another package)
           if (!peers.has(remoteClientId)) {
+            hadSideEffect = true;
+
             const pc = new RTCPeerConnection({ iceServers, certificates: [ localDtlsCert ] });
             pc.createDataChannel("signal");
             peers.set(remoteClientId, pc);
@@ -621,6 +629,8 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
             if (packageReceivedFromPeers.has(remoteClientId)) continue;
             if (!peers.has(remoteClientId)) continue;
 
+            hadSideEffect = true;
+
             const typeEl = document.getElementById(`${remoteClientId}-type`);
 
             if (typeEl && typeEl.innerText === "?") {
@@ -641,6 +651,8 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
           }
         }
       }
+
+      return hadSideEffect;
     };
   })();
 
@@ -652,6 +664,7 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
     let sentFirstPoll = false;
     let joinedAtTimestamp = new Date().getTime();
     let nextStepTime = -1;
+    let hadSideEffectAtLastUpdate = false;
 
     return async () => {
       const now = new Date().getTime();
@@ -732,9 +745,10 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
         const hasPeers = responsePeerList.length > 0;
 
         // Rate limit requests when room is empty.
-        nextStepTime = now + (hasPeers ? 2000 : 10000);
+        // Go faster when things are changing to avoid ICE timeouts
+        nextStepTime = now + (hadSideEffectAtLastUpdate ? 500 : (hasPeers ? 2000 : 10000));
 
-        handlePeerInfos(joinedAtTimestamp, localPeerInfo, dbData[SIGNAL_DB_KEYS.DTLS_CERT], localDtlsFingerprintBase64, packages, responsePeerList, responsePackages);
+        hadSideEffectAtLastUpdate = handlePeerInfos(joinedAtTimestamp, localPeerInfo, dbData[SIGNAL_DB_KEYS.DTLS_CERT], localDtlsFingerprintBase64, packages, responsePeerList, responsePackages);
       } catch (e) {
         console.error(e);
         nextStepTime = now + 1000;
