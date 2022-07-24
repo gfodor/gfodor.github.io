@@ -376,8 +376,6 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
     const packageReceivedFromPeers = new Set();
 
     return (localJoinedAtTimestamp, localPeerData, localDtlsCert, localDtlsFingerprintBase64, localPackages, remotePeerDatas, remotePackages) => {
-      let addedPeer = false;
-
       const [localClientId, localSymmetric] = localPeerData;
       const now = new Date().getTime();
 
@@ -405,7 +403,6 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
 
           for (const [localClientId, remoteClientId, remoteIceUFrag, remoteIcePwd, remoteDtlsFingerprintBase64, localIceUFrag, localIcePwd, sentAt, remoteCandidates] of remotePackages) {
             if (peers.has(remoteClientId)) continue;
-            addedPeer = true;
 
             const typeEl = document.getElementById(`${remoteClientId}-type`);
 
@@ -530,8 +527,6 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
           //   - Let trickle run, then once trickle finishes send a package for A to pick up = [my client id, my offer sdp, generated ufrag/pwd, dtls fingerprint, ice candidates]
           //   - keep the icecandidate listener active, and add the pfrlx candidates when they arrive (but don't send another package)
           if (!peers.has(remoteClientId)) {
-            addedPeer = true;
-
             const pc = new RTCPeerConnection({ iceServers, certificates: [ localDtlsCert ] });
             pc.createDataChannel("signal");
             peers.set(remoteClientId, pc);
@@ -647,8 +642,6 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
           }
         }
       }
-
-      return addedPeer;
     };
   })();
 
@@ -661,6 +654,7 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
     let joinedAtTimestamp = new Date().getTime();
     let nextStepTime = -1;
     let stopFastPollingAt = -1;
+    let seenPeerClientIds = new Set();
 
     return async () => {
       const now = new Date().getTime();
@@ -741,12 +735,22 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
         const hasPeers = responsePeerList.length > 0;
 
         // This returns true if we added a peer, candidate, or other side effect in the last run.
-        const addedPeer = handlePeerInfos(joinedAtTimestamp, localPeerInfo, dbData[SIGNAL_DB_KEYS.DTLS_CERT], localDtlsFingerprintBase64, packages, responsePeerList, responsePackages);
+        let addedPeer = false;
 
+        handlePeerInfos(joinedAtTimestamp, localPeerInfo, dbData[SIGNAL_DB_KEYS.DTLS_CERT], localDtlsFingerprintBase64, packages, responsePeerList, responsePackages);
+
+        for (const [remoteClientId] of responsePeerList) {
+          if (!seenPeerClientIds.has(remoteClientId)) {
+            addedPeer = true;
+            seenPeerClientIds.add(remoteClientId);
+          }
+        }
+
+        console.log("added", addedPeer);
         // Rate limit requests when room is empty, or look for new joins 
         // Go faster when things are changing to avoid ICE timeouts
         if (addedPeer) {
-          stopFastPollingAt = now + 12500
+          stopFastPollingAt = now + 10000;
         }
 
         if (now < stopFastPollingAt) {
