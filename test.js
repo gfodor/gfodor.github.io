@@ -457,18 +457,18 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
                 document.getElementById(`${remoteClientId}-ice-status`).setAttribute('style', 'width: 32px; height: 32px; background-color: yellow;');
               }
 
-              console.log("iceconnectionstatechange", iceConnectionState, iceGatheringState);
+              console.log("iceconnectionstatechange", remoteClientId.substring(0, 5), iceConnectionState, iceGatheringState);
             }
 
             pc.onicegatheringstatechange = () => {
               const iceConnectionState = pc.iceConnectionState;
               const iceGatheringState = pc.iceGatheringState;
-              console.log("icegatheringstatechange", iceConnectionState, iceGatheringState);
+              console.log("icegatheringstatechange", remoteClientId.substring(0, 5), iceConnectionState, iceGatheringState);
             }
 
             pc.onconnectionstatechange = () => {
               const connectionState = pc.connectionState;
-              console.log("connectionstatechange", connectionState);
+              console.log("connectionstatechange", remoteClientId.substring(0, 5), connectionState);
 
               if (connectionState === "connected") {
                 document.getElementById(`${remoteClientId}-conn-status`).setAttribute('style', 'width: 32px; height: 32px; background-color: green;');
@@ -481,7 +481,7 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
 
             pc.onsignalingstatechange = () => {
               const signalingState = pc.signalingState;
-              console.log("signalingstatechange", signalingState);
+              console.log("signalingstatechange", remoteClientId.substring(0, 5), signalingState);
             }
 
             const remoteSdp = createSdp(true, remoteIceUFrag, remoteIcePwd, remoteDtlsFingerprintBase64);
@@ -569,18 +569,18 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
                 document.getElementById(`${remoteClientId}-ice-status`).setAttribute('style', 'width: 32px; height: 32px; background-color: yellow;');
               }
 
-              console.log("iceconnectionstatechange", iceConnectionState, iceGatheringState);
+              console.log("iceconnectionstatechange", remoteClientId.substring(0, 5), iceConnectionState, iceGatheringState);
             }
 
             pc.onicegatheringstatechange = () => {
               const iceConnectionState = pc.iceConnectionState;
               const iceGatheringState = pc.iceGatheringState;
-              console.log("icegatheringstatechange", iceConnectionState, iceGatheringState);
+              console.log("icegatheringstatechange", remoteClientId.substring(0, 5), iceConnectionState, iceGatheringState);
             }
 
             pc.onconnectionstatechange = () => {
               const connectionState = pc.connectionState;
-              console.log("connectionstatechange", connectionState);
+              console.log("connectionstatechange", remoteClientId.substring(0, 5), connectionState);
 
               if (connectionState === "connected") {
                 document.getElementById(`${remoteClientId}-conn-status`).setAttribute('style', 'width: 32px; height: 32px; background-color: green;');
@@ -593,7 +593,7 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
 
             pc.onsignalingstatechange = () => {
               const signalingState = pc.signalingState;
-              console.log("signalingstatechange", signalingState);
+              console.log("signalingstatechange", remoteClientId.substring(0, 5), signalingState);
             }
 
             pc.createOffer().then(offer => {
