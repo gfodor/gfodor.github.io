@@ -404,6 +404,7 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
           for (const [localClientId, remoteClientId, remoteIceUFrag, remoteIcePwd, remoteDtlsFingerprintBase64, localIceUFrag, localIcePwd, sentAt, remoteCandidates] of remotePackages) {
             if (peers.has(remoteClientId)) continue;
 
+            initPeerUi(remoteClientId);
             const typeEl = document.getElementById(`${remoteClientId}-type`);
 
             if (typeEl && typeEl.innerText === "?") {
@@ -621,6 +622,7 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
             // If we already added the candidates from A, skip
             if (packageReceivedFromPeers.has(remoteClientId)) continue;
             if (!peers.has(remoteClientId)) continue;
+            initPeerUi(remoteClientId);
 
             const typeEl = document.getElementById(`${remoteClientId}-type`);
 
@@ -746,7 +748,6 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
           }
         }
 
-        console.log("added", addedPeer);
         // Rate limit requests when room is empty, or look for new joins 
         // Go faster when things are changing to avoid ICE timeouts
         if (addedPeer) {
