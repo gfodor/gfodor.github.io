@@ -516,6 +516,7 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
               
               if (pc.iceConnectionState !== "connected") {
                 typeEl.innerText = "A:" + remoteCandidates.length;
+                console.log("Add remote candidates", remoteClientId);
 
                 for (const candidate of remoteCandidates) {
                   pc.addIceCandidate({ candidate, sdpMLineIndex: 0 });
@@ -652,6 +653,7 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
 
               if (pc.iceConnectionState !== "connected") {
                 typeEl.innerText = "B:" + remoteCandidates.length;
+                console.log("Add remote candidates", remoteClientId);
 
                 for (const candidate of remoteCandidates) {
                   pc.addIceCandidate({ candidate, sdpMLineIndex: 0 });
