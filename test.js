@@ -664,7 +664,7 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
     let sentFirstPoll = false;
     let joinedAtTimestamp = new Date().getTime();
     let nextStepTime = -1;
-    let hadSideEffectAtLastUpdate = false;
+    let stopFastPollingAt = -1;
 
     return async () => {
       const now = new Date().getTime();
@@ -744,11 +744,21 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
 
         const hasPeers = responsePeerList.length > 0;
 
-        // Rate limit requests when room is empty.
-        // Go faster when things are changing to avoid ICE timeouts
-        nextStepTime = now + (hadSideEffectAtLastUpdate ? 500 : (hasPeers ? 2000 : 10000));
+        const hadSideEffectAtLastUpdate = handlePeerInfos(joinedAtTimestamp, localPeerInfo, dbData[SIGNAL_DB_KEYS.DTLS_CERT], localDtlsFingerprintBase64, packages, responsePeerList, responsePackages);
 
-        hadSideEffectAtLastUpdate = handlePeerInfos(joinedAtTimestamp, localPeerInfo, dbData[SIGNAL_DB_KEYS.DTLS_CERT], localDtlsFingerprintBase64, packages, responsePeerList, responsePackages);
+        // Begin fast polling when things are changing to avoid ICE timeouts.
+        if (hadSideEffectAtLastUpdate) {
+          stopFastPollingAt = now + 7500
+        }
+
+        // Rate limit requests when room is empty, or look for new joins 
+        // Go faster when things are changing to avoid ICE timeouts
+        if (now < stopFastPollingAt) {
+          nextStepTime = now + 750;
+        } else {
+          nextStepTime = now + hasPeers ? 2000 : 10000;
+        }
+
       } catch (e) {
         console.error(e);
         nextStepTime = now + 1000;
