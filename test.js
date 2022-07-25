@@ -651,14 +651,17 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
             const pc = peers.get(remoteClientId);
 
             if (delaySetRemoteUntilReceiveCandidates && !pc.remoteDescription && pc._pendingRemoteSdp) {
-              typeEl.innerText = "B::" + remoteCandidates.length;
               console.log("Add remote candidates", remoteClientId);
 
               pc.setRemoteDescription({ type: "answer", sdp: pc._pendingRemoteSdp }).then(() => {
                 delete pc._pendingRemoteSdp;
 
-                for (const candidate of remoteCandidates) {
-                  pc.addIceCandidate({ candidate, sdpMLineIndex: 0 });
+                typeEl.innerText = "B::" + remoteCandidates.length;
+
+                if (pc.iceConnectionState !== "connected") {
+                  for (const candidate of remoteCandidates) {
+                    pc.addIceCandidate({ candidate, sdpMLineIndex: 0 });
+                  }
                 }
 
                 packageReceivedFromPeers.add(remoteClientId);
@@ -671,8 +674,10 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
               typeEl.innerText = "B:" + remoteCandidates.length;
               console.log("Add remote candidates", remoteClientId);
 
-              for (const candidate of remoteCandidates) {
-                pc.addIceCandidate({ candidate, sdpMLineIndex: 0 });
+              if (pc.iceConnectionState !== "connected") {
+                for (const candidate of remoteCandidates) {
+                  pc.addIceCandidate({ candidate, sdpMLineIndex: 0 });
+                }
               }
 
               packageReceivedFromPeers.add(remoteClientId);
