@@ -627,7 +627,7 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
               }
 
 
-              if (delaySetRemoteUntilReceiveCandidates) {
+              if (!delaySetRemoteUntilReceiveCandidates) {
                 pc.setRemoteDescription({ type: "answer", sdp: remoteSdp });
               } else {
                 pc._pendingRemoteSdp = remoteSdp;
