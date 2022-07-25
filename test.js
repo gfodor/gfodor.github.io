@@ -63,6 +63,9 @@ const REFRESH_WINDOW_MS = 30000;
 const ROOM_ID = "room134";
 const WORKER_URL = "https://signalling.minddrop.workers.dev"
 //const WORKER_URL = "http://localhost:8787"
+//
+//
+const isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
 
 const domWrite = (...args) => {
   //const el = document.createElement("div");
@@ -405,7 +408,8 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
           iceTypeEl.innerText = iceServers === TURN_UDP_ICE ? "TU" : iceServers === TURN_TCP_ICE ? "TT" : "S";
         }
 
-        const delaySetRemoteUntilReceiveCandidates = true;
+        // Firefox answer side is very aggressive with ICE timeouts, so always delay answer set until second candidates received.
+        const delaySetRemoteUntilReceiveCandidates = isFirefox;
 
         if (isPeerA) {
           //  - I create PC
