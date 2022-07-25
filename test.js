@@ -650,28 +650,32 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
 
             const pc = peers.get(remoteClientId);
 
-            if ((pc.remoteDescription && remoteCandidates.length > 0) || delaySetRemoteUntilReceiveCandidates) {
-
-              typeEl.innerText = "B:" + remoteCandidates.length;
+            if (delaySetRemoteUntilReceiveCandidates && !pc.remoteDescription && pc._pendingRemoteSdp) {
+              typeEl.innerText = "B::" + remoteCandidates.length;
               console.log("Add remote candidates", remoteClientId);
 
-              if (pc._pendingRemoteSdp) {
-                pc.setRemoteDescription({ type: "answer", sdp: pc._pendingRemoteSdp }).then(() => {
-                  delete pc._pendingRemoteSdp;
+              pc.setRemoteDescription({ type: "answer", sdp: pc._pendingRemoteSdp }).then(() => {
+                delete pc._pendingRemoteSdp;
 
-                  for (const candidate of remoteCandidates) {
-                    pc.addIceCandidate({ candidate, sdpMLineIndex: 0 });
-                  }
-
-                  packageReceivedFromPeers.add(remoteClientId);
-                });
-              } else {
                 for (const candidate of remoteCandidates) {
                   pc.addIceCandidate({ candidate, sdpMLineIndex: 0 });
                 }
 
                 packageReceivedFromPeers.add(remoteClientId);
+              });
+
+              packageReceivedFromPeers.add(remoteClientId);
+            }
+
+            if (!delaySetRemoteUntilReceiveCandidates && pc.remoteDescription && remoteCandidates.length > 0) {
+              typeEl.innerText = "B:" + remoteCandidates.length;
+              console.log("Add remote candidates", remoteClientId);
+
+              for (const candidate of remoteCandidates) {
+                pc.addIceCandidate({ candidate, sdpMLineIndex: 0 });
               }
+
+              packageReceivedFromPeers.add(remoteClientId);
             }
           }
         }
