@@ -64,6 +64,8 @@ const ROOM_ID = "room134";
 const WORKER_URL = "https://signalling.minddrop.workers.dev"
 //const WORKER_URL = "http://localhost:8787"
 
+const isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
+
 const domWrite = (...args) => {
   //const el = document.createElement("div");
   //el.innerText = args.join(" ");
@@ -405,14 +407,15 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
           iceTypeEl.innerText = iceServers === TURN_UDP_ICE ? "TU" : iceServers === TURN_TCP_ICE ? "TT" : "S";
         }
 
-        const delaySetRemoteUntilReceiveCandidates = true;
-
         if (isPeerA) {
+          // I am peer A. Peer B will use my basic info to try to connect, and will send me a package I need to wait for (the first signalling message.)
+          //
           //  - I create PC
           //  - I create an answer SDP, and munge the ufrag
           //  - Set local description with answer
           //  - Set remote description via the received sdp
-          //  - Add the ice candidates
+          //  - Add the ice candidates from B
+          //  - If I don't connect quickly (in 1s) then send a second signalling message back to B.
 
           for (const [localClientId, remoteClientId, remoteIceUFrag, remoteIcePwd, remoteDtlsFingerprintBase64, localIceUFrag, localIcePwd, sentAt, remoteCandidates] of remotePackages) {
             if (peers.has(remoteClientId)) continue;
@@ -444,9 +447,10 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
             pc.onicecandidate = e => {
               if (!e.candidate) {
                 if (pkgCandidates.length > 0) {
-                  // If hole punch hasn't worked after two seconds, send these candidates back to B to help it punch through.
-                  domWrite("Peer A sending additional candidates to B given hole punch didn't work yet.");
-                  localPackages.push(pkg);
+                  if (pc.iceConnectionState !== "connected") {
+                    // Having trouble conneting. Send these candidates back to B to help it punch through. This makes signalling O(N^2) if it fails.
+                    localPackages.push(pkg);
+                  }
                 }
 
                 return;
@@ -523,12 +527,6 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
             });
           }
         } else {
-          const typeEl = document.getElementById(`${remoteClientId}-type`);
-
-          if (typeEl && typeEl.innerText === "?") {
-            typeEl.innerText = isPeerA ? "A" : "B"
-          }
-
           // I am peer B, I need to create a peer first if none exists, and send a package.
           //   - Create PC
           //   - Create offer
@@ -539,7 +537,17 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
           //   - Set remote description
           //     so peer reflexive candidates for it show up.
           //   - Let trickle run, then once trickle finishes send a package for A to pick up = [my client id, my offer sdp, generated ufrag/pwd, dtls fingerprint, ice candidates]
-          //   - keep the icecandidate listener active, and add the pfrlx candidates when they arrive (but don't send another package)
+          
+          // Firefox has *very* aggressive timeouts for ICE after setting the answer on the peer. As such, B have to wait until the second signalling return message
+          // before proceeding to try to connect. (The second signalling message normally would be skipped if the connection occurs fast enough.)
+          const delaySetAnswerUntilReceiveCandidatesFromA = isFirefox;
+
+          const typeEl = document.getElementById(`${remoteClientId}-type`);
+
+          if (typeEl && typeEl.innerText === "?") {
+            typeEl.innerText = isPeerA ? "A" : "B"
+          }
+
           if (!peers.has(remoteClientId)) {
             const pc = new RTCPeerConnection({ iceServers, certificates: [ localDtlsCert ] });
             pc.createDataChannel("signal");
@@ -626,11 +634,10 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
                 }
               }
 
-
-              if (!delaySetRemoteUntilReceiveCandidates) {
-                pc.setRemoteDescription({ type: "answer", sdp: remoteSdp });
-              } else {
+              if (delaySetAnswerUntilReceiveCandidatesFromA) {
                 pc._pendingRemoteSdp = remoteSdp;
+              } else {
+                pc.setRemoteDescription({ type: "answer", sdp: remoteSdp });
               }
             });
           }
@@ -650,28 +657,26 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
 
             const pc = peers.get(remoteClientId);
 
-            if ((pc.remoteDescription && remoteCandidates.length > 0) || delaySetRemoteUntilReceiveCandidates) {
-
+            if (delaySetAnswerUntilReceiveCandidatesFromA && pc._pendingRemoteSdp) {
               typeEl.innerText = "B:" + remoteCandidates.length;
-              console.log("Add remote candidates", remoteClientId);
 
-              if (pc._pendingRemoteSdp) {
-                pc.setRemoteDescription({ type: "answer", sdp: pc._pendingRemoteSdp }).then(() => {
-                  delete pc._pendingRemoteSdp;
+              const remoteSdp = pc._pendingRemoteSdp;
+              delete pc._pendingRemoteSdp;
 
-                  for (const candidate of remoteCandidates) {
-                    pc.addIceCandidate({ candidate, sdpMLineIndex: 0 });
-                  }
-
-                  packageReceivedFromPeers.add(remoteClientId);
-                });
-              } else {
+              pc.setRemoteDescription({ type: "answer", sdp: remoteSdp }).then(() => {
                 for (const candidate of remoteCandidates) {
                   pc.addIceCandidate({ candidate, sdpMLineIndex: 0 });
                 }
 
-                packageReceivedFromPeers.add(remoteClientId);
+              });
+
+              packageReceivedFromPeers.add(remoteClientId);
+            } else if (!delaySetAnswerUntilReceiveCandidatesFromA && pc.remoteDescription) {
+              for (const candidate of remoteCandidates) {
+                pc.addIceCandidate({ candidate, sdpMLineIndex: 0 });
               }
+
+              packageReceivedFromPeers.add(remoteClientId);
             }
           }
         }
