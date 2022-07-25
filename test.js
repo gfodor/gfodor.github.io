@@ -514,15 +514,11 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
 
               pc.setLocalDescription({ type: "answer", sdp: lines.join("\r\n") });
               
-              if (pc.iceConnectionState !== "connected") {
-                typeEl.innerText = "A:" + remoteCandidates.length;
-                console.log("Add remote candidates", remoteClientId);
+              typeEl.innerText = "A:" + remoteCandidates.length;
+              console.log("Add remote candidates", remoteClientId);
 
-                for (const candidate of remoteCandidates) {
-                  pc.addIceCandidate({ candidate, sdpMLineIndex: 0 });
-                }
-              } else {
-                typeEl.innerText = "A:*";
+              for (const candidate of remoteCandidates) {
+                pc.addIceCandidate({ candidate, sdpMLineIndex: 0 });
               }
             });
           }
@@ -565,6 +561,8 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
             for (let i = 0; i < remoteReflexiveIps.length; i++) {
               remoteSdp += `a=candidate:0 1 udp ${i + 1} ${remoteReflexiveIps[i]} 30000 typ srflx\r\n`;
             }
+
+            let delaySetRemoteUntilReceiveCandidates = true;
 
             pc.onicecandidate = e => {
               // Push package onto the given package list, so it will be sent in next polling step.
@@ -630,7 +628,10 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
                 }
               }
 
-              pc.setRemoteDescription({ type: "answer", sdp: remoteSdp });
+
+              if (!delaySetRemoteUntilReceiveCandidates) {
+                pc.setRemoteDescription({ type: "answer", sdp: remoteSdp });
+              }
             });
           }
 
@@ -651,15 +652,19 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
 
             if (pc.remoteDescription && remoteCandidates.length > 0) {
 
-              if (pc.iceConnectionState !== "connected") {
-                typeEl.innerText = "B:" + remoteCandidates.length;
-                console.log("Add remote candidates", remoteClientId);
+              typeEl.innerText = "B:" + remoteCandidates.length;
+              console.log("Add remote candidates", remoteClientId);
 
+              if (delaySetRemoteUntilReceiveCandidates) {
+                pc.setRemoteDescription({ type: "answer", sdp: remoteSdp }).then(() => {
+                  for (const candidate of remoteCandidates) {
+                    pc.addIceCandidate({ candidate, sdpMLineIndex: 0 });
+                  }
+                });
+              } else {
                 for (const candidate of remoteCandidates) {
                   pc.addIceCandidate({ candidate, sdpMLineIndex: 0 });
                 }
-              } else {
-                typeEl.innerText = "B*" + remoteCandidates.length;
               }
 
               packageReceivedFromPeers.add(remoteClientId);
