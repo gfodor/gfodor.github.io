@@ -405,6 +405,8 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
           iceTypeEl.innerText = iceServers === TURN_UDP_ICE ? "TU" : iceServers === TURN_TCP_ICE ? "TT" : "S";
         }
 
+        const delaySetRemoteUntilReceiveCandidates = true;
+
         if (isPeerA) {
           //  - I create PC
           //  - I create an answer SDP, and munge the ufrag
@@ -443,10 +445,8 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
               if (!e.candidate) {
                 if (pkgCandidates.length > 0) {
                   // If hole punch hasn't worked after two seconds, send these candidates back to B to help it punch through.
-                  if (pc.iceConnectionState !== "connected") {
-                    domWrite("Peer A sending additional candidates to B given hole punch didn't work yet.");
-                    localPackages.push(pkg);
-                  }
+                  domWrite("Peer A sending additional candidates to B given hole punch didn't work yet.");
+                  localPackages.push(pkg);
                 }
 
                 return;
@@ -562,8 +562,6 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
               remoteSdp += `a=candidate:0 1 udp ${i + 1} ${remoteReflexiveIps[i]} 30000 typ srflx\r\n`;
             }
 
-            let delaySetRemoteUntilReceiveCandidates = true;
-
             pc.onicecandidate = e => {
               // Push package onto the given package list, so it will be sent in next polling step.
               if (!e.candidate) return localPackages.push(pkg);
@@ -629,8 +627,10 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
               }
 
 
-              if (!delaySetRemoteUntilReceiveCandidates) {
+              if (delaySetRemoteUntilReceiveCandidates) {
                 pc.setRemoteDescription({ type: "answer", sdp: remoteSdp });
+              } else {
+                pc._pendingRemoteSdp = remoteSdp;
               }
             });
           }
@@ -650,24 +650,28 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
 
             const pc = peers.get(remoteClientId);
 
-            if (pc.remoteDescription && remoteCandidates.length > 0) {
+            if ((pc.remoteDescription && remoteCandidates.length > 0) || delaySetRemoteUntilReceiveCandidates) {
 
               typeEl.innerText = "B:" + remoteCandidates.length;
               console.log("Add remote candidates", remoteClientId);
 
-              if (delaySetRemoteUntilReceiveCandidates) {
-                pc.setRemoteDescription({ type: "answer", sdp: remoteSdp }).then(() => {
+              if (pc._pendingRemoteSdp) {
+                pc.setRemoteDescription({ type: "answer", sdp: pc._pendingRemoteSdp }).then(() => {
+                  delete pc._pendingRemoteSdp;
+
                   for (const candidate of remoteCandidates) {
                     pc.addIceCandidate({ candidate, sdpMLineIndex: 0 });
                   }
+
+                  packageReceivedFromPeers.add(remoteClientId);
                 });
               } else {
                 for (const candidate of remoteCandidates) {
                   pc.addIceCandidate({ candidate, sdpMLineIndex: 0 });
                 }
-              }
 
-              packageReceivedFromPeers.add(remoteClientId);
+                packageReceivedFromPeers.add(remoteClientId);
+              }
             }
           }
         }
