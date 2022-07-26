@@ -866,7 +866,7 @@ const contextId = history.state.contextId;
 
   setInterval(step, 500);
 
-  document.addEventListener('visibilitychange', function logData() {
+  document.addEventListener('pagehide', function logData() {
     if (document.visibilityState === 'hidden') {
       step(true);
     }
