@@ -727,7 +727,7 @@ const contextId = history.state.contextId;
         }
 
         const expired = dataTimestamp === null || (now - dataTimestamp) >= STATE_EXPIRATION_MS - REFRESH_WINDOW_MS;
-        const packagesChanged = lastPackages !== packages.join(" ");
+        const packagesChanged = lastPackages !== JSON.stringify(packages);
         let includePackages = false;
 
         if (expired || packagesChanged || finish) {
@@ -763,7 +763,7 @@ const contextId = history.state.contextId;
 
           if (includePackages) {
             payload.p = packages;
-            lastPackages = packages.join(" ");
+            lastPackages = JSON.stringify(packages);
           }
         }
 
@@ -801,7 +801,7 @@ const contextId = history.state.contextId;
           payload.t = dataTimestamp;
           payload.x = STATE_EXPIRATION_MS;
           payload.p = packages;
-          lastPackages = packages.join(" ");
+          lastPackages = JSON.stringify(packages);
 
           const res = await fetch(WORKER_URL, {
             method: "POST",
