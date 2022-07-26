@@ -327,20 +327,18 @@ const contextId = history.state.contextId;
   let udpEnabled, isSymmetric, reflexiveIps, dtlsFingerprint;
   let packages = [];
   const peers = new Map();
+  const packageReceivedFromPeers = new Set();
 
   const removePeer = clientId => {
     if (!peers.has(clientId)) return;
     const peer = peers.get(clientId);
     removePeerUi(clientId);
+    packageReceivedFromPeers.delete(clientId);
     peers.delete(clientId);
     peer.close();
   };
 
   const handlePeerInfos = (function() {
-    const remotePeerRoles = new Map(); // true if offer, false if answer
-    const remoteSdps = new Map();
-    const packageReceivedFromPeers = new Set();
-
     return (peers, localJoinedAtTimestamp, localPeerData, localDtlsCert, localDtlsFingerprintBase64, localPackages, remotePeerDatas, remotePackages) => {
 
       const [localClientId, localSymmetric] = localPeerData;
