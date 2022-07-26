@@ -385,119 +385,122 @@ const contextId = history.state.contextId;
         const delaySetRemoteUntilReceiveCandidates = isFirefox;
 
         if (isPeerA) {
+          if (peers.has(remoteClientId)) continue;
+
           //  - I create PC
           //  - I create an answer SDP, and munge the ufrag
           //  - Set local description with answer
           //  - Set remote description via the received sdp
           //  - Add the ice candidates
+          const remotePackage = remotePackages.find(p => p[1] === remoteClientId);
 
-          for (const [localClientId, remoteClientId, remoteIceUFrag, remoteIcePwd, remoteDtlsFingerprintBase64, localIceUFrag, localIcePwd, sentAt, remoteCandidates] of remotePackages) {
-            if (peers.has(remoteClientId)) continue;
+          if (!remotePackage) continue;
 
-            initPeerUi(remoteClientId);
-            const typeEl = document.getElementById(`${remoteClientId}-type`);
+          const [, , remoteIceUFrag, remoteIcePwd, remoteDtlsFingerprintBase64, localIceUFrag, localIcePwd, sentAt, remoteCandidates] = remotePackage;
 
-            if (typeEl && typeEl.innerText === "?") {
-              typeEl.innerText = isPeerA ? "A" : "B"
-            }
+          initPeerUi(remoteClientId);
+          const typeEl = document.getElementById(`${remoteClientId}-type`);
 
-            typeEl.innerText = "A!";
-
-            // If we already added the candidates from B, skip. This check is not strictly necessary given the peer will exist.
-            if (packageReceivedFromPeers.has(remoteClientId)) continue;
-            packageReceivedFromPeers.add(remoteClientId);
-
-            // I am peer A, I only care if packages have been published to me.
-            const pc = new RTCPeerConnection({ iceServers, certificates: [ localDtlsCert ] });
-            pc.createDataChannel("signal");
-            peers.set(remoteClientId, pc);
-
-            // Special case if both behind sym NAT or other hole punching isn't working: peer A needs to send its candidates as well.
-            const pkg = [remoteClientId, localClientId, /* lfrag */null, /* lpwd */null, /* ldtls */null, /* remote ufrag */ null, /* remote Pwd */ null, now, []];
-            const pkgCandidates = pkg[pkg.length - 1];
-
-            pc.onicecandidate = e => {
-              if (!e.candidate) {
-                if (pkgCandidates.length > 0) {
-                  // If hole punch hasn't worked after two seconds, send these candidates back to B to help it punch through.
-                  localPackages.push(pkg);
-                }
-
-                return;
-              }
-
-              if (!e.candidate.candidate) return;
-              pkgCandidates.push(e.candidate.candidate);
-            };
-
-            pc.oniceconnectionstatechange = () => {
-              const iceConnectionState = pc.iceConnectionState;
-              const iceGatheringState = pc.iceGatheringState;
-
-              if (iceConnectionState === "connected") {
-                document.getElementById(`${remoteClientId}-ice-status`).setAttribute('style', 'width: 32px; height: 32px; background-color: green;');
-              } else if (iceConnectionState === "failed") {
-                document.getElementById(`${remoteClientId}-ice-status`).setAttribute('style', 'width: 32px; height: 32px; background-color: red;');
-                removePeer(remoteClientId);
-              } else {
-                document.getElementById(`${remoteClientId}-ice-status`).setAttribute('style', 'width: 32px; height: 32px; background-color: yellow;');
-              }
-
-              console.log("iceconnectionstatechange", remoteClientId.substring(0, 5), iceConnectionState, iceGatheringState);
-            }
-
-            pc.onicegatheringstatechange = () => {
-              const iceConnectionState = pc.iceConnectionState;
-              const iceGatheringState = pc.iceGatheringState;
-              console.log("icegatheringstatechange", remoteClientId.substring(0, 5), iceConnectionState, iceGatheringState);
-            }
-
-            pc.onconnectionstatechange = () => {
-              const connectionState = pc.connectionState;
-              console.log("connectionstatechange", remoteClientId.substring(0, 5), connectionState);
-
-              if (connectionState === "connected") {
-                document.getElementById(`${remoteClientId}-conn-status`).setAttribute('style', 'width: 32px; height: 32px; background-color: green;');
-              } else if (connectionState === "failed") {
-                document.getElementById(`${remoteClientId}-conn-status`).setAttribute('style', 'width: 32px; height: 32px; background-color: red;');
-                removePeer(remoteClientId);
-              } else {
-                document.getElementById(`${remoteClientId}-conn-status`).setAttribute('style', 'width: 32px; height: 32px; background-color: yellow;');
-              }
-            }
-
-            pc.onsignalingstatechange = () => {
-              const signalingState = pc.signalingState;
-              console.log("signalingstatechange", remoteClientId.substring(0, 5), signalingState);
-            }
-
-            const remoteSdp = createSdp(true, remoteIceUFrag, remoteIcePwd, remoteDtlsFingerprintBase64);
-
-            pc.setRemoteDescription({ type: "offer", sdp: remoteSdp });
-
-            pc.createAnswer().then(answer => {
-              const lines = [];
-
-              for (const l of answer.sdp.split("\r\n")) {
-                if (l.startsWith("a=ice-ufrag")) {
-                  lines.push(`a=ice-ufrag:${localIceUFrag}`);
-                } else if (l.startsWith("a=ice-pwd")) {
-                  lines.push(`a=ice-pwd:${localIcePwd}`);
-                } else {
-                  lines.push(l);
-                }
-              }
-
-              pc.setLocalDescription({ type: "answer", sdp: lines.join("\r\n") });
-              
-              typeEl.innerText = "A:" + remoteCandidates.length;
-              console.log("Add remote candidates", remoteClientId);
-
-              for (const candidate of remoteCandidates) {
-                pc.addIceCandidate({ candidate, sdpMLineIndex: 0 });
-              }
-            });
+          if (typeEl && typeEl.innerText === "?") {
+            typeEl.innerText = isPeerA ? "A" : "B"
           }
+
+          typeEl.innerText = "A!";
+
+          // If we already added the candidates from B, skip. This check is not strictly necessary given the peer will exist.
+          if (packageReceivedFromPeers.has(remoteClientId)) continue;
+          packageReceivedFromPeers.add(remoteClientId);
+
+          // I am peer A, I only care if packages have been published to me.
+          const pc = new RTCPeerConnection({ iceServers, certificates: [ localDtlsCert ] });
+          pc.createDataChannel("signal");
+          peers.set(remoteClientId, pc);
+
+          // Special case if both behind sym NAT or other hole punching isn't working: peer A needs to send its candidates as well.
+          const pkg = [remoteClientId, localClientId, /* lfrag */null, /* lpwd */null, /* ldtls */null, /* remote ufrag */ null, /* remote Pwd */ null, now, []];
+          const pkgCandidates = pkg[pkg.length - 1];
+
+          pc.onicecandidate = e => {
+            if (!e.candidate) {
+              if (pkgCandidates.length > 0) {
+                // If hole punch hasn't worked after two seconds, send these candidates back to B to help it punch through.
+                localPackages.push(pkg);
+              }
+
+              return;
+            }
+
+            if (!e.candidate.candidate) return;
+            pkgCandidates.push(e.candidate.candidate);
+          };
+
+          pc.oniceconnectionstatechange = () => {
+            const iceConnectionState = pc.iceConnectionState;
+            const iceGatheringState = pc.iceGatheringState;
+
+            if (iceConnectionState === "connected") {
+              document.getElementById(`${remoteClientId}-ice-status`).setAttribute('style', 'width: 32px; height: 32px; background-color: green;');
+            } else if (iceConnectionState === "failed") {
+              document.getElementById(`${remoteClientId}-ice-status`).setAttribute('style', 'width: 32px; height: 32px; background-color: red;');
+              removePeer(remoteClientId);
+            } else {
+              document.getElementById(`${remoteClientId}-ice-status`).setAttribute('style', 'width: 32px; height: 32px; background-color: yellow;');
+            }
+
+            console.log("iceconnectionstatechange", remoteClientId.substring(0, 5), iceConnectionState, iceGatheringState);
+          }
+
+          pc.onicegatheringstatechange = () => {
+            const iceConnectionState = pc.iceConnectionState;
+            const iceGatheringState = pc.iceGatheringState;
+            console.log("icegatheringstatechange", remoteClientId.substring(0, 5), iceConnectionState, iceGatheringState);
+          }
+
+          pc.onconnectionstatechange = () => {
+            const connectionState = pc.connectionState;
+            console.log("connectionstatechange", remoteClientId.substring(0, 5), connectionState);
+
+            if (connectionState === "connected") {
+              document.getElementById(`${remoteClientId}-conn-status`).setAttribute('style', 'width: 32px; height: 32px; background-color: green;');
+            } else if (connectionState === "failed") {
+              document.getElementById(`${remoteClientId}-conn-status`).setAttribute('style', 'width: 32px; height: 32px; background-color: red;');
+              removePeer(remoteClientId);
+            } else {
+              document.getElementById(`${remoteClientId}-conn-status`).setAttribute('style', 'width: 32px; height: 32px; background-color: yellow;');
+            }
+          }
+
+          pc.onsignalingstatechange = () => {
+            const signalingState = pc.signalingState;
+            console.log("signalingstatechange", remoteClientId.substring(0, 5), signalingState);
+          }
+
+          const remoteSdp = createSdp(true, remoteIceUFrag, remoteIcePwd, remoteDtlsFingerprintBase64);
+
+          pc.setRemoteDescription({ type: "offer", sdp: remoteSdp });
+
+          pc.createAnswer().then(answer => {
+            const lines = [];
+
+            for (const l of answer.sdp.split("\r\n")) {
+              if (l.startsWith("a=ice-ufrag")) {
+                lines.push(`a=ice-ufrag:${localIceUFrag}`);
+              } else if (l.startsWith("a=ice-pwd")) {
+                lines.push(`a=ice-pwd:${localIcePwd}`);
+              } else {
+                lines.push(l);
+              }
+            }
+
+            pc.setLocalDescription({ type: "answer", sdp: lines.join("\r\n") });
+
+            typeEl.innerText = "A:" + remoteCandidates.length;
+            console.log("Add remote candidates", remoteClientId);
+
+            for (const candidate of remoteCandidates) {
+              pc.addIceCandidate({ candidate, sdpMLineIndex: 0 });
+            }
+          });
         } else {
           const typeEl = document.getElementById(`${remoteClientId}-type`);
 
@@ -611,44 +614,30 @@ const contextId = history.state.contextId;
             });
           }
 
+          const remotePackage = remotePackages.find(p => p[1] === remoteClientId);
+
+          if (!remotePackage) continue;
           // Peer B will also receive candidates in the case where hole punch fails.
-          for (const [, remoteClientId, , , , , , , remoteCandidates] of remotePackages) {
-            // If we already added the candidates from A, skip
-            if (packageReceivedFromPeers.has(remoteClientId)) continue;
-            if (!peers.has(remoteClientId)) continue;
-            initPeerUi(remoteClientId);
+          // If we already added the candidates from A, skip
+          const [, , , , , , , , remoteCandidates] = remotePackage;
 
-            const typeEl = document.getElementById(`${remoteClientId}-type`);
+          if (packageReceivedFromPeers.has(remoteClientId)) continue;
+          if (!peers.has(remoteClientId)) continue;
+          initPeerUi(remoteClientId);
 
-            if (typeEl && typeEl.innerText === "?") {
-              typeEl.innerText = isPeerA ? "A" : "B"
-            }
+          if (typeEl && typeEl.innerText === "?") {
+            typeEl.innerText = isPeerA ? "A" : "B"
+          }
 
-            const pc = peers.get(remoteClientId);
+          const pc = peers.get(remoteClientId);
 
-            if (delaySetRemoteUntilReceiveCandidates && !pc.remoteDescription && pc._pendingRemoteSdp) {
-              console.log("Add remote candidates", remoteClientId);
+          if (delaySetRemoteUntilReceiveCandidates && !pc.remoteDescription && pc._pendingRemoteSdp) {
+            console.log("Add remote candidates", remoteClientId);
 
-              pc.setRemoteDescription({ type: "answer", sdp: pc._pendingRemoteSdp }).then(() => {
-                delete pc._pendingRemoteSdp;
+            pc.setRemoteDescription({ type: "answer", sdp: pc._pendingRemoteSdp }).then(() => {
+              delete pc._pendingRemoteSdp;
 
-                typeEl.innerText = "B::" + remoteCandidates.length;
-
-                if (pc.iceConnectionState !== "connected") {
-                  for (const candidate of remoteCandidates) {
-                    pc.addIceCandidate({ candidate, sdpMLineIndex: 0 });
-                  }
-                }
-
-                packageReceivedFromPeers.add(remoteClientId);
-              });
-
-              packageReceivedFromPeers.add(remoteClientId);
-            }
-
-            if (!delaySetRemoteUntilReceiveCandidates && pc.remoteDescription && remoteCandidates.length > 0) {
-              typeEl.innerText = "B:" + remoteCandidates.length;
-              console.log("Add remote candidates", remoteClientId);
+              typeEl.innerText = "B::" + remoteCandidates.length;
 
               if (pc.iceConnectionState !== "connected") {
                 for (const candidate of remoteCandidates) {
@@ -657,7 +646,22 @@ const contextId = history.state.contextId;
               }
 
               packageReceivedFromPeers.add(remoteClientId);
+            });
+
+            packageReceivedFromPeers.add(remoteClientId);
+          }
+
+          if (!delaySetRemoteUntilReceiveCandidates && pc.remoteDescription && remoteCandidates.length > 0) {
+            typeEl.innerText = "B:" + remoteCandidates.length;
+            console.log("Add remote candidates", remoteClientId);
+
+            if (pc.iceConnectionState !== "connected") {
+              for (const candidate of remoteCandidates) {
+                pc.addIceCandidate({ candidate, sdpMLineIndex: 0 });
+              }
             }
+
+            packageReceivedFromPeers.add(remoteClientId);
           }
         }
       }
@@ -740,7 +744,7 @@ const contextId = history.state.contextId;
         if (expired || packagesChanged || finish) {
           // This will force a write
           dataTimestamp = now;
-          
+
           // Compact packages, expire any of them sent more than a minute ago. (ICE will timeout by then, even if KV latency fails us.)
           for (let i = 0; i < packages.length; i++) {
             const sentAt = packages[i][packages[i].length - 2];
@@ -792,7 +796,7 @@ const contextId = history.state.contextId;
         }
 
         const res = await fetch(WORKER_URL, { method: "POST", headers, body, keepalive })
-        
+
         const { ps: responsePeerList, pk: responsePackages, dk } = await res.json();
 
         if (dk) {
