@@ -710,10 +710,15 @@ const contextId = history.state.contextId;
     let nextStepTime = -1;
     let stopFastPollingAt = -1;
     let deleteKey = null;
+    let finished = false;
 
     return async (finish = false) => {
       const now = new Date().getTime();
-      if (!finish) {
+
+      if (finish) {
+        if (finished) return;
+        finished = true;
+      } else {
         if (nextStepTime > now) return;
         if (isSending) return;
         if (reflexiveIps.length === 0) return;
@@ -866,9 +871,15 @@ const contextId = history.state.contextId;
 
   setInterval(step, 500);
 
-  document.addEventListener('pagehide', function logData() {
-    if (document.visibilityState === 'hidden') {
+  // Wire up finish handlers
+  const ua = window.navigator.userAgent;
+  const iOS = !!ua.match(/iPad/i) || !!ua.match(/iPhone/i);
+  const webkit = !!ua.match(/WebKit/i);
+  const iOSSafari = iOS && webkit && !ua.match(/CriOS/i);
+
+  for (const ev of iOSSafari ? ['pagehide'] : ['beforeunload', 'unload']) {
+    document.addEventListener('beforeunload', function logData() {
       step(true);
-    }
-  });
+    });
+  }
 })();
