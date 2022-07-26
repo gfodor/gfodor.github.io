@@ -217,8 +217,6 @@ if (!history.state?.contextId) {
 
 const contextId = history.state.contextId;
 
-setTimeout(() => document.getElementById("client").innerText = clientId.substring(0, 5), 500);
-
 (async function() {
   const getNetworkSettings = async (dtlsCert) => {
     let dtlsFingerprint = null;
@@ -291,7 +289,17 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
   const t0 = performance.now();
   const dtlsCert = await RTCPeerConnection.generateCertificate({ name: "ECDSA", namedCurve: "P-256" });
  
-  const [udpEnabled, isSymmetric, reflexiveIps, dtlsFingerprint] = await getNetworkSettings(dtlsCert); 
+  let udpEnabled, isSymmetric, reflexiveIps, dtlsFingerprint;
+
+  [udpEnabled, isSymmetric, reflexiveIps, dtlsFingerprint] = await getNetworkSettings(dtlsCert); 
+
+  document.getElementById("client").innerText = clientId.substring(0, 5) + " " + [...reflexiveIps].join(", ") + " " + Math.floor(Math.random() * 100000);
+
+  setInterval(async () => {
+    [udpEnabled, isSymmetric, reflexiveIps, dtlsFingerprint] = await getNetworkSettings(dtlsCert); 
+
+    document.getElementById("client").innerText = clientId.substring(0, 5) + " " + [...reflexiveIps].join(", ") + " " + Math.floor(Math.random() * 100000);
+  }, 5000);
 
   const createSdp = (isOffer, iceUFrag, icePwd, dtlsFingerprintBase64) => {
     const dtlsHex = base64ToHex(dtlsFingerprintBase64);
