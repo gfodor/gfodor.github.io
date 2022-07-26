@@ -289,18 +289,6 @@ const contextId = history.state.contextId;
   const t0 = performance.now();
   const dtlsCert = await RTCPeerConnection.generateCertificate({ name: "ECDSA", namedCurve: "P-256" });
  
-  let udpEnabled, isSymmetric, reflexiveIps, dtlsFingerprint;
-
-  [udpEnabled, isSymmetric, reflexiveIps, dtlsFingerprint] = await getNetworkSettings(dtlsCert); 
-
-  document.getElementById("client").innerText = clientId.substring(0, 5) + " " + [...reflexiveIps].join(", ") + " " + Math.floor(Math.random() * 100000);
-
-  setInterval(async () => {
-    [udpEnabled, isSymmetric, reflexiveIps, dtlsFingerprint] = await getNetworkSettings(dtlsCert); 
-
-    document.getElementById("client").innerText = clientId.substring(0, 5) + " " + [...reflexiveIps].join(", ") + " " + Math.floor(Math.random() * 100000);
-  }, 5000);
-
   const createSdp = (isOffer, iceUFrag, icePwd, dtlsFingerprintBase64) => {
     const dtlsHex = base64ToHex(dtlsFingerprintBase64);
     let dtlsFingerprint = "";
@@ -336,19 +324,24 @@ const contextId = history.state.contextId;
     return sdp.join("\r\n") + "\r\n";
   }
 
+  let udpEnabled, isSymmetric, reflexiveIps, dtlsFingerprint;
+  let packages = [];
+  const peers = new Map();
+
+  const removePeer = clientId => {
+    if (!peers.has(clientId)) return;
+    const peer = peers.get(clientId);
+    removePeerUi(clientId);
+    peers.delete(clientId);
+    peer.close();
+  };
+
   const handlePeerInfos = (function() {
     const remotePeerRoles = new Map(); // true if offer, false if answer
     const remoteSdps = new Map();
     const packageReceivedFromPeers = new Set();
 
     return (peers, localJoinedAtTimestamp, localPeerData, localDtlsCert, localDtlsFingerprintBase64, localPackages, remotePeerDatas, remotePackages) => {
-      const removePeer = clientId => {
-        if (!peers.has(clientId)) return;
-        const peer = peers.get(clientId);
-        removePeerUi(clientId);
-        peers.delete(clientId);
-        peer.close();
-      };
 
       const [localClientId, localSymmetric] = localPeerData;
       const now = new Date().getTime();
@@ -664,17 +657,39 @@ const contextId = history.state.contextId;
     };
   })();
 
+  [udpEnabled, isSymmetric, reflexiveIps, dtlsFingerprint] = await getNetworkSettings(dtlsCert); 
+
+  document.getElementById("client").innerText = clientId.substring(0, 5) + " " + [...reflexiveIps].join(", ") + " " + Math.floor(Math.random() * 100000);
+
+  setInterval(async () => {
+    const [newUdpEnabled, newIsSymmetric, newReflexiveIps, newDtlsFingerprint] = await getNetworkSettings(dtlsCert); 
+
+    if (newUdpEnabled !== udpEnabled || newIsSymmetric !== isSymmetric || newDtlsFingerprint !== dtlsFingerprint || [...reflexiveIps].join(" ") !== [...newReflexiveIps].join(" ")) {
+      // Network reset, clear all peers
+      packages.length = 0;
+
+      for (const clientId of peers) {
+        removePeer(clientId);
+      }
+
+      document.getElementById("client").innerText = clientId.substring(0, 5) + " " + [...reflexiveIps].join(", ") + " " + Math.floor(Math.random() * 100000);
+
+      udpEnabled = newUdpEnabled;
+      isSymmetric = newIsSymmetric;
+      reflexiveIps = newReflexiveIps;
+      dtlsFingerprint = newDtlsFingerprint;
+    }
+  }, 5000);
+
   const step = (function() {
     let dataTimestamp = null;
     let isSending = false;
-    let packages = [];
     let lastPackagesLength = null;
     let sentFirstPoll = false;
     let joinedAtTimestamp = new Date().getTime();
     let nextStepTime = -1;
     let stopFastPollingAt = -1;
     let deleteKey = null;
-    const peers = new Map();
 
     return async (finish = false) => {
       const now = new Date().getTime();
