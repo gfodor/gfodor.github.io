@@ -328,6 +328,7 @@ const contextId = history.state.contextId;
   let packages = [];
   const peers = new Map();
   const packageReceivedFromPeers = new Set();
+  const lastReceivedDataTimestamps = new Map();
 
   const removePeer = clientId => {
     if (!peers.has(clientId)) return;
@@ -353,12 +354,15 @@ const contextId = history.state.contextId;
 
       const [localClientId, localSymmetric] = localPeerData;
       const now = new Date().getTime();
-      const seenRemoteClientIds = new Set();
 
       for (const remotePeerData of remotePeerDatas) {
-        const [remoteClientId, remoteSymmetric, remoteDtlsFingerprintBase64, remoteJoinedAtTimestamp, remoteReflexiveIps] = remotePeerData;
+        const [remoteClientId, remoteSymmetric, remoteDtlsFingerprintBase64, remoteJoinedAtTimestamp, remoteReflexiveIps, remoteDataTimestamp] = remotePeerData;
 
-        seenRemoteClientIds.add(remoteClientId);
+        // Don't process the same messages twice. This covers disconnect cases where stale data re-creates
+        // a peer too early.
+        if (lastReceivedDataTimestamps.get(remoteClientId) === remoteDataTimestamp) continue;
+
+        lastReceivedDataTimestamps.set(remoteClientId, remoteDataTimestamp)
         initPeerUi(remoteClientId);
 
         //Peer A is:
@@ -658,8 +662,11 @@ const contextId = history.state.contextId;
         }
       }
 
+      const remoteClientIds = remotePeerDatas.map(p => p[0]);
+
+      // Remove all peers no longer in the peer list.
       for (const [clientId, peer] of peers.entries()) {
-        if (seenRemoteClientIds.has(clientId)) continue;
+        if (remoteClientIds.includes(clientId)) continue;
         removePeer(clientId);
       }
     };
