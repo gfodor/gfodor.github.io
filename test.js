@@ -332,10 +332,20 @@ const contextId = history.state.contextId;
   const removePeer = clientId => {
     if (!peers.has(clientId)) return;
     const peer = peers.get(clientId);
+    peer.close();
     removePeerUi(clientId);
     packageReceivedFromPeers.delete(clientId);
     peers.delete(clientId);
-    peer.close();
+
+    for (let i = 0; i < packages.length; i++) {
+      if (packages[i][0] === clientId) {
+        packages[i] = null;
+      }
+    }
+
+    while (packages.indexOf(null) >= 0) {
+      packages.splice(packages.indexOf(null), 1);
+    }
   };
 
   const handlePeerInfos = (function() {
@@ -682,7 +692,7 @@ const contextId = history.state.contextId;
   const step = (function() {
     let dataTimestamp = null;
     let isSending = false;
-    let lastPackagesLength = null;
+    let lastPackages = null;
     let sentFirstPoll = false;
     let joinedAtTimestamp = new Date().getTime();
     let nextStepTime = -1;
@@ -691,9 +701,11 @@ const contextId = history.state.contextId;
 
     return async (finish = false) => {
       const now = new Date().getTime();
-      if (!finish && nextStepTime > now) return;
-      if (!finish && isSending) return;
-      if (!finish && reflexiveIps.length === 0) return;
+      if (!finish) {
+        if (nextStepTime > now) return;
+        if (isSending) return;
+        if (reflexiveIps.length === 0) return;
+      }
 
       isSending = true;
 
@@ -715,7 +727,7 @@ const contextId = history.state.contextId;
         }
 
         const expired = dataTimestamp === null || (now - dataTimestamp) >= STATE_EXPIRATION_MS - REFRESH_WINDOW_MS;
-        const packagesChanged = lastPackagesLength !== packages.length;
+        const packagesChanged = lastPackages !== packages.join(" ");
         let includePackages = false;
 
         if (expired || packagesChanged || finish) {
@@ -751,7 +763,7 @@ const contextId = history.state.contextId;
 
           if (includePackages) {
             payload.p = packages;
-            lastPackagesLength = packages.length;
+            lastPackages = packages.join(" ");
           }
         }
 
@@ -789,7 +801,7 @@ const contextId = history.state.contextId;
           payload.t = dataTimestamp;
           payload.x = STATE_EXPIRATION_MS;
           payload.p = packages;
-          lastPackagesLength = packages.length;
+          lastPackages = packages.join(" ");
 
           const res = await fetch(WORKER_URL, {
             method: "POST",
