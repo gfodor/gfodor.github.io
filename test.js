@@ -63,17 +63,8 @@ const REFRESH_WINDOW_MS = 30000;
 const ROOM_ID = "room134";
 const WORKER_URL = "https://signalling.minddrop.workers.dev"
 //const WORKER_URL = "http://localhost:8787"
-//
-//
-const isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
 
-const domWrite = (...args) => {
-  //const el = document.createElement("div");
-  //el.innerText = args.join(" ");
-  //setTimeout(() => {
-  //  document.body.appendChild(el);
-  //}, 1000);
-};
+const isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
 
 const initPeerUi = (clientId) => {
   if (document.getElementById(clientId)) return;
@@ -111,8 +102,6 @@ const initPeerUi = (clientId) => {
   document.getElementById("peers").appendChild(peerEl);
 };
 
-domWrite("room: ", ROOM_ID)
-
 const hexToBase64 = (hex) => {
   const d = [];
 
@@ -134,6 +123,16 @@ const base64ToHex = (b64) => {
   }
   return result.toLowerCase();
 };
+
+function arrayBufferToBase64( buffer ) {
+    var binary = '';
+    var bytes = new Uint8Array( buffer );
+    var len = bytes.byteLength;
+    for (var i = 0; i < len; i++) {
+        binary += String.fromCharCode( bytes[ i ] );
+    }
+    return window.btoa( binary );
+}
 
 // parseCandidate from https://github.com/fippo/sdp
 const parseCandidate = (line) => {
@@ -283,7 +282,6 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
         }
 
         if (e.candidate.candidate) {
-          domWrite("STUN: ", e.candidate.candidate);
           candidates.push(parseCandidate(e.candidate.candidate));
         }
       };
@@ -337,10 +335,8 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
 
   const dbData = await getDbData();
 
-  domWrite("Performing ICE");
   const t0 = performance.now();
   const [udpEnabled, isSymmetric, reflexiveIps, dtlsFingerprint] = await getNetworkSettings(dbData); 
-  domWrite("Done in", Math.floor(performance.now() - t0), "ms symmetric: ", isSymmetric, " udp: ", udpEnabled);
 
   const createSdp = (isOffer, iceUFrag, icePwd, dtlsFingerprintBase64) => {
     const dtlsHex = base64ToHex(dtlsFingerprintBase64);
@@ -435,8 +431,6 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
             packageReceivedFromPeers.add(remoteClientId);
 
             // I am peer A, I only care if packages have been published to me.
-            domWrite("I am peer A for ", remoteClientId,  " with candidates: ", JSON.stringify(remoteCandidates));
-
             const pc = new RTCPeerConnection({ iceServers, certificates: [ localDtlsCert ] });
             pc.createDataChannel("signal");
             peers.set(remoteClientId, pc);
@@ -449,7 +443,6 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
               if (!e.candidate) {
                 if (pkgCandidates.length > 0) {
                   // If hole punch hasn't worked after two seconds, send these candidates back to B to help it punch through.
-                  domWrite("Peer A sending additional candidates to B given hole punch didn't work yet.");
                   localPackages.push(pkg);
                 }
 
@@ -548,8 +541,6 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
             const pc = new RTCPeerConnection({ iceServers, certificates: [ localDtlsCert ] });
             pc.createDataChannel("signal");
             peers.set(remoteClientId, pc);
-
-            domWrite("I am peer B for ", remoteClientId);
 
             const remoteUfrag = generateRandomString(12);
             const remotePwd = generateRandomString(32);
@@ -724,6 +715,7 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
         const payload = { r: ROOM_ID, k: contextId };
         const expired = dataTimestamp === null || (now - dataTimestamp) >= STATE_EXPIRATION_MS - REFRESH_WINDOW_MS;
         const packagesChanged = lastPackagesLength !== packages.length;
+        let includePackages = false;
 
         if (expired || packagesChanged) {
           // This will force a write
@@ -741,24 +733,35 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
           while (packages.indexOf(null) >= 0) {
             packages.splice(packages.indexOf(null), 1);
           }
+
+          includePackages = true;
         }
 
-        lastPackagesLength = packages.length;
-
         // The first poll should just be a read, no writes, to build up packages before we do a write
-        // to reduce worker KV I/O. So don't include the data + packages on the first request.
+        // to reduce worker I/O. So don't include the data + packages on the first request.
         if (sentFirstPoll) {
           payload.d = localPeerInfo;
           payload.t = dataTimestamp;
           payload.x = STATE_EXPIRATION_MS;
-          payload.p = packages;
+
+          if (includePackages) {
+            payload.p = packages;
+            lastPackagesLength = packages.length;
+          }
         }
 
-        const res = await fetch(WORKER_URL, {
-          method: "POST",
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
-        })
+        let body = JSON.stringify(payload);
+        const deflatedBody = arrayBufferToBase64(pako.deflate(body));
+        const headers = { 'Content-Type': 'application/json '};
+
+        if (body.length > deflatedBody.length) {
+          body = deflatedBody;
+          headers["Content-Type"] = "application/json";
+          headers["Content-Encoding"] = "text/plain";
+          headers["Content-Length"] = deflatedBody.length;
+        }
+
+        const res = await fetch(WORKER_URL, { method: "POST", headers, body })
         
         const { peers: responsePeerList, packages: responsePackages } = await res.json();
 
@@ -769,6 +772,7 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
           payload.t = dataTimestamp;
           payload.x = STATE_EXPIRATION_MS;
           payload.p = packages;
+          lastPackagesLength = packages.length;
 
           await fetch(WORKER_URL, {
             method: "POST",
