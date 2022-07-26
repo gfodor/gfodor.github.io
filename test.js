@@ -56,7 +56,7 @@ const REFRESH_WINDOW_MS = 30000;
 
 const ROOM_ID = "room134";
 const WORKER_URL = "https://signalling.minddrop.workers.dev"
-// const WORKER_URL = "http://localhost:8787"
+//const WORKER_URL = "http://localhost:8787"
 
 const isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
 
@@ -335,6 +335,8 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
 
     return (peers, localJoinedAtTimestamp, localPeerData, localDtlsCert, localDtlsFingerprintBase64, localPackages, remotePeerDatas, remotePackages) => {
       const removePeer = clientId => {
+        if (!peers.has(clientId)) return;
+        const peer = peers.get(clientId);
         removePeerUi(clientId);
         peers.delete(clientId);
         peer.close();
@@ -422,8 +424,8 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
               if (iceConnectionState === "connected") {
                 document.getElementById(`${remoteClientId}-ice-status`).setAttribute('style', 'width: 32px; height: 32px; background-color: green;');
               } else if (iceConnectionState === "failed") {
-                removePeer(remoteClientId);
                 document.getElementById(`${remoteClientId}-ice-status`).setAttribute('style', 'width: 32px; height: 32px; background-color: red;');
+                removePeer(remoteClientId);
               } else {
                 document.getElementById(`${remoteClientId}-ice-status`).setAttribute('style', 'width: 32px; height: 32px; background-color: yellow;');
               }
@@ -444,8 +446,8 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
               if (connectionState === "connected") {
                 document.getElementById(`${remoteClientId}-conn-status`).setAttribute('style', 'width: 32px; height: 32px; background-color: green;');
               } else if (connectionState === "failed") {
-                removePeer(remoteClientId);
                 document.getElementById(`${remoteClientId}-conn-status`).setAttribute('style', 'width: 32px; height: 32px; background-color: red;');
+                removePeer(remoteClientId);
               } else {
                 document.getElementById(`${remoteClientId}-conn-status`).setAttribute('style', 'width: 32px; height: 32px; background-color: yellow;');
               }
@@ -537,6 +539,7 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
                 document.getElementById(`${remoteClientId}-ice-status`).setAttribute('style', 'width: 32px; height: 32px; background-color: green;');
               } else if (iceConnectionState === "failed") {
                 document.getElementById(`${remoteClientId}-ice-status`).setAttribute('style', 'width: 32px; height: 32px; background-color: red;');
+                removePeer(remoteClientId);
               } else {
                 document.getElementById(`${remoteClientId}-ice-status`).setAttribute('style', 'width: 32px; height: 32px; background-color: yellow;');
               }
@@ -558,6 +561,7 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
                 document.getElementById(`${remoteClientId}-conn-status`).setAttribute('style', 'width: 32px; height: 32px; background-color: green;');
               } else if (connectionState === "failed") {
                 document.getElementById(`${remoteClientId}-conn-status`).setAttribute('style', 'width: 32px; height: 32px; background-color: red;');
+                removePeer(remoteClientId);
               } else {
                 document.getElementById(`${remoteClientId}-conn-status`).setAttribute('style', 'width: 32px; height: 32px; background-color: yellow;');
               }
