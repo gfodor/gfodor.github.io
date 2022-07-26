@@ -878,7 +878,7 @@ const contextId = history.state.contextId;
   const iOSSafari = iOS && webkit && !ua.match(/CriOS/i);
 
   for (const ev of iOSSafari ? ['pagehide'] : ['beforeunload', 'unload']) {
-    document.addEventListener('beforeunload', function logData() {
+    window.addEventListener('beforeunload', function logData() {
       step(true);
     });
   }
