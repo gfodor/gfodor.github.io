@@ -672,14 +672,12 @@ const contextId = history.state.contextId;
         removePeer(clientId);
       }
 
-      document.getElementById("client").innerText = clientId.substring(0, 5) + " " + [...reflexiveIps].join(", ") + " " + Math.floor(Math.random() * 100000);
-
       udpEnabled = newUdpEnabled;
       isSymmetric = newIsSymmetric;
       reflexiveIps = newReflexiveIps;
       dtlsFingerprint = newDtlsFingerprint;
-    } else {
-      document.getElementById("client").innerText = "MISS " + clientId.substring(0, 5) + "[" + [...reflexiveIps].join(", ") + "][" + [...newReflexiveIps].join(", ")+ "] " + Math.floor(Math.random() * 100000);
+
+      document.getElementById("client").innerText = clientId.substring(0, 5) + " " + [...reflexiveIps].join(", ") + " " + Math.floor(Math.random() * 100000);
     }
   }, 5000);
 
@@ -696,8 +694,9 @@ const contextId = history.state.contextId;
     return async (finish = false) => {
       const now = new Date().getTime();
       if (!finish && nextStepTime > now) return;
-
       if (!finish && isSending) return;
+      if (!finish && reflexiveIps.length === 0) return;
+
       isSending = true;
 
       try {
