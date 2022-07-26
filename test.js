@@ -1,9 +1,3 @@
-const SIGNAL_DB_KEYS = {
-  DTLS_CERT: 0,
-  ICE_UFRAG: 1,
-  ICE_PWD: 2
-};
-
 const CANDIDATE_TYPES = {
   host: 0,
   srflx: 1,
@@ -54,17 +48,21 @@ const TURN_TCP_ICE = [
 
 const POLL_INTERVAL_MS = 5000;
 
-// How long until we expire entries in KV
-const STATE_EXPIRATION_MS = 5 * 60 * 1000;
+// How long until we expire entries in R2.
+const STATE_EXPIRATION_MS = 2 * 60 * 1000;
 
 // How long until expiration do we refresh
 const REFRESH_WINDOW_MS = 30000;
 
 const ROOM_ID = "room134";
 const WORKER_URL = "https://signalling.minddrop.workers.dev"
-//const WORKER_URL = "http://localhost:8787"
+// const WORKER_URL = "http://localhost:8787"
 
 const isFirefox = navigator.userAgent.toLowerCase().indexOf('firefox') > -1;
+
+const removePeerUi = (clientId) => {
+  document.getElementById(clientId)?.remove();
+}
 
 const initPeerUi = (clientId) => {
   if (document.getElementById(clientId)) return;
@@ -220,59 +218,16 @@ if (!history.state?.contextId) {
 const contextId = history.state.contextId;
 
 setTimeout(() => document.getElementById("client").innerText = clientId.substring(0, 5), 500);
- 
+
 (async function() {
-  const getDbData = async () => {
-    const dbreq = indexedDB.open("signal-db", 1);
-
-    dbreq.addEventListener("upgradeneeded", ({ target: { result: db } }) => {
-      db.createObjectStore("signal-data", { keyPath: "id" });
-    });
-
-    const dbData = {};
-
-    await new Promise(res => {
-      const ps = [];
-
-      new Promise(res => {
-        dbreq.addEventListener("success", async ({ target: { result: db } }) => {
-          const fetch = (key, f) => {
-            ps.push(new Promise(res => {
-              db.transaction("signal-data").objectStore("signal-data").get(key).addEventListener("success", async ({ target: { result } }) => {
-                let value;
-
-                if (result?.value) {
-                  value = result.value;
-                } else {
-                  value = await f();
-                  await db.transaction("signal-data", "readwrite").objectStore("signal-data").put({ id: key, value });
-                }
-
-                dbData[key] = value;
-                res();
-              })
-            }));
-          };
-
-          fetch(SIGNAL_DB_KEYS.DTLS_CERT, () => RTCPeerConnection.generateCertificate({ name: "ECDSA", namedCurve: "P-256" }));
-          fetch(SIGNAL_DB_KEYS.ICE_UFRAG, async () => generateRandomString(12));
-          fetch(SIGNAL_DB_KEYS.ICE_PWD, async () => generateRandomString(32));
-          res();
-        });
-      }).then(() => Promise.all(ps).then(res));
-    });
-
-    return dbData;
-  };
-
-  const getNetworkSettings = async (dbData) => {
+  const getNetworkSettings = async (dtlsCert) => {
     let dtlsFingerprint = null;
     const candidates = [];
     const reflexiveIps = new Set();
 
     let iceServers = STUN_ICE;
 
-    const pc = new RTCPeerConnection({ iceServers, certificates: [ dbData[SIGNAL_DB_KEYS.DTLS_CERT] ] });
+    const pc = new RTCPeerConnection({ iceServers, certificates: [dtlsCert] });
     pc.createDataChannel("foo");
 
     const p = new Promise(res => {
@@ -333,10 +288,10 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
     return [udpEnabled, isSymmetric, reflexiveIps, dtlsFingerprint];
   };
 
-  const dbData = await getDbData();
-
   const t0 = performance.now();
-  const [udpEnabled, isSymmetric, reflexiveIps, dtlsFingerprint] = await getNetworkSettings(dbData); 
+  const dtlsCert = await RTCPeerConnection.generateCertificate({ name: "ECDSA", namedCurve: "P-256" });
+ 
+  const [udpEnabled, isSymmetric, reflexiveIps, dtlsFingerprint] = await getNetworkSettings(dtlsCert); 
 
   const createSdp = (isOffer, iceUFrag, icePwd, dtlsFingerprintBase64) => {
     const dtlsHex = base64ToHex(dtlsFingerprintBase64);
@@ -374,18 +329,25 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
   }
 
   const handlePeerInfos = (function() {
-    const peers = new Map();
     const remotePeerRoles = new Map(); // true if offer, false if answer
     const remoteSdps = new Map();
     const packageReceivedFromPeers = new Set();
 
-    return (localJoinedAtTimestamp, localPeerData, localDtlsCert, localDtlsFingerprintBase64, localPackages, remotePeerDatas, remotePackages) => {
+    return (peers, localJoinedAtTimestamp, localPeerData, localDtlsCert, localDtlsFingerprintBase64, localPackages, remotePeerDatas, remotePackages) => {
+      const removePeer = clientId => {
+        removePeerUi(clientId);
+        peers.delete(clientId);
+        peer.close();
+      };
+
       const [localClientId, localSymmetric] = localPeerData;
       const now = new Date().getTime();
+      const seenRemoteClientIds = new Set();
 
       for (const remotePeerData of remotePeerDatas) {
         const [remoteClientId, remoteSymmetric, remoteDtlsFingerprintBase64, remoteJoinedAtTimestamp, remoteReflexiveIps] = remotePeerData;
 
+        seenRemoteClientIds.add(remoteClientId);
         initPeerUi(remoteClientId);
 
         //Peer A is:
@@ -460,6 +422,7 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
               if (iceConnectionState === "connected") {
                 document.getElementById(`${remoteClientId}-ice-status`).setAttribute('style', 'width: 32px; height: 32px; background-color: green;');
               } else if (iceConnectionState === "failed") {
+                removePeer(remoteClientId);
                 document.getElementById(`${remoteClientId}-ice-status`).setAttribute('style', 'width: 32px; height: 32px; background-color: red;');
               } else {
                 document.getElementById(`${remoteClientId}-ice-status`).setAttribute('style', 'width: 32px; height: 32px; background-color: yellow;');
@@ -481,6 +444,7 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
               if (connectionState === "connected") {
                 document.getElementById(`${remoteClientId}-conn-status`).setAttribute('style', 'width: 32px; height: 32px; background-color: green;');
               } else if (connectionState === "failed") {
+                removePeer(remoteClientId);
                 document.getElementById(`${remoteClientId}-conn-status`).setAttribute('style', 'width: 32px; height: 32px; background-color: red;');
               } else {
                 document.getElementById(`${remoteClientId}-conn-status`).setAttribute('style', 'width: 32px; height: 32px; background-color: yellow;');
@@ -680,6 +644,11 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
           }
         }
       }
+
+      for (const [clientId, peer] of peers.entries()) {
+        if (seenRemoteClientIds.has(clientId)) continue;
+        removePeer(clientId);
+      }
     };
   })();
 
@@ -692,13 +661,14 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
     let joinedAtTimestamp = new Date().getTime();
     let nextStepTime = -1;
     let stopFastPollingAt = -1;
-    let seenPeerClientIds = new Set();
+    let deleteKey = null;
+    const peers = new Map();
 
-    return async () => {
+    return async (finish = false) => {
       const now = new Date().getTime();
-      if (nextStepTime > now) return;
+      if (!finish && nextStepTime > now) return;
 
-      if (isSending) return;
+      if (!finish && isSending) return;
       isSending = true;
 
       try {
@@ -713,11 +683,16 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
         ];
 
         const payload = { r: ROOM_ID, k: contextId };
+
+        if (finish) {
+          payload.dk = deleteKey;
+        }
+
         const expired = dataTimestamp === null || (now - dataTimestamp) >= STATE_EXPIRATION_MS - REFRESH_WINDOW_MS;
         const packagesChanged = lastPackagesLength !== packages.length;
         let includePackages = false;
 
-        if (expired || packagesChanged) {
+        if (expired || packagesChanged || finish) {
           // This will force a write
           dataTimestamp = now;
           
@@ -737,6 +712,10 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
           includePackages = true;
         }
 
+        if (finish) {
+          includePackages = false;
+        }
+
         // The first poll should just be a read, no writes, to build up packages before we do a write
         // to reduce worker I/O. So don't include the data + packages on the first request.
         if (sentFirstPoll) {
@@ -753,6 +732,7 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
         let body = JSON.stringify(payload);
         const deflatedBody = arrayBufferToBase64(pako.deflate(body));
         const headers = { 'Content-Type': 'application/json '};
+        let keepalive = false;
 
         if (body.length > deflatedBody.length) {
           body = deflatedBody;
@@ -761,9 +741,20 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
           headers["Content-Length"] = deflatedBody.length;
         }
 
-        const res = await fetch(WORKER_URL, { method: "POST", headers, body })
+        if (finish) {
+          headers["X-Worker-Method"] = "DELETE";
+          keepalive = true;
+        }
+
+        const res = await fetch(WORKER_URL, { method: "POST", headers, body, keepalive })
         
-        const { peers: responsePeerList, packages: responsePackages } = await res.json();
+        const { ps: responsePeerList, pk: responsePackages, dk } = await res.json();
+
+        if (dk) {
+          deleteKey = dk;
+        }
+
+        if (finish) return;
 
         // Slight optimization: if the peers are empty on the first poll, immediately publish data to reduce
         // delay before first peers show up.
@@ -774,32 +765,33 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
           payload.p = packages;
           lastPackagesLength = packages.length;
 
-          await fetch(WORKER_URL, {
+          const res = await fetch(WORKER_URL, {
             method: "POST",
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(payload)
           });
+
+          const { dk } = await res.json();
+
+          if (dk) {
+            deleteKey = dk;
+          }
         }
 
         sentFirstPoll = true;
 
-        const hasPeers = responsePeerList.length > 0;
+        const previousPeerClientIds = [...peers.keys()];
 
         // This returns true if we added a peer, candidate, or other side effect in the last run.
-        let addedPeer = false;
+        handlePeerInfos(peers, joinedAtTimestamp, localPeerInfo, dtlsCert, localDtlsFingerprintBase64, packages, responsePeerList, responsePackages);
 
-        handlePeerInfos(joinedAtTimestamp, localPeerInfo, dbData[SIGNAL_DB_KEYS.DTLS_CERT], localDtlsFingerprintBase64, packages, responsePeerList, responsePackages);
+        const activeClientIds = responsePeerList.map(p => p[0]);
 
-        for (const [remoteClientId] of responsePeerList) {
-          if (!seenPeerClientIds.has(remoteClientId)) {
-            addedPeer = true;
-            seenPeerClientIds.add(remoteClientId);
-          }
-        }
+        const peersChanged = previousPeerClientIds.length !== activeClientIds.length || activeClientIds.find(c => !previousPeerClientIds.includes(c)) || previousPeerClientIds.find(c => !activeClientIds.includes(c));
 
         // Rate limit requests when room is empty, or look for new joins 
         // Go faster when things are changing to avoid ICE timeouts
-        if (addedPeer) {
+        if (peersChanged) {
           stopFastPollingAt = now + 10000;
         }
 
@@ -807,8 +799,8 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
           document.getElementById("speed").innerText = "Fast";
           nextStepTime = now + 750;
         } else {
-          document.getElementById("speed").innerText = hasPeers ? "Med" : "Slow";
-          nextStepTime = now + (hasPeers ? 5000 : 10000);
+          document.getElementById("speed").innerText = "Slow";
+          nextStepTime = now + 5000;
         }
 
       } catch (e) {
@@ -823,4 +815,10 @@ setTimeout(() => document.getElementById("client").innerText = clientId.substrin
   step();
 
   setInterval(step, 500);
+
+  document.addEventListener('visibilitychange', function logData() {
+    if (document.visibilityState === 'hidden') {
+      step(true);
+    }
+  });
 })();
