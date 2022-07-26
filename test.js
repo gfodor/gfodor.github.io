@@ -326,6 +326,9 @@ const contextId = history.state.contextId;
 
   let udpEnabled, isSymmetric, reflexiveIps, dtlsFingerprint;
   let packages = [];
+  let dataTimestamp = null;
+  let lastPackages = null;
+
   const peers = new Map();
   const packageReceivedFromPeers = new Set();
   const lastReceivedDataTimestamps = new Map();
@@ -358,8 +361,7 @@ const contextId = history.state.contextId;
       for (const remotePeerData of remotePeerDatas) {
         const [remoteClientId, remoteSymmetric, remoteDtlsFingerprintBase64, remoteJoinedAtTimestamp, remoteReflexiveIps, remoteDataTimestamp] = remotePeerData;
 
-        // Don't process the same messages twice. This covers disconnect cases where stale data re-creates
-        // a peer too early.
+        // Don't process the same messages twice. This covers disconnect cases where stale data re-creates a peer too early.
         if (lastReceivedDataTimestamps.get(remoteClientId) === remoteDataTimestamp) continue;
 
         lastReceivedDataTimestamps.set(remoteClientId, remoteDataTimestamp)
@@ -383,18 +385,21 @@ const contextId = history.state.contextId;
 
         // Firefox answer side is very aggressive with ICE timeouts, so always delay answer set until second candidates received.
         const delaySetRemoteUntilReceiveCandidates = isFirefox;
+        const remotePackage = remotePackages.find(p => p[1] === remoteClientId);
 
         if (isPeerA) {
           if (peers.has(remoteClientId)) continue;
+          if (!remotePackage) continue;
+
+          // If we already added the candidates from B, skip. This check is not strictly necessary given the peer will exist.
+          if (packageReceivedFromPeers.has(remoteClientId)) continue;
+          packageReceivedFromPeers.add(remoteClientId);
 
           //  - I create PC
           //  - I create an answer SDP, and munge the ufrag
           //  - Set local description with answer
           //  - Set remote description via the received sdp
           //  - Add the ice candidates
-          const remotePackage = remotePackages.find(p => p[1] === remoteClientId);
-
-          if (!remotePackage) continue;
 
           const [, , remoteIceUFrag, remoteIcePwd, remoteDtlsFingerprintBase64, localIceUFrag, localIcePwd, sentAt, remoteCandidates] = remotePackage;
 
@@ -402,14 +407,10 @@ const contextId = history.state.contextId;
           const typeEl = document.getElementById(`${remoteClientId}-type`);
 
           if (typeEl && typeEl.innerText === "?") {
-            typeEl.innerText = isPeerA ? "A" : "B"
+            typeEl.innerText = "A";
           }
 
           typeEl.innerText = "A!";
-
-          // If we already added the candidates from B, skip. This check is not strictly necessary given the peer will exist.
-          if (packageReceivedFromPeers.has(remoteClientId)) continue;
-          packageReceivedFromPeers.add(remoteClientId);
 
           // I am peer A, I only care if packages have been published to me.
           const pc = new RTCPeerConnection({ iceServers, certificates: [ localDtlsCert ] });
@@ -691,6 +692,8 @@ const contextId = history.state.contextId;
         removePeer(clientId);
       }
 
+      dataTimestamp = null;
+      lastPackages = null;
       udpEnabled = newUdpEnabled;
       isSymmetric = newIsSymmetric;
       reflexiveIps = newReflexiveIps;
@@ -701,9 +704,7 @@ const contextId = history.state.contextId;
   }, 5000);
 
   const step = (function() {
-    let dataTimestamp = null;
     let isSending = false;
-    let lastPackages = null;
     let sentFirstPoll = false;
     let joinedAtTimestamp = new Date().getTime();
     let nextStepTime = -1;
