@@ -47,6 +47,7 @@ const TURN_TCP_ICE = [
 ];
 
 const POLL_INTERVAL_MS = 5000;
+const NETWORK_CHANGE_POLL_INTERVAL = 15000;
 
 // How long until we expire entries in R2.
 const STATE_EXPIRATION_MS = 2 * 60 * 1000;
@@ -701,7 +702,7 @@ const contextId = history.state.contextId;
 
       document.getElementById("client").innerText = clientId.substring(0, 5) + " " + [...reflexiveIps].join(", ") + " " + Math.floor(Math.random() * 100000);
     }
-  }, 5000);
+  }, NETWORK_CHANGE_POLL_INTERVAL);
 
   const step = (function() {
     let isSending = false;
