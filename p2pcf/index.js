@@ -7,6 +7,7 @@ if (!document.location.hash) {
 }
 
 const p2pcf = new P2PCF('testguy', document.location.hash.substring(1))
+window.p2pcf = p2pcf
 
 const removePeerUi = clientId => {
   document.getElementById(clientId)?.remove()
