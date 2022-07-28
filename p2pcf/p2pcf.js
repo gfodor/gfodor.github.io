@@ -11925,6 +11925,7 @@ var require_p2pcf = __commonJS({
               if (payload.endsWith("\0")) {
                 payload = payload.substring(0, payload.length - 1);
               }
+              console.log("received signal", payload);
               peer.signal(payload);
               return;
             }
@@ -11958,7 +11959,7 @@ var require_p2pcf = __commonJS({
         });
         peer.once("_iceComplete", () => {
           peer.on("signal", (signalData) => {
-            console.log("on signal", signalData);
+            console.log("on signal", JSON.stringify(signalData));
             const payloadBytes = new TextEncoder().encode(
               JSON.stringify(signalData)
             );
