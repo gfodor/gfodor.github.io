@@ -11313,6 +11313,8 @@ var require_p2pcf = __commonJS({
         if (finish) {
           if (this.finished)
             return;
+          if (!this.deleteKey)
+            return;
           this.finished = true;
         } else {
           if (this.nextStepTime > now)
@@ -11488,14 +11490,11 @@ var require_p2pcf = __commonJS({
               ,
               remoteCandidates
             ] = remotePackage;
-            let hasFinishedFirstIce = false;
             const peer = new Peer({
               config: peerOptions,
               initiator: false,
               iceCompleteTimeout: 3e3,
               sdpTransform: (sdp) => {
-                if (hasFinishedFirstIce)
-                  return sdp;
                 const lines = [];
                 for (const l of sdp.split("\r\n")) {
                   if (l.startsWith("a=ice-ufrag")) {
@@ -11532,7 +11531,6 @@ var require_p2pcf = __commonJS({
             };
             peer.on("signal", initialCandidateSignalling);
             const finishIce = () => {
-              hasFinishedFirstIce = true;
               peer.removeListener("signal", initialCandidateSignalling);
               if (localPackages.includes(pkg))
                 return;
@@ -11923,7 +11921,6 @@ var require_p2pcf = __commonJS({
               if (payload.endsWith("\0")) {
                 payload = payload.substring(0, payload.length - 1);
               }
-              console.log("received signal", payload);
               peer.signal(payload);
               return;
             }
@@ -11956,16 +11953,7 @@ var require_p2pcf = __commonJS({
           this._updateConnectedSessions();
         });
         peer.once("_iceComplete", () => {
-          peer.trickle = false;
-          peer.allowHalfTrickle = false;
           peer.on("signal", (signalData) => {
-            console.log(
-              "on signal",
-              peer.id,
-              peer.initiator,
-              JSON.stringify(signalData)
-            );
-            console.trace();
             const payloadBytes = new TextEncoder().encode(
               JSON.stringify(signalData)
             );
