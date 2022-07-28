@@ -11798,10 +11798,8 @@ var require_p2pcf = __commonJS({
           }
           this.destroyOnUnload = null;
         }
-        for (const channels of this.peers.values()) {
-          for (const peer of channels.values()) {
-            peer.destroy();
-          }
+        for (const peer of this.peers.values()) {
+          peer.destroy();
         }
       }
       _chunkHandler(data, messageId, chunkId) {
@@ -11959,7 +11957,13 @@ var require_p2pcf = __commonJS({
         });
         peer.once("_iceComplete", () => {
           peer.on("signal", (signalData) => {
-            console.log("on signal", JSON.stringify(signalData));
+            console.log(
+              "on signal",
+              peer.id,
+              peer.initiator,
+              JSON.stringify(signalData)
+            );
+            console.trace();
             const payloadBytes = new TextEncoder().encode(
               JSON.stringify(signalData)
             );
