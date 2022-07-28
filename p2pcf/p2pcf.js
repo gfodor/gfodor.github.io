@@ -11956,6 +11956,8 @@ var require_p2pcf = __commonJS({
           this._updateConnectedSessions();
         });
         peer.once("_iceComplete", () => {
+          peer.trickle = false;
+          peer.allowHalfTrickle = false;
           peer.on("signal", (signalData) => {
             console.log(
               "on signal",
