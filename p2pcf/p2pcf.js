@@ -10879,7 +10879,6 @@ var require_utils = __commonJS({
     var arrayBufferToHex = require_array_buffer_to_hex();
     var base64ToHex = (b64) => arrayBufferToHex(base64ToArrayBuffer(b64));
     function createSdp(isOffer, iceUFrag, icePwd, dtlsFingerprintBase64) {
-      console.log("finger", dtlsFingerprintBase64);
       const dtlsHex = base64ToHex(dtlsFingerprintBase64);
       let dtlsFingerprint = "";
       for (let i = 0; i < dtlsHex.length; i += 2) {
@@ -11143,7 +11142,7 @@ var require_p2pcf = __commonJS({
     var { createSdp } = require_utils();
     var randomstring = require_randomstring2();
     var hexToBase64 = (hex) => arrayBufferToBase64(hexToBytes(hex));
-    var MAX_MESSAGE_LENGTH_BYTES = 16e3;
+    var MAX_MESSAGE_LENGTH_BYTES = 20;
     var CHUNK_HEADER_LENGTH_BYTES = 12;
     var CHUNK_MAGIC_WORD = 8121;
     var CHUNK_MAX_LENGTH_BYTES = MAX_MESSAGE_LENGTH_BYTES - CHUNK_HEADER_LENGTH_BYTES;
@@ -11192,36 +11191,6 @@ var require_p2pcf = __commonJS({
     var webkit = !!ua.match(/WebKit/i);
     var iOSSafari = !!(iOS && webkit && !ua.match(/CriOS/i));
     var isFirefox = !!(navigator?.userAgent.toLowerCase().indexOf("firefox") > -1);
-    var removePeerUi = (clientId) => {
-      document.getElementById(clientId)?.remove();
-    };
-    var initPeerUi = (sessionId) => {
-      if (document.getElementById(sessionId))
-        return;
-      const peerEl = document.createElement("div");
-      peerEl.style = "display: flex;";
-      const name = document.createElement("div");
-      name.innerText = sessionId.substring(0, 5);
-      peerEl.appendChild(name);
-      const st = document.createElement("div");
-      st.id = `${sessionId}-ice-status`;
-      st.style = "width: 32px; height 32px; background-color: blue;";
-      peerEl.appendChild(st);
-      const cst = document.createElement("div");
-      cst.id = `${sessionId}-conn-status`;
-      cst.style = "width: 32px; height 32px; background-color: blue;";
-      peerEl.appendChild(cst);
-      const type = document.createElement("div");
-      type.id = `${sessionId}-type`;
-      type.innerText = "?";
-      peerEl.appendChild(type);
-      const icetype = document.createElement("div");
-      icetype.id = `${sessionId}-ice-type`;
-      icetype.innerText = "";
-      peerEl.appendChild(icetype);
-      peerEl.id = sessionId;
-      document.getElementById("peers").appendChild(peerEl);
-    };
     var parseCandidate = (line) => {
       let parts;
       if (line.indexOf("a=candidate:") === 0) {
@@ -11273,7 +11242,6 @@ var require_p2pcf = __commonJS({
         this._step = this._step.bind(this);
         this.peers = /* @__PURE__ */ new Map();
         this.msgChunks = /* @__PURE__ */ new Map();
-        this.responseWaiting = /* @__PURE__ */ new Map();
         this.connectedSessions = [];
         this.clientId = clientId;
         this.roomId = roomId;
@@ -11478,7 +11446,6 @@ var require_p2pcf = __commonJS({
           turnIceServers
         } = this;
         const [localSessionId, , localSymmetric] = localPeerData;
-        const localClientId = this.clientId;
         const now = new Date().getTime();
         for (const remotePeerData of remotePeerDatas) {
           const [
@@ -11494,29 +11461,7 @@ var require_p2pcf = __commonJS({
             continue;
           }
           lastReceivedDataTimestamps.set(remoteSessionId, remoteDataTimestamp);
-          initPeerUi(remoteSessionId);
           const isPeerA = localSymmetric === remoteSymmetric ? localStartedAtTimestamp === remoteStartedAtTimestamp ? localSessionId > remoteSessionId : localStartedAtTimestamp > remoteStartedAtTimestamp : localSymmetric;
-          console.log(
-            localSymmetric === remoteSymmetric,
-            localStartedAtTimestamp === remoteStartedAtTimestamp,
-            localSessionId > remoteSessionId,
-            localStartedAtTimestamp > remoteStartedAtTimestamp,
-            "Peer type :",
-            isPeerA ? "A" : "B",
-            ":",
-            this.clientId,
-            this.sessionId,
-            "connecting with",
-            remoteClientId,
-            remoteSessionId,
-            ":",
-            localSymmetric,
-            remoteSymmetric,
-            localSessionId,
-            remoteSessionId,
-            localStartedAtTimestamp,
-            remoteStartedAtTimestamp
-          );
           const iceServers = localSymmetric || remoteSymmetric ? turnIceServers : stunIceServers;
           const delaySetRemoteUntilReceiveCandidates = isFirefox;
           const remotePackage = remotePackages.find((p) => p[1] === remoteSessionId);
@@ -11529,18 +11474,6 @@ var require_p2pcf = __commonJS({
               continue;
             if (!remotePackage)
               continue;
-            if (remotePackage) {
-              console.log(
-                isPeerA ? "A" : "B",
-                localClientId,
-                localSessionId,
-                "received from ",
-                isPeerA ? "B" : "A",
-                remoteClientId,
-                remoteSessionId,
-                remotePackage
-              );
-            }
             if (packageReceivedFromPeers.has(remoteSessionId))
               continue;
             packageReceivedFromPeers.add(remoteSessionId);
@@ -11555,7 +11488,6 @@ var require_p2pcf = __commonJS({
               ,
               remoteCandidates
             ] = remotePackage;
-            initPeerUi(remoteSessionId);
             const peer = new Peer({
               config: peerOptions,
               initiator: false,
@@ -11574,8 +11506,10 @@ var require_p2pcf = __commonJS({
                 return lines.join("\r\n");
               }
             });
-            peers.set(remoteSessionId, peer);
-            peer.on("error", (e) => this._handlePeerError(peer, e));
+            peer.id = remoteSessionId;
+            peer.client_id = remoteClientId;
+            this._wireUpCommonPeerEvents(peer);
+            peers.set(peer.id, peer);
             const pkg = [
               remoteSessionId,
               localSessionId,
@@ -11603,16 +11537,6 @@ var require_p2pcf = __commonJS({
               localPackages.push(pkg);
             };
             peer.once("_iceComplete", finishIce);
-            peer.on("iceStateChange", (e) => {
-              console.log("ice state change", e);
-            });
-            peer.on("connect", () => {
-              document.getElementById(`${remoteSessionId}-ice-status`).setAttribute(
-                "style",
-                "width: 32px; height: 32px; background-color: green;"
-              );
-            });
-            peer.on("close", () => this._removePeerBySessionId(remoteSessionId));
             const remoteSdp = createSdp(
               true,
               remoteIceUFrag,
@@ -11632,8 +11556,10 @@ var require_p2pcf = __commonJS({
                 iceCompleteTimeout: 3e3,
                 initiator: true
               });
-              peers.set(remoteSessionId, peer2);
-              peer2.on("error", (e) => this._handlePeerError(peer2, e));
+              peer2.id = remoteSessionId;
+              peer2.client_id = remoteClientId;
+              this._wireUpCommonPeerEvents(peer2);
+              peers.set(peer2.id, peer2);
               const pkg = [
                 remoteSessionId,
                 localSessionId,
@@ -11661,13 +11587,6 @@ var require_p2pcf = __commonJS({
                 localPackages.push(pkg);
               };
               peer2.once("_iceComplete", finishIce);
-              peer2.on("close", () => this._removePeerBySessionId(remoteSessionId));
-              peer2.on("connect", () => {
-                document.getElementById(`${remoteSessionId}-ice-status`).setAttribute(
-                  "style",
-                  "width: 32px; height: 32px; background-color: green;"
-                );
-              });
               const enqueuePackageFromOffer = (e) => {
                 if (e.type !== "offer")
                   return;
@@ -11711,18 +11630,8 @@ var require_p2pcf = __commonJS({
               continue;
             if (!peers.has(remoteSessionId))
               continue;
-            initPeerUi(remoteSessionId);
             const peer = peers.get(remoteSessionId);
             if (delaySetRemoteUntilReceiveCandidates && !peer._pc.remoteDescription && peer._pendingRemoteSdp) {
-              console.log(
-                localClientId,
-                localSessionId,
-                " 3add remote candidates from ",
-                isPeerA ? "B" : "A",
-                remoteClientId,
-                remoteSessionId,
-                remoteCandidates.length
-              );
               if (!peer.connected) {
                 for (const candidate of remoteCandidates) {
                   peer.signal({ candidate: { candidate, sdpMLineIndex: 0 } });
@@ -11743,18 +11652,10 @@ var require_p2pcf = __commonJS({
           }
         }
         const remoteSessionIds = remotePeerDatas.map((p) => p[0]);
-        for (const sessionId of peers.keys()) {
+        for (const [sessionId, peer] of peers.entries()) {
           if (remoteSessionIds.includes(sessionId))
             continue;
-          console.log(
-            "Missing",
-            sessionId,
-            "on",
-            this.clientId,
-            " removing",
-            JSON.stringify(remoteSessionIds)
-          );
-          this._removePeerBySessionId(sessionId);
+          this._removePeer(peer);
         }
       }
       async start() {
@@ -11779,22 +11680,8 @@ var require_p2pcf = __commonJS({
           ] = await this._getNetworkSettings(this.dtlsCert);
           if (newUdpEnabled !== this.udpEnabled || newIsSymmetric !== this.isSymmetric || newDtlsFingerprint !== this.dtlsFingerprint || [...this.reflexiveIps].join(" ") !== [...newReflexiveIps].join(" ")) {
             this.packages.length = 0;
-            console.log(
-              newUdpEnabled !== this.udpEnabled,
-              newIsSymmetric !== this.isSymmetric,
-              newDtlsFingerprint !== this.dtlsFingerprint,
-              [...this.reflexiveIps].sort().join(" ") !== [...newReflexiveIps].sort().join(" "),
-              this.udpEnabled,
-              newUdpEnabled,
-              this.isSymmetric,
-              newIsSymmetric,
-              this.dtlsFingerprint,
-              newDtlsFingerprint,
-              this.reflexiveIps,
-              newReflexiveIps
-            );
-            for (const sessionId of this.peers.keys()) {
-              this._removePeerBySessionId(sessionId);
+            for (const peer of this.peers.values()) {
+              this._removePeer(peer);
             }
             this.dataTimestamp = null;
             this.lastPackages = null;
@@ -11812,33 +11699,19 @@ var require_p2pcf = __commonJS({
         }
       }
       _removePeer(peer) {
-        if (!this.peers.has(peer.id)) {
-          return false;
-        }
-        this.peers.get(peer.id).delete(peer.channelName);
-        if (this.peers.get(peer.id).size === 0) {
-          this.emit("peerclose", peer);
-          this.responseWaiting.delete(peer.id);
-          this.peers.delete(peer.id);
-        }
-      }
-      async _removePeerBySessionId(sessionId) {
-        const { peers, packageReceivedFromPeers, packages } = this;
-        if (!peers.has(sessionId))
+        const { packages, peers } = this;
+        if (!peers.has(peer.id))
           return;
-        const peer = peers.get(sessionId);
-        peer.destroy();
-        removePeerUi(sessionId);
-        packageReceivedFromPeers.delete(sessionId);
-        peers.delete(sessionId);
         for (let i = 0; i < packages.length; i++) {
-          if (packages[i][0] === sessionId) {
+          if (packages[i][0] === peer.id) {
             packages[i] = null;
           }
         }
         while (packages.indexOf(null) >= 0) {
           packages.splice(packages.indexOf(null), 1);
         }
+        peers.delete(peer.id);
+        this.emit("peerclose", peer);
       }
       send(peer, msg) {
         return new Promise((resolve, reject) => {
@@ -11861,29 +11734,17 @@ var require_p2pcf = __commonJS({
           if (dataArrBuffer.byteLength > MAX_MESSAGE_LENGTH_BYTES || new Uint16Array(dataArrBuffer, 0, 1) === CHUNK_MAGIC_WORD) {
             messageId = Math.floor(Math.random() * 256 * 128);
           }
-          try {
-            if (!peer.connected) {
-              for (const p of this.peers.get(peer.id).values()) {
-                if (!p.connected)
-                  continue;
-                peer = p;
-                break;
-              }
-            }
-            if (!this.responseWaiting.has(peer.id)) {
-              this.responseWaiting.set(peer.id, /* @__PURE__ */ new Map());
-            }
-            this.responseWaiting.get(peer.id).set(messageId, resolve);
-          } catch (e) {
-            return reject(Error("Connection to peer closed" + e));
-          }
           if (messageId !== null) {
             for (let offset = 0, chunkId = 0; offset < dataArrBuffer.byteLength; offset += CHUNK_MAX_LENGTH_BYTES, chunkId++) {
               const chunkSize = Math.min(
                 CHUNK_MAX_LENGTH_BYTES,
                 dataArrBuffer.byteLength - offset
               );
-              const buf = new ArrayBuffer(CHUNK_HEADER_LENGTH_BYTES + chunkSize);
+              let bufSize = CHUNK_HEADER_LENGTH_BYTES + chunkSize;
+              while (bufSize % 4 !== 0) {
+                bufSize++;
+              }
+              const buf = new ArrayBuffer(bufSize);
               new Uint8Array(buf, CHUNK_HEADER_LENGTH_BYTES).set(
                 new Uint8Array(dataArrBuffer, offset, chunkSize)
               );
@@ -11904,13 +11765,10 @@ var require_p2pcf = __commonJS({
       }
       broadcast(msg) {
         const ps = [];
-        for (const channels of this.peers.values()) {
-          for (const peer of channels.values()) {
-            if (!peer.connected)
-              continue;
-            ps.push(this.send(peer, msg));
-            break;
-          }
+        for (const peer of this.peers.values()) {
+          if (!peer.connected)
+            continue;
+          ps.push(this.send(peer, msg));
         }
         return Promise.all(ps);
       }
@@ -11947,8 +11805,17 @@ var require_p2pcf = __commonJS({
         } else {
           target = this.msgChunks.get(messageId);
         }
+        const offsetToSet = chunkId * CHUNK_MAX_LENGTH_BYTES;
+        const numBytesToSet = Math.min(
+          target.byteLength - offsetToSet,
+          CHUNK_MAX_LENGTH_BYTES
+        );
         target.set(
-          new Uint8Array(data.buffer, data.byteOffset + CHUNK_HEADER_LENGTH_BYTES),
+          new Uint8Array(
+            data.buffer,
+            data.byteOffset + CHUNK_HEADER_LENGTH_BYTES,
+            numBytesToSet
+          ),
           chunkId * CHUNK_MAX_LENGTH_BYTES
         );
         return target;
@@ -11956,16 +11823,12 @@ var require_p2pcf = __commonJS({
       _destroyChunks(msgID) {
         this.msgChunks.delete(msgID);
       }
-      _fetchPeers() {
-      }
       _updateConnectedSessions() {
         this.connectedSessions.length = 0;
-        for (const [peerId, channels] of this.peers) {
-          for (const peer of channels.values()) {
-            if (peer.connected) {
-              this.connectedSessions.push(peerId);
-              continue;
-            }
+        for (const [sessionId, peer] of this.peers) {
+          if (peer.connected) {
+            this.connectedSessions.push(sessionId);
+            continue;
           }
         }
       }
@@ -12026,6 +11889,49 @@ var require_p2pcf = __commonJS({
           return;
         }
         console.error(err);
+      }
+      _wireUpCommonPeerEvents(peer) {
+        peer.on("connect", () => {
+          this.emit("peerconnect", peer);
+          this._updateConnectedSessions();
+        });
+        peer.on("data", (data) => {
+          let messageId = null;
+          let u16 = null;
+          if (data.length >= CHUNK_HEADER_LENGTH_BYTES) {
+            u16 = new Uint16Array(
+              data.buffer,
+              data.byteOffset,
+              CHUNK_HEADER_LENGTH_BYTES / 2
+            );
+            if (u16[0] === CHUNK_MAGIC_WORD) {
+              messageId = u16[1];
+            }
+          }
+          if (messageId !== null) {
+            try {
+              const chunkId = u16[2];
+              const last = u16[3] !== 0;
+              const msg = this._chunkHandler(data, messageId, chunkId, last);
+              if (last) {
+                this.emit("msg", peer, msg);
+                this._destroyChunks(messageId);
+              }
+            } catch (e) {
+              console.error(e);
+            }
+          } else {
+            this.emit("msg", peer, data);
+          }
+        });
+        peer.on("error", () => {
+          this._removePeer(peer);
+          this._updateConnectedSessions();
+        });
+        peer.on("close", () => {
+          this._removePeer(peer);
+          this._updateConnectedSessions();
+        });
       }
     };
     module.exports = P2PCF;
