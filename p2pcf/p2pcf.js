@@ -11249,7 +11249,6 @@ var require_p2pcf = __commonJS({
         this.packages = [];
         this.dataTimestamp = null;
         this.lastPackages = null;
-        this.packageReceivedFromPeers = /* @__PURE__ */ new Set();
         this.lastReceivedDataTimestamps = /* @__PURE__ */ new Map();
         this.packageReceivedFromPeers = /* @__PURE__ */ new Set();
         this.startedAtTimestamp = null;
@@ -11699,7 +11698,12 @@ var require_p2pcf = __commonJS({
         }
       }
       _removePeer(peer, destroy = false) {
-        const { packages, peers } = this;
+        const {
+          packageReceivedFromPeers,
+          lastReceivedDataTimestamps,
+          packages,
+          peers
+        } = this;
         if (!peers.has(peer.id))
           return;
         for (let i = 0; i < packages.length; i++) {
@@ -11710,6 +11714,8 @@ var require_p2pcf = __commonJS({
         while (packages.indexOf(null) >= 0) {
           packages.splice(packages.indexOf(null), 1);
         }
+        lastReceivedDataTimestamps.delete(peer.id);
+        packageReceivedFromPeers.delete(peer.id);
         peers.delete(peer.id);
         if (destroy) {
           peer.destroy();
@@ -11823,9 +11829,6 @@ var require_p2pcf = __commonJS({
         );
         return target;
       }
-      _destroyChunks(msgID) {
-        this.msgChunks.delete(msgID);
-      }
       _updateConnectedSessions() {
         this.connectedSessions.length = 0;
         for (const [sessionId, peer] of this.peers) {
@@ -11918,7 +11921,7 @@ var require_p2pcf = __commonJS({
               const msg = this._chunkHandler(data, messageId, chunkId, last);
               if (last) {
                 this.emit("msg", peer, msg);
-                this._destroyChunks(messageId);
+                this.msgChunks.delete(messageId);
               }
             } catch (e) {
               console.error(e);
