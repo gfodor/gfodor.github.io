@@ -11681,6 +11681,7 @@ var require_p2pcf = __commonJS({
             this.packages.length = 0;
             for (const peer of this.peers.values()) {
               this._removePeer(peer, true);
+              this.lastReceivedDataTimestamps.delete(peer.id);
             }
             this.dataTimestamp = null;
             this.lastPackages = null;
@@ -11698,12 +11699,7 @@ var require_p2pcf = __commonJS({
         }
       }
       _removePeer(peer, destroy = false) {
-        const {
-          packageReceivedFromPeers,
-          lastReceivedDataTimestamps,
-          packages,
-          peers
-        } = this;
+        const { packageReceivedFromPeers, packages, peers } = this;
         if (!peers.has(peer.id))
           return;
         for (let i = 0; i < packages.length; i++) {
@@ -11714,7 +11710,6 @@ var require_p2pcf = __commonJS({
         while (packages.indexOf(null) >= 0) {
           packages.splice(packages.indexOf(null), 1);
         }
-        lastReceivedDataTimestamps.delete(peer.id);
         packageReceivedFromPeers.delete(peer.id);
         peers.delete(peer.id);
         if (destroy) {
