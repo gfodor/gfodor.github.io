@@ -11954,6 +11954,7 @@ var require_p2pcf = __commonJS({
         });
         peer.once("_iceComplete", () => {
           peer.on("signal", (signalData) => {
+            console.log("on signal", signalData);
             const payloadBytes = new TextEncoder().encode(
               JSON.stringify(signalData)
             );

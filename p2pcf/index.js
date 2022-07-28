@@ -47,7 +47,7 @@ p2pcf.on('peerconnect', peer => {
   peer.on('track', (track, stream) => {
     console.log('got track', track)
     const video = document.createElement('video')
-    video.id = `${peer.client_id}-video`
+    video.id = `${peer.id}-video`
     video.srcObject = stream
     video.setAttribute('playsinline', true)
     document.getElementById('videos').appendChild(video)
