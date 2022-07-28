@@ -11655,7 +11655,7 @@ var require_p2pcf = __commonJS({
         for (const [sessionId, peer] of peers.entries()) {
           if (remoteSessionIds.includes(sessionId))
             continue;
-          this._removePeer(peer);
+          this._removePeer(peer, true);
         }
       }
       async start() {
@@ -11681,7 +11681,7 @@ var require_p2pcf = __commonJS({
           if (newUdpEnabled !== this.udpEnabled || newIsSymmetric !== this.isSymmetric || newDtlsFingerprint !== this.dtlsFingerprint || [...this.reflexiveIps].join(" ") !== [...newReflexiveIps].join(" ")) {
             this.packages.length = 0;
             for (const peer of this.peers.values()) {
-              this._removePeer(peer);
+              this._removePeer(peer, true);
             }
             this.dataTimestamp = null;
             this.lastPackages = null;
@@ -11698,7 +11698,7 @@ var require_p2pcf = __commonJS({
           window.addEventListener(ev, this.destroyOnUnload);
         }
       }
-      _removePeer(peer) {
+      _removePeer(peer, destroy = false) {
         const { packages, peers } = this;
         if (!peers.has(peer.id))
           return;
@@ -11711,6 +11711,9 @@ var require_p2pcf = __commonJS({
           packages.splice(packages.indexOf(null), 1);
         }
         peers.delete(peer.id);
+        if (destroy) {
+          peer.destroy();
+        }
         this.emit("peerclose", peer);
       }
       send(peer, msg) {

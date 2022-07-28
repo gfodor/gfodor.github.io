@@ -35,6 +35,7 @@ const addMessage = message => {
 }
 
 p2pcf.on('peerconnect', peer => {
+  console.log('Peer connect', peer.id, peer)
   addPeerUi(peer.id)
 })
 
@@ -59,7 +60,7 @@ export const waitForEvent = function (eventName, eventObj) {
 
 const go = () => {
   document.getElementById('session-id').innerText =
-    p2pcf.sessionId.substring(0, 5) + ':'
+    p2pcf.sessionId.substring(0, 5) + '@' + p2pcf.roomId + ':'
 
   document.getElementById('send-button').addEventListener('click', () => {
     const box = document.getElementById('send-box')
