@@ -11488,11 +11488,14 @@ var require_p2pcf = __commonJS({
               ,
               remoteCandidates
             ] = remotePackage;
+            let hasFinishedFirstIce = false;
             const peer = new Peer({
               config: peerOptions,
               initiator: false,
               iceCompleteTimeout: 3e3,
               sdpTransform: (sdp) => {
+                if (hasFinishedFirstIce)
+                  return sdp;
                 const lines = [];
                 for (const l of sdp.split("\r\n")) {
                   if (l.startsWith("a=ice-ufrag")) {
@@ -11529,6 +11532,7 @@ var require_p2pcf = __commonJS({
             };
             peer.on("signal", initialCandidateSignalling);
             const finishIce = () => {
+              hasFinishedFirstIce = true;
               peer.removeListener("signal", initialCandidateSignalling);
               if (localPackages.includes(pkg))
                 return;
