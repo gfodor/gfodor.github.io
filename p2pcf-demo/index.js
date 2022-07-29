@@ -6,7 +6,7 @@ if (!document.location.hash) {
     `#room-example-${Math.floor(Math.random() * 100000)}`
 }
 
-const p2pcf = new P2PCF('user-' + Math.floor(Math.random() * 100000), document.location.hash.substring(1), { fastPollingRateMs: 1000 })
+const p2pcf = new P2PCF('user-' + Math.floor(Math.random() * 100000), document.location.hash.substring(1), { slowPollingRateMs: 1000 })
 window.p2pcf = p2pcf
 
 const removePeerUi = clientId => {
