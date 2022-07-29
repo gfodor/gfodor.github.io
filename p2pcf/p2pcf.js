@@ -11679,7 +11679,14 @@ var require_p2pcf = __commonJS({
             newReflexiveIps,
             newDtlsFingerprint
           ] = await this._getNetworkSettings(this.dtlsCert);
-          if (newUdpEnabled !== this.udpEnabled || newIsSymmetric !== this.isSymmetric || newDtlsFingerprint !== this.dtlsFingerprint || [...this.reflexiveIps].join(" ") !== [...newReflexiveIps].join(" ")) {
+          let retainedAnyReflexiveIps = false;
+          for (const oldIp of this.reflexiveIps) {
+            for (const newIp of newReflexiveIps) {
+              if (oldIp === newIp)
+                retainedAnyReflexiveIps = true;
+            }
+          }
+          if (newUdpEnabled !== this.udpEnabled || newIsSymmetric !== this.isSymmetric || newDtlsFingerprint !== this.dtlsFingerprint || !retainedAnyReflexiveIps) {
             this.packages.length = 0;
             for (const peer of this.peers.values()) {
               this._removePeer(peer, true);
