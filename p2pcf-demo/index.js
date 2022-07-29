@@ -68,14 +68,6 @@ p2pcf.on('msg', (peer, data) => {
   )
 })
 
-p2pcf.start()
-
-export const waitForEvent = function (eventName, eventObj) {
-  return new Promise(resolve => {
-    eventObj.addEventListener(eventName, resolve, { once: true })
-  })
-}
-
 const go = () => {
   document.getElementById('session-id').innerText =
     p2pcf.sessionId.substring(0, 5) + '@' + p2pcf.roomId + ':'
@@ -96,6 +88,8 @@ const go = () => {
         peer.addStream(stream)
       }
     })
+
+  p2pcf.start()
 }
 
 if (
@@ -104,5 +98,5 @@ if (
 ) {
   go()
 } else {
-  window.addEventListener('DOMCOntentLoaded', go, { once: true })
+  window.addEventListener('DOMContentLoaded', go, { once: true })
 }
