@@ -6,41 +6,7 @@ if (!document.location.hash) {
     `#room-example-${Math.floor(Math.random() * 100000)}`
 }
 
-let turnIceServers = null
-
-const twilioUsername = new URLSearchParams(document.location.search).get(
-  'twilio_username'
-)
-const twilioCredential = new URLSearchParams(document.location.search).get(
-  'twilio_credential'
-)
-
-if (twilioCredential && twilioUsername) {
-  turnIceServers = [
-    {
-      username: twilioUsername,
-      credential: twilioCredential,
-      url: 'turn:global.turn.twilio.com:3478?transport=udp',
-      urls: 'turn:global.turn.twilio.com:3478?transport=udp'
-    },
-    {
-      username: twilioUsername,
-      credential: twilioCredential,
-      url: 'turn:global.turn.twilio.com:3478?transport=tcp',
-      urls: 'turn:global.turn.twilio.com:3478?transport=tcp'
-    },
-    {
-      username: twilioUsername,
-      credential: twilioCredential,
-      url: 'turn:global.turn.twilio.com:443?transport=tcp',
-      urls: 'turn:global.turn.twilio.com:443?transport=tcp'
-    }
-  ]
-}
-
-const p2pcf = new P2PCF('testguy', document.location.hash.substring(1), {
-  turnIceServers
-})
+const p2pcf = new P2PCF('testguy', document.location.hash.substring(1))
 window.p2pcf = p2pcf
 
 const removePeerUi = clientId => {
