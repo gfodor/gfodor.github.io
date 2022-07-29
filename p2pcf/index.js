@@ -8,10 +8,12 @@ if (!document.location.hash) {
 
 let turnIceServers = null
 
-const twilioUsername = new URLSearchParams(document.location.search)
-  .twilio_username
-const twilioCredential = new URLSearchParams(document.location.search)
-  .twilio_credential
+const twilioUsername = new URLSearchParams(document.location.search).get(
+  'twilio_username'
+)
+const twilioCredential = new URLSearchParams(document.location.search).get(
+  'twilio_credential'
+)
 
 if (twilioCredential && twilioUsername) {
   turnIceServers = [
