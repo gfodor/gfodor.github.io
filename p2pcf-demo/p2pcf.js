@@ -1,19 +1,2776 @@
-var Ul=(e,t)=>()=>(e&&(t=e(e=0)),t);var v=(e,t)=>()=>(t||e((t={exports:{}}).exports,t),t.exports);var jr=v(cn=>{"use strict";_();cn.byteLength=ql;cn.toByteArray=jl;cn.fromByteArray=Zl;var le=[],te=[],Pl=typeof Uint8Array<"u"?Uint8Array:Array,ni="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";for($e=0,qr=ni.length;$e<qr;++$e)le[$e]=ni[$e],te[ni.charCodeAt($e)]=$e;var $e,qr;te["-".charCodeAt(0)]=62;te["_".charCodeAt(0)]=63;function zr(e){var t=e.length;if(t%4>0)throw new Error("Invalid string. Length must be a multiple of 4");var n=e.indexOf("=");n===-1&&(n=t);var i=n===t?0:4-n%4;return[n,i]}function ql(e){var t=zr(e),n=t[0],i=t[1];return(n+i)*3/4-i}function zl(e,t,n){return(t+n)*3/4-n}function jl(e){var t,n=zr(e),i=n[0],r=n[1],a=new Pl(zl(e,i,r)),o=0,s=r>0?i-4:i,u;for(u=0;u<s;u+=4)t=te[e.charCodeAt(u)]<<18|te[e.charCodeAt(u+1)]<<12|te[e.charCodeAt(u+2)]<<6|te[e.charCodeAt(u+3)],a[o++]=t>>16&255,a[o++]=t>>8&255,a[o++]=t&255;return r===2&&(t=te[e.charCodeAt(u)]<<2|te[e.charCodeAt(u+1)]>>4,a[o++]=t&255),r===1&&(t=te[e.charCodeAt(u)]<<10|te[e.charCodeAt(u+1)]<<4|te[e.charCodeAt(u+2)]>>2,a[o++]=t>>8&255,a[o++]=t&255),a}function Hl(e){return le[e>>18&63]+le[e>>12&63]+le[e>>6&63]+le[e&63]}function Wl(e,t,n){for(var i,r=[],a=t;a<n;a+=3)i=(e[a]<<16&16711680)+(e[a+1]<<8&65280)+(e[a+2]&255),r.push(Hl(i));return r.join("")}function Zl(e){for(var t,n=e.length,i=n%3,r=[],a=16383,o=0,s=n-i;o<s;o+=a)r.push(Wl(e,o,o+a>s?s:o+a));return i===1?(t=e[n-1],r.push(le[t>>2]+le[t<<4&63]+"==")):i===2&&(t=(e[n-2]<<8)+e[n-1],r.push(le[t>>10]+le[t>>4&63]+le[t<<2&63]+"=")),r.join("")}});var Hr=v(ii=>{_();ii.read=function(e,t,n,i,r){var a,o,s=r*8-i-1,u=(1<<s)-1,l=u>>1,f=-7,h=n?r-1:0,p=n?-1:1,c=e[t+h];for(h+=p,a=c&(1<<-f)-1,c>>=-f,f+=s;f>0;a=a*256+e[t+h],h+=p,f-=8);for(o=a&(1<<-f)-1,a>>=-f,f+=i;f>0;o=o*256+e[t+h],h+=p,f-=8);if(a===0)a=1-l;else{if(a===u)return o?NaN:(c?-1:1)*(1/0);o=o+Math.pow(2,i),a=a-l}return(c?-1:1)*o*Math.pow(2,a-i)};ii.write=function(e,t,n,i,r,a){var o,s,u,l=a*8-r-1,f=(1<<l)-1,h=f>>1,p=r===23?Math.pow(2,-24)-Math.pow(2,-77):0,c=i?0:a-1,y=i?1:-1,E=t<0||t===0&&1/t<0?1:0;for(t=Math.abs(t),isNaN(t)||t===1/0?(s=isNaN(t)?1:0,o=f):(o=Math.floor(Math.log(t)/Math.LN2),t*(u=Math.pow(2,-o))<1&&(o--,u*=2),o+h>=1?t+=p/u:t+=p*Math.pow(2,1-h),t*u>=2&&(o++,u/=2),o+h>=f?(s=0,o=f):o+h>=1?(s=(t*u-1)*Math.pow(2,r),o=o+h):(s=t*Math.pow(2,h-1)*Math.pow(2,r),o=0));r>=8;e[n+c]=s&255,c+=y,s/=256,r-=8);for(o=o<<r|s,l+=r;l>0;e[n+c]=o&255,c+=y,o/=256,l-=8);e[n+c-y]|=E*128}});var Xe=v(pt=>{"use strict";_();var ri=jr(),ct=Hr(),Wr=typeof Symbol=="function"&&typeof Symbol.for=="function"?Symbol.for("nodejs.util.inspect.custom"):null;pt.Buffer=d;pt.SlowBuffer=Vl;pt.INSPECT_MAX_BYTES=50;var dn=2147483647;pt.kMaxLength=dn;d.TYPED_ARRAY_SUPPORT=Yl();!d.TYPED_ARRAY_SUPPORT&&typeof console<"u"&&typeof console.error=="function"&&console.error("This browser lacks typed array (Uint8Array) support which is required by `buffer` v5.x. Use `buffer` v4.x if you require old browser support.");function Yl(){try{let e=new Uint8Array(1),t={foo:function(){return 42}};return Object.setPrototypeOf(t,Uint8Array.prototype),Object.setPrototypeOf(e,t),e.foo()===42}catch{return!1}}Object.defineProperty(d.prototype,"parent",{enumerable:!0,get:function(){if(!!d.isBuffer(this))return this.buffer}});Object.defineProperty(d.prototype,"offset",{enumerable:!0,get:function(){if(!!d.isBuffer(this))return this.byteOffset}});function xe(e){if(e>dn)throw new RangeError('The value "'+e+'" is invalid for option "size"');let t=new Uint8Array(e);return Object.setPrototypeOf(t,d.prototype),t}function d(e,t,n){if(typeof e=="number"){if(typeof t=="string")throw new TypeError('The "string" argument must be of type string. Received type number');return li(e)}return $r(e,t,n)}d.poolSize=8192;function $r(e,t,n){if(typeof e=="string")return $l(e,t);if(ArrayBuffer.isView(e))return Kl(e);if(e==null)throw new TypeError("The first argument must be one of type string, Buffer, ArrayBuffer, Array, or Array-like Object. Received type "+typeof e);if(fe(e,ArrayBuffer)||e&&fe(e.buffer,ArrayBuffer)||typeof SharedArrayBuffer<"u"&&(fe(e,SharedArrayBuffer)||e&&fe(e.buffer,SharedArrayBuffer)))return oi(e,t,n);if(typeof e=="number")throw new TypeError('The "value" argument must not be of type number. Received type number');let i=e.valueOf&&e.valueOf();if(i!=null&&i!==e)return d.from(i,t,n);let r=Xl(e);if(r)return r;if(typeof Symbol<"u"&&Symbol.toPrimitive!=null&&typeof e[Symbol.toPrimitive]=="function")return d.from(e[Symbol.toPrimitive]("string"),t,n);throw new TypeError("The first argument must be one of type string, Buffer, ArrayBuffer, Array, or Array-like Object. Received type "+typeof e)}d.from=function(e,t,n){return $r(e,t,n)};Object.setPrototypeOf(d.prototype,Uint8Array.prototype);Object.setPrototypeOf(d,Uint8Array);function Kr(e){if(typeof e!="number")throw new TypeError('"size" argument must be of type number');if(e<0)throw new RangeError('The value "'+e+'" is invalid for option "size"')}function Gl(e,t,n){return Kr(e),e<=0?xe(e):t!==void 0?typeof n=="string"?xe(e).fill(t,n):xe(e).fill(t):xe(e)}d.alloc=function(e,t,n){return Gl(e,t,n)};function li(e){return Kr(e),xe(e<0?0:fi(e)|0)}d.allocUnsafe=function(e){return li(e)};d.allocUnsafeSlow=function(e){return li(e)};function $l(e,t){if((typeof t!="string"||t==="")&&(t="utf8"),!d.isEncoding(t))throw new TypeError("Unknown encoding: "+t);let n=Xr(e,t)|0,i=xe(n),r=i.write(e,t);return r!==n&&(i=i.slice(0,r)),i}function ai(e){let t=e.length<0?0:fi(e.length)|0,n=xe(t);for(let i=0;i<t;i+=1)n[i]=e[i]&255;return n}function Kl(e){if(fe(e,Uint8Array)){let t=new Uint8Array(e);return oi(t.buffer,t.byteOffset,t.byteLength)}return ai(e)}function oi(e,t,n){if(t<0||e.byteLength<t)throw new RangeError('"offset" is outside of buffer bounds');if(e.byteLength<t+(n||0))throw new RangeError('"length" is outside of buffer bounds');let i;return t===void 0&&n===void 0?i=new Uint8Array(e):n===void 0?i=new Uint8Array(e,t):i=new Uint8Array(e,t,n),Object.setPrototypeOf(i,d.prototype),i}function Xl(e){if(d.isBuffer(e)){let t=fi(e.length)|0,n=xe(t);return n.length===0||e.copy(n,0,0,t),n}if(e.length!==void 0)return typeof e.length!="number"||hi(e.length)?xe(0):ai(e);if(e.type==="Buffer"&&Array.isArray(e.data))return ai(e.data)}function fi(e){if(e>=dn)throw new RangeError("Attempt to allocate Buffer larger than maximum size: 0x"+dn.toString(16)+" bytes");return e|0}function Vl(e){return+e!=e&&(e=0),d.alloc(+e)}d.isBuffer=function(t){return t!=null&&t._isBuffer===!0&&t!==d.prototype};d.compare=function(t,n){if(fe(t,Uint8Array)&&(t=d.from(t,t.offset,t.byteLength)),fe(n,Uint8Array)&&(n=d.from(n,n.offset,n.byteLength)),!d.isBuffer(t)||!d.isBuffer(n))throw new TypeError('The "buf1", "buf2" arguments must be one of type Buffer or Uint8Array');if(t===n)return 0;let i=t.length,r=n.length;for(let a=0,o=Math.min(i,r);a<o;++a)if(t[a]!==n[a]){i=t[a],r=n[a];break}return i<r?-1:r<i?1:0};d.isEncoding=function(t){switch(String(t).toLowerCase()){case"hex":case"utf8":case"utf-8":case"ascii":case"latin1":case"binary":case"base64":case"ucs2":case"ucs-2":case"utf16le":case"utf-16le":return!0;default:return!1}};d.concat=function(t,n){if(!Array.isArray(t))throw new TypeError('"list" argument must be an Array of Buffers');if(t.length===0)return d.alloc(0);let i;if(n===void 0)for(n=0,i=0;i<t.length;++i)n+=t[i].length;let r=d.allocUnsafe(n),a=0;for(i=0;i<t.length;++i){let o=t[i];if(fe(o,Uint8Array))a+o.length>r.length?(d.isBuffer(o)||(o=d.from(o)),o.copy(r,a)):Uint8Array.prototype.set.call(r,o,a);else if(d.isBuffer(o))o.copy(r,a);else throw new TypeError('"list" argument must be an Array of Buffers');a+=o.length}return r};function Xr(e,t){if(d.isBuffer(e))return e.length;if(ArrayBuffer.isView(e)||fe(e,ArrayBuffer))return e.byteLength;if(typeof e!="string")throw new TypeError('The "string" argument must be one of type string, Buffer, or ArrayBuffer. Received type '+typeof e);let n=e.length,i=arguments.length>2&&arguments[2]===!0;if(!i&&n===0)return 0;let r=!1;for(;;)switch(t){case"ascii":case"latin1":case"binary":return n;case"utf8":case"utf-8":return si(e).length;case"ucs2":case"ucs-2":case"utf16le":case"utf-16le":return n*2;case"hex":return n>>>1;case"base64":return aa(e).length;default:if(r)return i?-1:si(e).length;t=(""+t).toLowerCase(),r=!0}}d.byteLength=Xr;function Jl(e,t,n){let i=!1;if((t===void 0||t<0)&&(t=0),t>this.length||((n===void 0||n>this.length)&&(n=this.length),n<=0)||(n>>>=0,t>>>=0,n<=t))return"";for(e||(e="utf8");;)switch(e){case"hex":return ff(this,t,n);case"utf8":case"utf-8":return Jr(this,t,n);case"ascii":return sf(this,t,n);case"latin1":case"binary":return lf(this,t,n);case"base64":return af(this,t,n);case"ucs2":case"ucs-2":case"utf16le":case"utf-16le":return uf(this,t,n);default:if(i)throw new TypeError("Unknown encoding: "+e);e=(e+"").toLowerCase(),i=!0}}d.prototype._isBuffer=!0;function Ke(e,t,n){let i=e[t];e[t]=e[n],e[n]=i}d.prototype.swap16=function(){let t=this.length;if(t%2!==0)throw new RangeError("Buffer size must be a multiple of 16-bits");for(let n=0;n<t;n+=2)Ke(this,n,n+1);return this};d.prototype.swap32=function(){let t=this.length;if(t%4!==0)throw new RangeError("Buffer size must be a multiple of 32-bits");for(let n=0;n<t;n+=4)Ke(this,n,n+3),Ke(this,n+1,n+2);return this};d.prototype.swap64=function(){let t=this.length;if(t%8!==0)throw new RangeError("Buffer size must be a multiple of 64-bits");for(let n=0;n<t;n+=8)Ke(this,n,n+7),Ke(this,n+1,n+6),Ke(this,n+2,n+5),Ke(this,n+3,n+4);return this};d.prototype.toString=function(){let t=this.length;return t===0?"":arguments.length===0?Jr(this,0,t):Jl.apply(this,arguments)};d.prototype.toLocaleString=d.prototype.toString;d.prototype.equals=function(t){if(!d.isBuffer(t))throw new TypeError("Argument must be a Buffer");return this===t?!0:d.compare(this,t)===0};d.prototype.inspect=function(){let t="",n=pt.INSPECT_MAX_BYTES;return t=this.toString("hex",0,n).replace(/(.{2})/g,"$1 ").trim(),this.length>n&&(t+=" ... "),"<Buffer "+t+">"};Wr&&(d.prototype[Wr]=d.prototype.inspect);d.prototype.compare=function(t,n,i,r,a){if(fe(t,Uint8Array)&&(t=d.from(t,t.offset,t.byteLength)),!d.isBuffer(t))throw new TypeError('The "target" argument must be one of type Buffer or Uint8Array. Received type '+typeof t);if(n===void 0&&(n=0),i===void 0&&(i=t?t.length:0),r===void 0&&(r=0),a===void 0&&(a=this.length),n<0||i>t.length||r<0||a>this.length)throw new RangeError("out of range index");if(r>=a&&n>=i)return 0;if(r>=a)return-1;if(n>=i)return 1;if(n>>>=0,i>>>=0,r>>>=0,a>>>=0,this===t)return 0;let o=a-r,s=i-n,u=Math.min(o,s),l=this.slice(r,a),f=t.slice(n,i);for(let h=0;h<u;++h)if(l[h]!==f[h]){o=l[h],s=f[h];break}return o<s?-1:s<o?1:0};function Vr(e,t,n,i,r){if(e.length===0)return-1;if(typeof n=="string"?(i=n,n=0):n>2147483647?n=2147483647:n<-2147483648&&(n=-2147483648),n=+n,hi(n)&&(n=r?0:e.length-1),n<0&&(n=e.length+n),n>=e.length){if(r)return-1;n=e.length-1}else if(n<0)if(r)n=0;else return-1;if(typeof t=="string"&&(t=d.from(t,i)),d.isBuffer(t))return t.length===0?-1:Zr(e,t,n,i,r);if(typeof t=="number")return t=t&255,typeof Uint8Array.prototype.indexOf=="function"?r?Uint8Array.prototype.indexOf.call(e,t,n):Uint8Array.prototype.lastIndexOf.call(e,t,n):Zr(e,[t],n,i,r);throw new TypeError("val must be string, number or Buffer")}function Zr(e,t,n,i,r){let a=1,o=e.length,s=t.length;if(i!==void 0&&(i=String(i).toLowerCase(),i==="ucs2"||i==="ucs-2"||i==="utf16le"||i==="utf-16le")){if(e.length<2||t.length<2)return-1;a=2,o/=2,s/=2,n/=2}function u(f,h){return a===1?f[h]:f.readUInt16BE(h*a)}let l;if(r){let f=-1;for(l=n;l<o;l++)if(u(e,l)===u(t,f===-1?0:l-f)){if(f===-1&&(f=l),l-f+1===s)return f*a}else f!==-1&&(l-=l-f),f=-1}else for(n+s>o&&(n=o-s),l=n;l>=0;l--){let f=!0;for(let h=0;h<s;h++)if(u(e,l+h)!==u(t,h)){f=!1;break}if(f)return l}return-1}d.prototype.includes=function(t,n,i){return this.indexOf(t,n,i)!==-1};d.prototype.indexOf=function(t,n,i){return Vr(this,t,n,i,!0)};d.prototype.lastIndexOf=function(t,n,i){return Vr(this,t,n,i,!1)};function Ql(e,t,n,i){n=Number(n)||0;let r=e.length-n;i?(i=Number(i),i>r&&(i=r)):i=r;let a=t.length;i>a/2&&(i=a/2);let o;for(o=0;o<i;++o){let s=parseInt(t.substr(o*2,2),16);if(hi(s))return o;e[n+o]=s}return o}function ef(e,t,n,i){return pn(si(t,e.length-n),e,n,i)}function tf(e,t,n,i){return pn(pf(t),e,n,i)}function nf(e,t,n,i){return pn(aa(t),e,n,i)}function rf(e,t,n,i){return pn(_f(t,e.length-n),e,n,i)}d.prototype.write=function(t,n,i,r){if(n===void 0)r="utf8",i=this.length,n=0;else if(i===void 0&&typeof n=="string")r=n,i=this.length,n=0;else if(isFinite(n))n=n>>>0,isFinite(i)?(i=i>>>0,r===void 0&&(r="utf8")):(r=i,i=void 0);else throw new Error("Buffer.write(string, encoding, offset[, length]) is no longer supported");let a=this.length-n;if((i===void 0||i>a)&&(i=a),t.length>0&&(i<0||n<0)||n>this.length)throw new RangeError("Attempt to write outside buffer bounds");r||(r="utf8");let o=!1;for(;;)switch(r){case"hex":return Ql(this,t,n,i);case"utf8":case"utf-8":return ef(this,t,n,i);case"ascii":case"latin1":case"binary":return tf(this,t,n,i);case"base64":return nf(this,t,n,i);case"ucs2":case"ucs-2":case"utf16le":case"utf-16le":return rf(this,t,n,i);default:if(o)throw new TypeError("Unknown encoding: "+r);r=(""+r).toLowerCase(),o=!0}};d.prototype.toJSON=function(){return{type:"Buffer",data:Array.prototype.slice.call(this._arr||this,0)}};function af(e,t,n){return t===0&&n===e.length?ri.fromByteArray(e):ri.fromByteArray(e.slice(t,n))}function Jr(e,t,n){n=Math.min(e.length,n);let i=[],r=t;for(;r<n;){let a=e[r],o=null,s=a>239?4:a>223?3:a>191?2:1;if(r+s<=n){let u,l,f,h;switch(s){case 1:a<128&&(o=a);break;case 2:u=e[r+1],(u&192)===128&&(h=(a&31)<<6|u&63,h>127&&(o=h));break;case 3:u=e[r+1],l=e[r+2],(u&192)===128&&(l&192)===128&&(h=(a&15)<<12|(u&63)<<6|l&63,h>2047&&(h<55296||h>57343)&&(o=h));break;case 4:u=e[r+1],l=e[r+2],f=e[r+3],(u&192)===128&&(l&192)===128&&(f&192)===128&&(h=(a&15)<<18|(u&63)<<12|(l&63)<<6|f&63,h>65535&&h<1114112&&(o=h))}}o===null?(o=65533,s=1):o>65535&&(o-=65536,i.push(o>>>10&1023|55296),o=56320|o&1023),i.push(o),r+=s}return of(i)}var Yr=4096;function of(e){let t=e.length;if(t<=Yr)return String.fromCharCode.apply(String,e);let n="",i=0;for(;i<t;)n+=String.fromCharCode.apply(String,e.slice(i,i+=Yr));return n}function sf(e,t,n){let i="";n=Math.min(e.length,n);for(let r=t;r<n;++r)i+=String.fromCharCode(e[r]&127);return i}function lf(e,t,n){let i="";n=Math.min(e.length,n);for(let r=t;r<n;++r)i+=String.fromCharCode(e[r]);return i}function ff(e,t,n){let i=e.length;(!t||t<0)&&(t=0),(!n||n<0||n>i)&&(n=i);let r="";for(let a=t;a<n;++a)r+=gf[e[a]];return r}function uf(e,t,n){let i=e.slice(t,n),r="";for(let a=0;a<i.length-1;a+=2)r+=String.fromCharCode(i[a]+i[a+1]*256);return r}d.prototype.slice=function(t,n){let i=this.length;t=~~t,n=n===void 0?i:~~n,t<0?(t+=i,t<0&&(t=0)):t>i&&(t=i),n<0?(n+=i,n<0&&(n=0)):n>i&&(n=i),n<t&&(n=t);let r=this.subarray(t,n);return Object.setPrototypeOf(r,d.prototype),r};function Z(e,t,n){if(e%1!==0||e<0)throw new RangeError("offset is not uint");if(e+t>n)throw new RangeError("Trying to access beyond buffer length")}d.prototype.readUintLE=d.prototype.readUIntLE=function(t,n,i){t=t>>>0,n=n>>>0,i||Z(t,n,this.length);let r=this[t],a=1,o=0;for(;++o<n&&(a*=256);)r+=this[t+o]*a;return r};d.prototype.readUintBE=d.prototype.readUIntBE=function(t,n,i){t=t>>>0,n=n>>>0,i||Z(t,n,this.length);let r=this[t+--n],a=1;for(;n>0&&(a*=256);)r+=this[t+--n]*a;return r};d.prototype.readUint8=d.prototype.readUInt8=function(t,n){return t=t>>>0,n||Z(t,1,this.length),this[t]};d.prototype.readUint16LE=d.prototype.readUInt16LE=function(t,n){return t=t>>>0,n||Z(t,2,this.length),this[t]|this[t+1]<<8};d.prototype.readUint16BE=d.prototype.readUInt16BE=function(t,n){return t=t>>>0,n||Z(t,2,this.length),this[t]<<8|this[t+1]};d.prototype.readUint32LE=d.prototype.readUInt32LE=function(t,n){return t=t>>>0,n||Z(t,4,this.length),(this[t]|this[t+1]<<8|this[t+2]<<16)+this[t+3]*16777216};d.prototype.readUint32BE=d.prototype.readUInt32BE=function(t,n){return t=t>>>0,n||Z(t,4,this.length),this[t]*16777216+(this[t+1]<<16|this[t+2]<<8|this[t+3])};d.prototype.readBigUInt64LE=Le(function(t){t=t>>>0,dt(t,"offset");let n=this[t],i=this[t+7];(n===void 0||i===void 0)&&Ut(t,this.length-8);let r=n+this[++t]*2**8+this[++t]*2**16+this[++t]*2**24,a=this[++t]+this[++t]*2**8+this[++t]*2**16+i*2**24;return BigInt(r)+(BigInt(a)<<BigInt(32))});d.prototype.readBigUInt64BE=Le(function(t){t=t>>>0,dt(t,"offset");let n=this[t],i=this[t+7];(n===void 0||i===void 0)&&Ut(t,this.length-8);let r=n*2**24+this[++t]*2**16+this[++t]*2**8+this[++t],a=this[++t]*2**24+this[++t]*2**16+this[++t]*2**8+i;return(BigInt(r)<<BigInt(32))+BigInt(a)});d.prototype.readIntLE=function(t,n,i){t=t>>>0,n=n>>>0,i||Z(t,n,this.length);let r=this[t],a=1,o=0;for(;++o<n&&(a*=256);)r+=this[t+o]*a;return a*=128,r>=a&&(r-=Math.pow(2,8*n)),r};d.prototype.readIntBE=function(t,n,i){t=t>>>0,n=n>>>0,i||Z(t,n,this.length);let r=n,a=1,o=this[t+--r];for(;r>0&&(a*=256);)o+=this[t+--r]*a;return a*=128,o>=a&&(o-=Math.pow(2,8*n)),o};d.prototype.readInt8=function(t,n){return t=t>>>0,n||Z(t,1,this.length),this[t]&128?(255-this[t]+1)*-1:this[t]};d.prototype.readInt16LE=function(t,n){t=t>>>0,n||Z(t,2,this.length);let i=this[t]|this[t+1]<<8;return i&32768?i|4294901760:i};d.prototype.readInt16BE=function(t,n){t=t>>>0,n||Z(t,2,this.length);let i=this[t+1]|this[t]<<8;return i&32768?i|4294901760:i};d.prototype.readInt32LE=function(t,n){return t=t>>>0,n||Z(t,4,this.length),this[t]|this[t+1]<<8|this[t+2]<<16|this[t+3]<<24};d.prototype.readInt32BE=function(t,n){return t=t>>>0,n||Z(t,4,this.length),this[t]<<24|this[t+1]<<16|this[t+2]<<8|this[t+3]};d.prototype.readBigInt64LE=Le(function(t){t=t>>>0,dt(t,"offset");let n=this[t],i=this[t+7];(n===void 0||i===void 0)&&Ut(t,this.length-8);let r=this[t+4]+this[t+5]*2**8+this[t+6]*2**16+(i<<24);return(BigInt(r)<<BigInt(32))+BigInt(n+this[++t]*2**8+this[++t]*2**16+this[++t]*2**24)});d.prototype.readBigInt64BE=Le(function(t){t=t>>>0,dt(t,"offset");let n=this[t],i=this[t+7];(n===void 0||i===void 0)&&Ut(t,this.length-8);let r=(n<<24)+this[++t]*2**16+this[++t]*2**8+this[++t];return(BigInt(r)<<BigInt(32))+BigInt(this[++t]*2**24+this[++t]*2**16+this[++t]*2**8+i)});d.prototype.readFloatLE=function(t,n){return t=t>>>0,n||Z(t,4,this.length),ct.read(this,t,!0,23,4)};d.prototype.readFloatBE=function(t,n){return t=t>>>0,n||Z(t,4,this.length),ct.read(this,t,!1,23,4)};d.prototype.readDoubleLE=function(t,n){return t=t>>>0,n||Z(t,8,this.length),ct.read(this,t,!0,52,8)};d.prototype.readDoubleBE=function(t,n){return t=t>>>0,n||Z(t,8,this.length),ct.read(this,t,!1,52,8)};function X(e,t,n,i,r,a){if(!d.isBuffer(e))throw new TypeError('"buffer" argument must be a Buffer instance');if(t>r||t<a)throw new RangeError('"value" argument is out of bounds');if(n+i>e.length)throw new RangeError("Index out of range")}d.prototype.writeUintLE=d.prototype.writeUIntLE=function(t,n,i,r){if(t=+t,n=n>>>0,i=i>>>0,!r){let s=Math.pow(2,8*i)-1;X(this,t,n,i,s,0)}let a=1,o=0;for(this[n]=t&255;++o<i&&(a*=256);)this[n+o]=t/a&255;return n+i};d.prototype.writeUintBE=d.prototype.writeUIntBE=function(t,n,i,r){if(t=+t,n=n>>>0,i=i>>>0,!r){let s=Math.pow(2,8*i)-1;X(this,t,n,i,s,0)}let a=i-1,o=1;for(this[n+a]=t&255;--a>=0&&(o*=256);)this[n+a]=t/o&255;return n+i};d.prototype.writeUint8=d.prototype.writeUInt8=function(t,n,i){return t=+t,n=n>>>0,i||X(this,t,n,1,255,0),this[n]=t&255,n+1};d.prototype.writeUint16LE=d.prototype.writeUInt16LE=function(t,n,i){return t=+t,n=n>>>0,i||X(this,t,n,2,65535,0),this[n]=t&255,this[n+1]=t>>>8,n+2};d.prototype.writeUint16BE=d.prototype.writeUInt16BE=function(t,n,i){return t=+t,n=n>>>0,i||X(this,t,n,2,65535,0),this[n]=t>>>8,this[n+1]=t&255,n+2};d.prototype.writeUint32LE=d.prototype.writeUInt32LE=function(t,n,i){return t=+t,n=n>>>0,i||X(this,t,n,4,4294967295,0),this[n+3]=t>>>24,this[n+2]=t>>>16,this[n+1]=t>>>8,this[n]=t&255,n+4};d.prototype.writeUint32BE=d.prototype.writeUInt32BE=function(t,n,i){return t=+t,n=n>>>0,i||X(this,t,n,4,4294967295,0),this[n]=t>>>24,this[n+1]=t>>>16,this[n+2]=t>>>8,this[n+3]=t&255,n+4};function Qr(e,t,n,i,r){ra(t,i,r,e,n,7);let a=Number(t&BigInt(4294967295));e[n++]=a,a=a>>8,e[n++]=a,a=a>>8,e[n++]=a,a=a>>8,e[n++]=a;let o=Number(t>>BigInt(32)&BigInt(4294967295));return e[n++]=o,o=o>>8,e[n++]=o,o=o>>8,e[n++]=o,o=o>>8,e[n++]=o,n}function ea(e,t,n,i,r){ra(t,i,r,e,n,7);let a=Number(t&BigInt(4294967295));e[n+7]=a,a=a>>8,e[n+6]=a,a=a>>8,e[n+5]=a,a=a>>8,e[n+4]=a;let o=Number(t>>BigInt(32)&BigInt(4294967295));return e[n+3]=o,o=o>>8,e[n+2]=o,o=o>>8,e[n+1]=o,o=o>>8,e[n]=o,n+8}d.prototype.writeBigUInt64LE=Le(function(t,n=0){return Qr(this,t,n,BigInt(0),BigInt("0xffffffffffffffff"))});d.prototype.writeBigUInt64BE=Le(function(t,n=0){return ea(this,t,n,BigInt(0),BigInt("0xffffffffffffffff"))});d.prototype.writeIntLE=function(t,n,i,r){if(t=+t,n=n>>>0,!r){let u=Math.pow(2,8*i-1);X(this,t,n,i,u-1,-u)}let a=0,o=1,s=0;for(this[n]=t&255;++a<i&&(o*=256);)t<0&&s===0&&this[n+a-1]!==0&&(s=1),this[n+a]=(t/o>>0)-s&255;return n+i};d.prototype.writeIntBE=function(t,n,i,r){if(t=+t,n=n>>>0,!r){let u=Math.pow(2,8*i-1);X(this,t,n,i,u-1,-u)}let a=i-1,o=1,s=0;for(this[n+a]=t&255;--a>=0&&(o*=256);)t<0&&s===0&&this[n+a+1]!==0&&(s=1),this[n+a]=(t/o>>0)-s&255;return n+i};d.prototype.writeInt8=function(t,n,i){return t=+t,n=n>>>0,i||X(this,t,n,1,127,-128),t<0&&(t=255+t+1),this[n]=t&255,n+1};d.prototype.writeInt16LE=function(t,n,i){return t=+t,n=n>>>0,i||X(this,t,n,2,32767,-32768),this[n]=t&255,this[n+1]=t>>>8,n+2};d.prototype.writeInt16BE=function(t,n,i){return t=+t,n=n>>>0,i||X(this,t,n,2,32767,-32768),this[n]=t>>>8,this[n+1]=t&255,n+2};d.prototype.writeInt32LE=function(t,n,i){return t=+t,n=n>>>0,i||X(this,t,n,4,2147483647,-2147483648),this[n]=t&255,this[n+1]=t>>>8,this[n+2]=t>>>16,this[n+3]=t>>>24,n+4};d.prototype.writeInt32BE=function(t,n,i){return t=+t,n=n>>>0,i||X(this,t,n,4,2147483647,-2147483648),t<0&&(t=4294967295+t+1),this[n]=t>>>24,this[n+1]=t>>>16,this[n+2]=t>>>8,this[n+3]=t&255,n+4};d.prototype.writeBigInt64LE=Le(function(t,n=0){return Qr(this,t,n,-BigInt("0x8000000000000000"),BigInt("0x7fffffffffffffff"))});d.prototype.writeBigInt64BE=Le(function(t,n=0){return ea(this,t,n,-BigInt("0x8000000000000000"),BigInt("0x7fffffffffffffff"))});function ta(e,t,n,i,r,a){if(n+i>e.length)throw new RangeError("Index out of range");if(n<0)throw new RangeError("Index out of range")}function na(e,t,n,i,r){return t=+t,n=n>>>0,r||ta(e,t,n,4,34028234663852886e22,-34028234663852886e22),ct.write(e,t,n,i,23,4),n+4}d.prototype.writeFloatLE=function(t,n,i){return na(this,t,n,!0,i)};d.prototype.writeFloatBE=function(t,n,i){return na(this,t,n,!1,i)};function ia(e,t,n,i,r){return t=+t,n=n>>>0,r||ta(e,t,n,8,17976931348623157e292,-17976931348623157e292),ct.write(e,t,n,i,52,8),n+8}d.prototype.writeDoubleLE=function(t,n,i){return ia(this,t,n,!0,i)};d.prototype.writeDoubleBE=function(t,n,i){return ia(this,t,n,!1,i)};d.prototype.copy=function(t,n,i,r){if(!d.isBuffer(t))throw new TypeError("argument should be a Buffer");if(i||(i=0),!r&&r!==0&&(r=this.length),n>=t.length&&(n=t.length),n||(n=0),r>0&&r<i&&(r=i),r===i||t.length===0||this.length===0)return 0;if(n<0)throw new RangeError("targetStart out of bounds");if(i<0||i>=this.length)throw new RangeError("Index out of range");if(r<0)throw new RangeError("sourceEnd out of bounds");r>this.length&&(r=this.length),t.length-n<r-i&&(r=t.length-n+i);let a=r-i;return this===t&&typeof Uint8Array.prototype.copyWithin=="function"?this.copyWithin(n,i,r):Uint8Array.prototype.set.call(t,this.subarray(i,r),n),a};d.prototype.fill=function(t,n,i,r){if(typeof t=="string"){if(typeof n=="string"?(r=n,n=0,i=this.length):typeof i=="string"&&(r=i,i=this.length),r!==void 0&&typeof r!="string")throw new TypeError("encoding must be a string");if(typeof r=="string"&&!d.isEncoding(r))throw new TypeError("Unknown encoding: "+r);if(t.length===1){let o=t.charCodeAt(0);(r==="utf8"&&o<128||r==="latin1")&&(t=o)}}else typeof t=="number"?t=t&255:typeof t=="boolean"&&(t=Number(t));if(n<0||this.length<n||this.length<i)throw new RangeError("Out of range index");if(i<=n)return this;n=n>>>0,i=i===void 0?this.length:i>>>0,t||(t=0);let a;if(typeof t=="number")for(a=n;a<i;++a)this[a]=t;else{let o=d.isBuffer(t)?t:d.from(t,r),s=o.length;if(s===0)throw new TypeError('The value "'+t+'" is invalid for argument "value"');for(a=0;a<i-n;++a)this[a+n]=o[a%s]}return this};var ht={};function ui(e,t,n){ht[e]=class extends n{constructor(){super(),Object.defineProperty(this,"message",{value:t.apply(this,arguments),writable:!0,configurable:!0}),this.name=`${this.name} [${e}]`,this.stack,delete this.name}get code(){return e}set code(r){Object.defineProperty(this,"code",{configurable:!0,enumerable:!0,value:r,writable:!0})}toString(){return`${this.name} [${e}]: ${this.message}`}}}ui("ERR_BUFFER_OUT_OF_BOUNDS",function(e){return e?`${e} is outside of buffer bounds`:"Attempt to access memory outside buffer bounds"},RangeError);ui("ERR_INVALID_ARG_TYPE",function(e,t){return`The "${e}" argument must be of type number. Received type ${typeof t}`},TypeError);ui("ERR_OUT_OF_RANGE",function(e,t,n){let i=`The value of "${e}" is out of range.`,r=n;return Number.isInteger(n)&&Math.abs(n)>2**32?r=Gr(String(n)):typeof n=="bigint"&&(r=String(n),(n>BigInt(2)**BigInt(32)||n<-(BigInt(2)**BigInt(32)))&&(r=Gr(r)),r+="n"),i+=` It must be ${t}. Received ${r}`,i},RangeError);function Gr(e){let t="",n=e.length,i=e[0]==="-"?1:0;for(;n>=i+4;n-=3)t=`_${e.slice(n-3,n)}${t}`;return`${e.slice(0,n)}${t}`}function hf(e,t,n){dt(t,"offset"),(e[t]===void 0||e[t+n]===void 0)&&Ut(t,e.length-(n+1))}function ra(e,t,n,i,r,a){if(e>n||e<t){let o=typeof t=="bigint"?"n":"",s;throw a>3?t===0||t===BigInt(0)?s=`>= 0${o} and < 2${o} ** ${(a+1)*8}${o}`:s=`>= -(2${o} ** ${(a+1)*8-1}${o}) and < 2 ** ${(a+1)*8-1}${o}`:s=`>= ${t}${o} and <= ${n}${o}`,new ht.ERR_OUT_OF_RANGE("value",s,e)}hf(i,r,a)}function dt(e,t){if(typeof e!="number")throw new ht.ERR_INVALID_ARG_TYPE(t,"number",e)}function Ut(e,t,n){throw Math.floor(e)!==e?(dt(e,n),new ht.ERR_OUT_OF_RANGE(n||"offset","an integer",e)):t<0?new ht.ERR_BUFFER_OUT_OF_BOUNDS:new ht.ERR_OUT_OF_RANGE(n||"offset",`>= ${n?1:0} and <= ${t}`,e)}var cf=/[^+/0-9A-Za-z-_]/g;function df(e){if(e=e.split("=")[0],e=e.trim().replace(cf,""),e.length<2)return"";for(;e.length%4!==0;)e=e+"=";return e}function si(e,t){t=t||1/0;let n,i=e.length,r=null,a=[];for(let o=0;o<i;++o){if(n=e.charCodeAt(o),n>55295&&n<57344){if(!r){if(n>56319){(t-=3)>-1&&a.push(239,191,189);continue}else if(o+1===i){(t-=3)>-1&&a.push(239,191,189);continue}r=n;continue}if(n<56320){(t-=3)>-1&&a.push(239,191,189),r=n;continue}n=(r-55296<<10|n-56320)+65536}else r&&(t-=3)>-1&&a.push(239,191,189);if(r=null,n<128){if((t-=1)<0)break;a.push(n)}else if(n<2048){if((t-=2)<0)break;a.push(n>>6|192,n&63|128)}else if(n<65536){if((t-=3)<0)break;a.push(n>>12|224,n>>6&63|128,n&63|128)}else if(n<1114112){if((t-=4)<0)break;a.push(n>>18|240,n>>12&63|128,n>>6&63|128,n&63|128)}else throw new Error("Invalid code point")}return a}function pf(e){let t=[];for(let n=0;n<e.length;++n)t.push(e.charCodeAt(n)&255);return t}function _f(e,t){let n,i,r,a=[];for(let o=0;o<e.length&&!((t-=2)<0);++o)n=e.charCodeAt(o),i=n>>8,r=n%256,a.push(r),a.push(i);return a}function aa(e){return ri.toByteArray(df(e))}function pn(e,t,n,i){let r;for(r=0;r<i&&!(r+n>=t.length||r>=e.length);++r)t[r+n]=e[r];return r}function fe(e,t){return e instanceof t||e!=null&&e.constructor!=null&&e.constructor.name!=null&&e.constructor.name===t.name}function hi(e){return e!==e}var gf=function(){let e="0123456789abcdef",t=new Array(256);for(let n=0;n<16;++n){let i=n*16;for(let r=0;r<16;++r)t[i+r]=e[n]+e[r]}return t}();function Le(e){return typeof BigInt>"u"?wf:e}function wf(){throw new Error("BigInt not supported")}});var ua=v((O0,fa)=>{_();var j=fa.exports={},ue,he;function ci(){throw new Error("setTimeout has not been defined")}function di(){throw new Error("clearTimeout has not been defined")}(function(){try{typeof setTimeout=="function"?ue=setTimeout:ue=ci}catch{ue=ci}try{typeof clearTimeout=="function"?he=clearTimeout:he=di}catch{he=di}})();function oa(e){if(ue===setTimeout)return setTimeout(e,0);if((ue===ci||!ue)&&setTimeout)return ue=setTimeout,setTimeout(e,0);try{return ue(e,0)}catch{try{return ue.call(null,e,0)}catch{return ue.call(this,e,0)}}}function yf(e){if(he===clearTimeout)return clearTimeout(e);if((he===di||!he)&&clearTimeout)return he=clearTimeout,clearTimeout(e);try{return he(e)}catch{try{return he.call(null,e)}catch{return he.call(this,e)}}}var ve=[],_t=!1,Ve,_n=-1;function bf(){!_t||!Ve||(_t=!1,Ve.length?ve=Ve.concat(ve):_n=-1,ve.length&&sa())}function sa(){if(!_t){var e=oa(bf);_t=!0;for(var t=ve.length;t;){for(Ve=ve,ve=[];++_n<t;)Ve&&Ve[_n].run();_n=-1,t=ve.length}Ve=null,_t=!1,yf(e)}}j.nextTick=function(e){var t=new Array(arguments.length-1);if(arguments.length>1)for(var n=1;n<arguments.length;n++)t[n-1]=arguments[n];ve.push(new la(e,t)),ve.length===1&&!_t&&oa(sa)};function la(e,t){this.fun=e,this.array=t}la.prototype.run=function(){this.fun.apply(null,this.array)};j.title="browser";j.browser=!0;j.env={};j.argv=[];j.version="";j.versions={};function Se(){}j.on=Se;j.addListener=Se;j.once=Se;j.off=Se;j.removeListener=Se;j.removeAllListeners=Se;j.emit=Se;j.prependListener=Se;j.prependOnceListener=Se;j.listeners=function(e){return[]};j.binding=function(e){throw new Error("process.binding is not supported")};j.cwd=function(){return"/"};j.chdir=function(e){throw new Error("process.chdir is not supported")};j.umask=function(){return 0}});var R,g,_=Ul(()=>{R=Xe().Buffer,g=ua()});var pi=v((F0,ha)=>{_();ha.exports=function(){if(typeof globalThis>"u")return null;var t={RTCPeerConnection:globalThis.RTCPeerConnection||globalThis.mozRTCPeerConnection||globalThis.webkitRTCPeerConnection,RTCSessionDescription:globalThis.RTCSessionDescription||globalThis.mozRTCSessionDescription||globalThis.webkitRTCSessionDescription,RTCIceCandidate:globalThis.RTCIceCandidate||globalThis.mozRTCIceCandidate||globalThis.webkitRTCIceCandidate};return t.RTCPeerConnection?t:null}});var gn=v((M0,wa)=>{_();var gt=Object.create||If,mf=Object.keys||Df,Ef=Function.prototype.bind||Lf;function P(){(!this._events||!Object.prototype.hasOwnProperty.call(this,"_events"))&&(this._events=gt(null),this._eventsCount=0),this._maxListeners=this._maxListeners||void 0}wa.exports=P;P.EventEmitter=P;P.prototype._events=void 0;P.prototype._maxListeners=void 0;var _i=10,wi;try{gi={},Object.defineProperty&&Object.defineProperty(gi,"x",{value:0}),wi=gi.x===0}catch{wi=!1}var gi;wi?Object.defineProperty(P,"defaultMaxListeners",{enumerable:!0,get:function(){return _i},set:function(e){if(typeof e!="number"||e<0||e!==e)throw new TypeError('"defaultMaxListeners" must be a positive number');_i=e}}):P.defaultMaxListeners=_i;P.prototype.setMaxListeners=function(t){if(typeof t!="number"||t<0||isNaN(t))throw new TypeError('"n" argument must be a positive number');return this._maxListeners=t,this};function ca(e){return e._maxListeners===void 0?P.defaultMaxListeners:e._maxListeners}P.prototype.getMaxListeners=function(){return ca(this)};function xf(e,t,n){if(t)e.call(n);else for(var i=e.length,r=wt(e,i),a=0;a<i;++a)r[a].call(n)}function vf(e,t,n,i){if(t)e.call(n,i);else for(var r=e.length,a=wt(e,r),o=0;o<r;++o)a[o].call(n,i)}function Sf(e,t,n,i,r){if(t)e.call(n,i,r);else for(var a=e.length,o=wt(e,a),s=0;s<a;++s)o[s].call(n,i,r)}function Rf(e,t,n,i,r,a){if(t)e.call(n,i,r,a);else for(var o=e.length,s=wt(e,o),u=0;u<o;++u)s[u].call(n,i,r,a)}function Tf(e,t,n,i){if(t)e.apply(n,i);else for(var r=e.length,a=wt(e,r),o=0;o<r;++o)a[o].apply(n,i)}P.prototype.emit=function(t){var n,i,r,a,o,s,u=t==="error";if(s=this._events,s)u=u&&s.error==null;else if(!u)return!1;if(u){if(arguments.length>1&&(n=arguments[1]),n instanceof Error)throw n;var l=new Error('Unhandled "error" event. ('+n+")");throw l.context=n,l;return!1}if(i=s[t],!i)return!1;var f=typeof i=="function";switch(r=arguments.length,r){case 1:xf(i,f,this);break;case 2:vf(i,f,this,arguments[1]);break;case 3:Sf(i,f,this,arguments[1],arguments[2]);break;case 4:Rf(i,f,this,arguments[1],arguments[2],arguments[3]);break;default:for(a=new Array(r-1),o=1;o<r;o++)a[o-1]=arguments[o];Tf(i,f,this,a)}return!0};function da(e,t,n,i){var r,a,o;if(typeof n!="function")throw new TypeError('"listener" argument must be a function');if(a=e._events,a?(a.newListener&&(e.emit("newListener",t,n.listener?n.listener:n),a=e._events),o=a[t]):(a=e._events=gt(null),e._eventsCount=0),!o)o=a[t]=n,++e._eventsCount;else if(typeof o=="function"?o=a[t]=i?[n,o]:[o,n]:i?o.unshift(n):o.push(n),!o.warned&&(r=ca(e),r&&r>0&&o.length>r)){o.warned=!0;var s=new Error("Possible EventEmitter memory leak detected. "+o.length+' "'+String(t)+'" listeners added. Use emitter.setMaxListeners() to increase limit.');s.name="MaxListenersExceededWarning",s.emitter=e,s.type=t,s.count=o.length,typeof console=="object"&&console.warn&&console.warn("%s: %s",s.name,s.message)}return e}P.prototype.addListener=function(t,n){return da(this,t,n,!1)};P.prototype.on=P.prototype.addListener;P.prototype.prependListener=function(t,n){return da(this,t,n,!0)};function Cf(){if(!this.fired)switch(this.target.removeListener(this.type,this.wrapFn),this.fired=!0,arguments.length){case 0:return this.listener.call(this.target);case 1:return this.listener.call(this.target,arguments[0]);case 2:return this.listener.call(this.target,arguments[0],arguments[1]);case 3:return this.listener.call(this.target,arguments[0],arguments[1],arguments[2]);default:for(var e=new Array(arguments.length),t=0;t<e.length;++t)e[t]=arguments[t];this.listener.apply(this.target,e)}}function pa(e,t,n){var i={fired:!1,wrapFn:void 0,target:e,type:t,listener:n},r=Ef.call(Cf,i);return r.listener=n,i.wrapFn=r,r}P.prototype.once=function(t,n){if(typeof n!="function")throw new TypeError('"listener" argument must be a function');return this.on(t,pa(this,t,n)),this};P.prototype.prependOnceListener=function(t,n){if(typeof n!="function")throw new TypeError('"listener" argument must be a function');return this.prependListener(t,pa(this,t,n)),this};P.prototype.removeListener=function(t,n){var i,r,a,o,s;if(typeof n!="function")throw new TypeError('"listener" argument must be a function');if(r=this._events,!r)return this;if(i=r[t],!i)return this;if(i===n||i.listener===n)--this._eventsCount===0?this._events=gt(null):(delete r[t],r.removeListener&&this.emit("removeListener",t,i.listener||n));else if(typeof i!="function"){for(a=-1,o=i.length-1;o>=0;o--)if(i[o]===n||i[o].listener===n){s=i[o].listener,a=o;break}if(a<0)return this;a===0?i.shift():Af(i,a),i.length===1&&(r[t]=i[0]),r.removeListener&&this.emit("removeListener",t,s||n)}return this};P.prototype.removeAllListeners=function(t){var n,i,r;if(i=this._events,!i)return this;if(!i.removeListener)return arguments.length===0?(this._events=gt(null),this._eventsCount=0):i[t]&&(--this._eventsCount===0?this._events=gt(null):delete i[t]),this;if(arguments.length===0){var a=mf(i),o;for(r=0;r<a.length;++r)o=a[r],o!=="removeListener"&&this.removeAllListeners(o);return this.removeAllListeners("removeListener"),this._events=gt(null),this._eventsCount=0,this}if(n=i[t],typeof n=="function")this.removeListener(t,n);else if(n)for(r=n.length-1;r>=0;r--)this.removeListener(t,n[r]);return this};function _a(e,t,n){var i=e._events;if(!i)return[];var r=i[t];return r?typeof r=="function"?n?[r.listener||r]:[r]:n?kf(r):wt(r,r.length):[]}P.prototype.listeners=function(t){return _a(this,t,!0)};P.prototype.rawListeners=function(t){return _a(this,t,!1)};P.listenerCount=function(e,t){return typeof e.listenerCount=="function"?e.listenerCount(t):ga.call(e,t)};P.prototype.listenerCount=ga;function ga(e){var t=this._events;if(t){var n=t[e];if(typeof n=="function")return 1;if(n)return n.length}return 0}P.prototype.eventNames=function(){return this._eventsCount>0?Reflect.ownKeys(this._events):[]};function Af(e,t){for(var n=t,i=n+1,r=e.length;i<r;n+=1,i+=1)e[n]=e[i];e.pop()}function wt(e,t){for(var n=new Array(t),i=0;i<t;++i)n[i]=e[i];return n}function kf(e){for(var t=new Array(e.length),n=0;n<t.length;++n)t[n]=e[n].listener||e[n];return t}function If(e){var t=function(){};return t.prototype=e,new t}function Df(e){var t=[];for(var n in e)Object.prototype.hasOwnProperty.call(e,n)&&t.push(n);return n}function Lf(e){var t=this;return function(){return t.apply(e,arguments)}}});var ba=v((U0,ya)=>{_();var yt=1e3,bt=yt*60,mt=bt*60,Je=mt*24,Nf=Je*7,Of=Je*365.25;ya.exports=function(e,t){t=t||{};var n=typeof e;if(n==="string"&&e.length>0)return Bf(e);if(n==="number"&&isFinite(e))return t.long?Mf(e):Ff(e);throw new Error("val is not a non-empty string or a valid number. val="+JSON.stringify(e))};function Bf(e){if(e=String(e),!(e.length>100)){var t=/^(-?(?:\d+)?\.?\d+) *(milliseconds?|msecs?|ms|seconds?|secs?|s|minutes?|mins?|m|hours?|hrs?|h|days?|d|weeks?|w|years?|yrs?|y)?$/i.exec(e);if(!!t){var n=parseFloat(t[1]),i=(t[2]||"ms").toLowerCase();switch(i){case"years":case"year":case"yrs":case"yr":case"y":return n*Of;case"weeks":case"week":case"w":return n*Nf;case"days":case"day":case"d":return n*Je;case"hours":case"hour":case"hrs":case"hr":case"h":return n*mt;case"minutes":case"minute":case"mins":case"min":case"m":return n*bt;case"seconds":case"second":case"secs":case"sec":case"s":return n*yt;case"milliseconds":case"millisecond":case"msecs":case"msec":case"ms":return n;default:return}}}}function Ff(e){var t=Math.abs(e);return t>=Je?Math.round(e/Je)+"d":t>=mt?Math.round(e/mt)+"h":t>=bt?Math.round(e/bt)+"m":t>=yt?Math.round(e/yt)+"s":e+"ms"}function Mf(e){var t=Math.abs(e);return t>=Je?wn(e,t,Je,"day"):t>=mt?wn(e,t,mt,"hour"):t>=bt?wn(e,t,bt,"minute"):t>=yt?wn(e,t,yt,"second"):e+" ms"}function wn(e,t,n,i){var r=t>=n*1.5;return Math.round(e/n)+" "+i+(r?"s":"")}});var Ea=v((P0,ma)=>{_();function Uf(e){n.debug=n,n.default=n,n.coerce=u,n.disable=a,n.enable=r,n.enabled=o,n.humanize=ba(),n.destroy=l,Object.keys(e).forEach(f=>{n[f]=e[f]}),n.names=[],n.skips=[],n.formatters={};function t(f){let h=0;for(let p=0;p<f.length;p++)h=(h<<5)-h+f.charCodeAt(p),h|=0;return n.colors[Math.abs(h)%n.colors.length]}n.selectColor=t;function n(f){let h,p=null,c,y;function E(...m){if(!E.enabled)return;let b=E,x=Number(new Date),C=x-(h||x);b.diff=C,b.prev=h,b.curr=x,h=x,m[0]=n.coerce(m[0]),typeof m[0]!="string"&&m.unshift("%O");let w=0;m[0]=m[0].replace(/%([a-zA-Z%])/g,(M,S)=>{if(M==="%%")return"%";w++;let I=n.formatters[S];if(typeof I=="function"){let L=m[w];M=I.call(b,L),m.splice(w,1),w--}return M}),n.formatArgs.call(b,m),(b.log||n.log).apply(b,m)}return E.namespace=f,E.useColors=n.useColors(),E.color=n.selectColor(f),E.extend=i,E.destroy=n.destroy,Object.defineProperty(E,"enabled",{enumerable:!0,configurable:!1,get:()=>p!==null?p:(c!==n.namespaces&&(c=n.namespaces,y=n.enabled(f)),y),set:m=>{p=m}}),typeof n.init=="function"&&n.init(E),E}function i(f,h){let p=n(this.namespace+(typeof h>"u"?":":h)+f);return p.log=this.log,p}function r(f){n.save(f),n.namespaces=f,n.names=[],n.skips=[];let h,p=(typeof f=="string"?f:"").split(/[\s,]+/),c=p.length;for(h=0;h<c;h++)!p[h]||(f=p[h].replace(/\*/g,".*?"),f[0]==="-"?n.skips.push(new RegExp("^"+f.slice(1)+"$")):n.names.push(new RegExp("^"+f+"$")))}function a(){let f=[...n.names.map(s),...n.skips.map(s).map(h=>"-"+h)].join(",");return n.enable(""),f}function o(f){if(f[f.length-1]==="*")return!0;let h,p;for(h=0,p=n.skips.length;h<p;h++)if(n.skips[h].test(f))return!1;for(h=0,p=n.names.length;h<p;h++)if(n.names[h].test(f))return!0;return!1}function s(f){return f.toString().substring(2,f.toString().length-2).replace(/\.\*\?$/,"*")}function u(f){return f instanceof Error?f.stack||f.message:f}function l(){console.warn("Instance method `debug.destroy()` is deprecated and no longer does anything. It will be removed in the next major version of `debug`.")}return n.enable(n.load()),n}ma.exports=Uf});var xa=v((ee,yn)=>{_();ee.formatArgs=qf;ee.save=zf;ee.load=jf;ee.useColors=Pf;ee.storage=Hf();ee.destroy=(()=>{let e=!1;return()=>{e||(e=!0,console.warn("Instance method `debug.destroy()` is deprecated and no longer does anything. It will be removed in the next major version of `debug`."))}})();ee.colors=["#0000CC","#0000FF","#0033CC","#0033FF","#0066CC","#0066FF","#0099CC","#0099FF","#00CC00","#00CC33","#00CC66","#00CC99","#00CCCC","#00CCFF","#3300CC","#3300FF","#3333CC","#3333FF","#3366CC","#3366FF","#3399CC","#3399FF","#33CC00","#33CC33","#33CC66","#33CC99","#33CCCC","#33CCFF","#6600CC","#6600FF","#6633CC","#6633FF","#66CC00","#66CC33","#9900CC","#9900FF","#9933CC","#9933FF","#99CC00","#99CC33","#CC0000","#CC0033","#CC0066","#CC0099","#CC00CC","#CC00FF","#CC3300","#CC3333","#CC3366","#CC3399","#CC33CC","#CC33FF","#CC6600","#CC6633","#CC9900","#CC9933","#CCCC00","#CCCC33","#FF0000","#FF0033","#FF0066","#FF0099","#FF00CC","#FF00FF","#FF3300","#FF3333","#FF3366","#FF3399","#FF33CC","#FF33FF","#FF6600","#FF6633","#FF9900","#FF9933","#FFCC00","#FFCC33"];function Pf(){return typeof window<"u"&&window.process&&(window.process.type==="renderer"||window.process.__nwjs)?!0:typeof navigator<"u"&&navigator.userAgent&&navigator.userAgent.toLowerCase().match(/(edge|trident)\/(\d+)/)?!1:typeof document<"u"&&document.documentElement&&document.documentElement.style&&document.documentElement.style.WebkitAppearance||typeof window<"u"&&window.console&&(window.console.firebug||window.console.exception&&window.console.table)||typeof navigator<"u"&&navigator.userAgent&&navigator.userAgent.toLowerCase().match(/firefox\/(\d+)/)&&parseInt(RegExp.$1,10)>=31||typeof navigator<"u"&&navigator.userAgent&&navigator.userAgent.toLowerCase().match(/applewebkit\/(\d+)/)}function qf(e){if(e[0]=(this.useColors?"%c":"")+this.namespace+(this.useColors?" %c":" ")+e[0]+(this.useColors?"%c ":" ")+"+"+yn.exports.humanize(this.diff),!this.useColors)return;let t="color: "+this.color;e.splice(1,0,t,"color: inherit");let n=0,i=0;e[0].replace(/%[a-zA-Z%]/g,r=>{r!=="%%"&&(n++,r==="%c"&&(i=n))}),e.splice(i,0,t)}ee.log=console.debug||console.log||(()=>{});function zf(e){try{e?ee.storage.setItem("debug",e):ee.storage.removeItem("debug")}catch{}}function jf(){let e;try{e=ee.storage.getItem("debug")}catch{}return!e&&typeof g<"u"&&"env"in g&&(e=g.env.DEBUG),e}function Hf(){try{return localStorage}catch{}}yn.exports=Ea()(ee);var{formatters:Wf}=yn.exports;Wf.j=function(e){try{return JSON.stringify(e)}catch(t){return"[UnexpectedJSONParseError]: "+t.message}}});var bi=v((yi,Sa)=>{_();var bn=Xe(),Re=bn.Buffer;function va(e,t){for(var n in e)t[n]=e[n]}Re.from&&Re.alloc&&Re.allocUnsafe&&Re.allocUnsafeSlow?Sa.exports=bn:(va(bn,yi),yi.Buffer=Et);function Et(e,t,n){return Re(e,t,n)}va(Re,Et);Et.from=function(e,t,n){if(typeof e=="number")throw new TypeError("Argument must not be a number");return Re(e,t,n)};Et.alloc=function(e,t,n){if(typeof e!="number")throw new TypeError("Argument must be a number");var i=Re(e);return t!==void 0?typeof n=="string"?i.fill(t,n):i.fill(t):i.fill(0),i};Et.allocUnsafe=function(e){if(typeof e!="number")throw new TypeError("Argument must be a number");return Re(e)};Et.allocUnsafeSlow=function(e){if(typeof e!="number")throw new TypeError("Argument must be a number");return bn.SlowBuffer(e)}});var Ra=v((q0,Ei)=>{"use strict";_();var mi=65536,Zf=4294967295;function Yf(){throw new Error(`Secure random number generation is not supported by this browser.
-Use Chrome, Firefox or Internet Explorer 11`)}var Gf=bi().Buffer,mn=window.crypto||window.msCrypto;mn&&mn.getRandomValues?Ei.exports=$f:Ei.exports=Yf;function $f(e,t){if(e>Zf)throw new RangeError("requested too many random bytes");var n=Gf.allocUnsafe(e);if(e>0)if(e>mi)for(var i=0;i<e;i+=mi)mn.getRandomValues(n.slice(i,i+mi));else mn.getRandomValues(n);return typeof t=="function"?g.nextTick(function(){t(null,n)}):n}});var xi=v((z0,Ta)=>{_();Ta.exports=gn().EventEmitter});var vi=v(()=>{_()});var Ia=v((W0,ka)=>{"use strict";_();function Ca(e,t){var n=Object.keys(e);if(Object.getOwnPropertySymbols){var i=Object.getOwnPropertySymbols(e);t&&(i=i.filter(function(r){return Object.getOwnPropertyDescriptor(e,r).enumerable})),n.push.apply(n,i)}return n}function Kf(e){for(var t=1;t<arguments.length;t++){var n=arguments[t]!=null?arguments[t]:{};t%2?Ca(Object(n),!0).forEach(function(i){Xf(e,i,n[i])}):Object.getOwnPropertyDescriptors?Object.defineProperties(e,Object.getOwnPropertyDescriptors(n)):Ca(Object(n)).forEach(function(i){Object.defineProperty(e,i,Object.getOwnPropertyDescriptor(n,i))})}return e}function Xf(e,t,n){return t in e?Object.defineProperty(e,t,{value:n,enumerable:!0,configurable:!0,writable:!0}):e[t]=n,e}function Vf(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")}function Aa(e,t){for(var n=0;n<t.length;n++){var i=t[n];i.enumerable=i.enumerable||!1,i.configurable=!0,"value"in i&&(i.writable=!0),Object.defineProperty(e,i.key,i)}}function Jf(e,t,n){return t&&Aa(e.prototype,t),n&&Aa(e,n),e}var Qf=Xe(),En=Qf.Buffer,eu=vi(),Si=eu.inspect,tu=Si&&Si.custom||"inspect";function nu(e,t,n){En.prototype.copy.call(e,t,n)}ka.exports=function(){function e(){Vf(this,e),this.head=null,this.tail=null,this.length=0}return Jf(e,[{key:"push",value:function(n){var i={data:n,next:null};this.length>0?this.tail.next=i:this.head=i,this.tail=i,++this.length}},{key:"unshift",value:function(n){var i={data:n,next:this.head};this.length===0&&(this.tail=i),this.head=i,++this.length}},{key:"shift",value:function(){if(this.length!==0){var n=this.head.data;return this.length===1?this.head=this.tail=null:this.head=this.head.next,--this.length,n}}},{key:"clear",value:function(){this.head=this.tail=null,this.length=0}},{key:"join",value:function(n){if(this.length===0)return"";for(var i=this.head,r=""+i.data;i=i.next;)r+=n+i.data;return r}},{key:"concat",value:function(n){if(this.length===0)return En.alloc(0);for(var i=En.allocUnsafe(n>>>0),r=this.head,a=0;r;)nu(r.data,i,a),a+=r.data.length,r=r.next;return i}},{key:"consume",value:function(n,i){var r;return n<this.head.data.length?(r=this.head.data.slice(0,n),this.head.data=this.head.data.slice(n)):n===this.head.data.length?r=this.shift():r=i?this._getString(n):this._getBuffer(n),r}},{key:"first",value:function(){return this.head.data}},{key:"_getString",value:function(n){var i=this.head,r=1,a=i.data;for(n-=a.length;i=i.next;){var o=i.data,s=n>o.length?o.length:n;if(s===o.length?a+=o:a+=o.slice(0,n),n-=s,n===0){s===o.length?(++r,i.next?this.head=i.next:this.head=this.tail=null):(this.head=i,i.data=o.slice(s));break}++r}return this.length-=r,a}},{key:"_getBuffer",value:function(n){var i=En.allocUnsafe(n),r=this.head,a=1;for(r.data.copy(i),n-=r.data.length;r=r.next;){var o=r.data,s=n>o.length?o.length:n;if(o.copy(i,i.length-n,0,s),n-=s,n===0){s===o.length?(++a,r.next?this.head=r.next:this.head=this.tail=null):(this.head=r,r.data=o.slice(s));break}++a}return this.length-=a,i}},{key:tu,value:function(n,i){return Si(this,Kf({},i,{depth:0,customInspect:!1}))}}]),e}()});var Ti=v((Z0,La)=>{"use strict";_();function iu(e,t){var n=this,i=this._readableState&&this._readableState.destroyed,r=this._writableState&&this._writableState.destroyed;return i||r?(t?t(e):e&&(this._writableState?this._writableState.errorEmitted||(this._writableState.errorEmitted=!0,g.nextTick(Ri,this,e)):g.nextTick(Ri,this,e)),this):(this._readableState&&(this._readableState.destroyed=!0),this._writableState&&(this._writableState.destroyed=!0),this._destroy(e||null,function(a){!t&&a?n._writableState?n._writableState.errorEmitted?g.nextTick(xn,n):(n._writableState.errorEmitted=!0,g.nextTick(Da,n,a)):g.nextTick(Da,n,a):t?(g.nextTick(xn,n),t(a)):g.nextTick(xn,n)}),this)}function Da(e,t){Ri(e,t),xn(e)}function xn(e){e._writableState&&!e._writableState.emitClose||e._readableState&&!e._readableState.emitClose||e.emit("close")}function ru(){this._readableState&&(this._readableState.destroyed=!1,this._readableState.reading=!1,this._readableState.ended=!1,this._readableState.endEmitted=!1),this._writableState&&(this._writableState.destroyed=!1,this._writableState.ended=!1,this._writableState.ending=!1,this._writableState.finalCalled=!1,this._writableState.prefinished=!1,this._writableState.finished=!1,this._writableState.errorEmitted=!1)}function Ri(e,t){e.emit("error",t)}function au(e,t){var n=e._readableState,i=e._writableState;n&&n.autoDestroy||i&&i.autoDestroy?e.destroy(t):e.emit("error",t)}La.exports={destroy:iu,undestroy:ru,errorOrDestroy:au}});var Qe=v((Y0,Ba)=>{"use strict";_();function ou(e,t){e.prototype=Object.create(t.prototype),e.prototype.constructor=e,e.__proto__=t}var Oa={};function ne(e,t,n){n||(n=Error);function i(a,o,s){return typeof t=="string"?t:t(a,o,s)}var r=function(a){ou(o,a);function o(s,u,l){return a.call(this,i(s,u,l))||this}return o}(n);r.prototype.name=n.name,r.prototype.code=e,Oa[e]=r}function Na(e,t){if(Array.isArray(e)){var n=e.length;return e=e.map(function(i){return String(i)}),n>2?"one of ".concat(t," ").concat(e.slice(0,n-1).join(", "),", or ")+e[n-1]:n===2?"one of ".concat(t," ").concat(e[0]," or ").concat(e[1]):"of ".concat(t," ").concat(e[0])}else return"of ".concat(t," ").concat(String(e))}function su(e,t,n){return e.substr(!n||n<0?0:+n,t.length)===t}function lu(e,t,n){return(n===void 0||n>e.length)&&(n=e.length),e.substring(n-t.length,n)===t}function fu(e,t,n){return typeof n!="number"&&(n=0),n+t.length>e.length?!1:e.indexOf(t,n)!==-1}ne("ERR_INVALID_OPT_VALUE",function(e,t){return'The value "'+t+'" is invalid for option "'+e+'"'},TypeError);ne("ERR_INVALID_ARG_TYPE",function(e,t,n){var i;typeof t=="string"&&su(t,"not ")?(i="must not be",t=t.replace(/^not /,"")):i="must be";var r;if(lu(e," argument"))r="The ".concat(e," ").concat(i," ").concat(Na(t,"type"));else{var a=fu(e,".")?"property":"argument";r='The "'.concat(e,'" ').concat(a," ").concat(i," ").concat(Na(t,"type"))}return r+=". Received type ".concat(typeof n),r},TypeError);ne("ERR_STREAM_PUSH_AFTER_EOF","stream.push() after EOF");ne("ERR_METHOD_NOT_IMPLEMENTED",function(e){return"The "+e+" method is not implemented"});ne("ERR_STREAM_PREMATURE_CLOSE","Premature close");ne("ERR_STREAM_DESTROYED",function(e){return"Cannot call "+e+" after a stream was destroyed"});ne("ERR_MULTIPLE_CALLBACK","Callback called multiple times");ne("ERR_STREAM_CANNOT_PIPE","Cannot pipe, not readable");ne("ERR_STREAM_WRITE_AFTER_END","write after end");ne("ERR_STREAM_NULL_VALUES","May not write null values to stream",TypeError);ne("ERR_UNKNOWN_ENCODING",function(e){return"Unknown encoding: "+e},TypeError);ne("ERR_STREAM_UNSHIFT_AFTER_END_EVENT","stream.unshift() after end event");Ba.exports.codes=Oa});var Ci=v((G0,Fa)=>{"use strict";_();var uu=Qe().codes.ERR_INVALID_OPT_VALUE;function hu(e,t,n){return e.highWaterMark!=null?e.highWaterMark:t?e[n]:null}function cu(e,t,n,i){var r=hu(t,i,n);if(r!=null){if(!(isFinite(r)&&Math.floor(r)===r)||r<0){var a=i?n:"highWaterMark";throw new uu(a,r)}return Math.floor(r)}return e.objectMode?16:16*1024}Fa.exports={getHighWaterMark:cu}});var xt=v(($0,Ai)=>{_();typeof Object.create=="function"?Ai.exports=function(t,n){n&&(t.super_=n,t.prototype=Object.create(n.prototype,{constructor:{value:t,enumerable:!1,writable:!0,configurable:!0}}))}:Ai.exports=function(t,n){if(n){t.super_=n;var i=function(){};i.prototype=n.prototype,t.prototype=new i,t.prototype.constructor=t}}});var Ua=v((K0,Ma)=>{_();Ma.exports=du;function du(e,t){if(ki("noDeprecation"))return e;var n=!1;function i(){if(!n){if(ki("throwDeprecation"))throw new Error(t);ki("traceDeprecation")?console.trace(t):console.warn(t),n=!0}return e.apply(this,arguments)}return i}function ki(e){try{if(!window.localStorage)return!1}catch{return!1}var t=window.localStorage[e];return t==null?!1:String(t).toLowerCase()==="true"}});var Li=v((X0,Wa)=>{"use strict";_();Wa.exports=z;function qa(e){var t=this;this.next=null,this.entry=null,this.finish=function(){qu(t,e)}}var vt;z.WritableState=qt;var pu={deprecate:Ua()},za=xi(),Sn=Xe().Buffer,_u=window.Uint8Array||function(){};function gu(e){return Sn.from(e)}function wu(e){return Sn.isBuffer(e)||e instanceof _u}var Di=Ti(),yu=Ci(),bu=yu.getHighWaterMark,Ne=Qe().codes,mu=Ne.ERR_INVALID_ARG_TYPE,Eu=Ne.ERR_METHOD_NOT_IMPLEMENTED,xu=Ne.ERR_MULTIPLE_CALLBACK,vu=Ne.ERR_STREAM_CANNOT_PIPE,Su=Ne.ERR_STREAM_DESTROYED,Ru=Ne.ERR_STREAM_NULL_VALUES,Tu=Ne.ERR_STREAM_WRITE_AFTER_END,Cu=Ne.ERR_UNKNOWN_ENCODING,St=Di.errorOrDestroy;xt()(z,za);function Au(){}function qt(e,t,n){vt=vt||et(),e=e||{},typeof n!="boolean"&&(n=t instanceof vt),this.objectMode=!!e.objectMode,n&&(this.objectMode=this.objectMode||!!e.writableObjectMode),this.highWaterMark=bu(this,e,"writableHighWaterMark",n),this.finalCalled=!1,this.needDrain=!1,this.ending=!1,this.ended=!1,this.finished=!1,this.destroyed=!1;var i=e.decodeStrings===!1;this.decodeStrings=!i,this.defaultEncoding=e.defaultEncoding||"utf8",this.length=0,this.writing=!1,this.corked=0,this.sync=!0,this.bufferProcessing=!1,this.onwrite=function(r){Bu(t,r)},this.writecb=null,this.writelen=0,this.bufferedRequest=null,this.lastBufferedRequest=null,this.pendingcb=0,this.prefinished=!1,this.errorEmitted=!1,this.emitClose=e.emitClose!==!1,this.autoDestroy=!!e.autoDestroy,this.bufferedRequestCount=0,this.corkedRequestsFree=new qa(this)}qt.prototype.getBuffer=function(){for(var t=this.bufferedRequest,n=[];t;)n.push(t),t=t.next;return n};(function(){try{Object.defineProperty(qt.prototype,"buffer",{get:pu.deprecate(function(){return this.getBuffer()},"_writableState.buffer is deprecated. Use _writableState.getBuffer instead.","DEP0003")})}catch{}})();var vn;typeof Symbol=="function"&&Symbol.hasInstance&&typeof Function.prototype[Symbol.hasInstance]=="function"?(vn=Function.prototype[Symbol.hasInstance],Object.defineProperty(z,Symbol.hasInstance,{value:function(t){return vn.call(this,t)?!0:this!==z?!1:t&&t._writableState instanceof qt}})):vn=function(t){return t instanceof this};function z(e){vt=vt||et();var t=this instanceof vt;if(!t&&!vn.call(z,this))return new z(e);this._writableState=new qt(e,this,t),this.writable=!0,e&&(typeof e.write=="function"&&(this._write=e.write),typeof e.writev=="function"&&(this._writev=e.writev),typeof e.destroy=="function"&&(this._destroy=e.destroy),typeof e.final=="function"&&(this._final=e.final)),za.call(this)}z.prototype.pipe=function(){St(this,new vu)};function ku(e,t){var n=new Tu;St(e,n),g.nextTick(t,n)}function Iu(e,t,n,i){var r;return n===null?r=new Ru:typeof n!="string"&&!t.objectMode&&(r=new mu("chunk",["string","Buffer"],n)),r?(St(e,r),g.nextTick(i,r),!1):!0}z.prototype.write=function(e,t,n){var i=this._writableState,r=!1,a=!i.objectMode&&wu(e);return a&&!Sn.isBuffer(e)&&(e=gu(e)),typeof t=="function"&&(n=t,t=null),a?t="buffer":t||(t=i.defaultEncoding),typeof n!="function"&&(n=Au),i.ending?ku(this,n):(a||Iu(this,i,e,n))&&(i.pendingcb++,r=Lu(this,i,a,e,t,n)),r};z.prototype.cork=function(){this._writableState.corked++};z.prototype.uncork=function(){var e=this._writableState;e.corked&&(e.corked--,!e.writing&&!e.corked&&!e.bufferProcessing&&e.bufferedRequest&&ja(this,e))};z.prototype.setDefaultEncoding=function(t){if(typeof t=="string"&&(t=t.toLowerCase()),!(["hex","utf8","utf-8","ascii","binary","base64","ucs2","ucs-2","utf16le","utf-16le","raw"].indexOf((t+"").toLowerCase())>-1))throw new Cu(t);return this._writableState.defaultEncoding=t,this};Object.defineProperty(z.prototype,"writableBuffer",{enumerable:!1,get:function(){return this._writableState&&this._writableState.getBuffer()}});function Du(e,t,n){return!e.objectMode&&e.decodeStrings!==!1&&typeof t=="string"&&(t=Sn.from(t,n)),t}Object.defineProperty(z.prototype,"writableHighWaterMark",{enumerable:!1,get:function(){return this._writableState.highWaterMark}});function Lu(e,t,n,i,r,a){if(!n){var o=Du(t,i,r);i!==o&&(n=!0,r="buffer",i=o)}var s=t.objectMode?1:i.length;t.length+=s;var u=t.length<t.highWaterMark;if(u||(t.needDrain=!0),t.writing||t.corked){var l=t.lastBufferedRequest;t.lastBufferedRequest={chunk:i,encoding:r,isBuf:n,callback:a,next:null},l?l.next=t.lastBufferedRequest:t.bufferedRequest=t.lastBufferedRequest,t.bufferedRequestCount+=1}else Ii(e,t,!1,s,i,r,a);return u}function Ii(e,t,n,i,r,a,o){t.writelen=i,t.writecb=o,t.writing=!0,t.sync=!0,t.destroyed?t.onwrite(new Su("write")):n?e._writev(r,t.onwrite):e._write(r,a,t.onwrite),t.sync=!1}function Nu(e,t,n,i,r){--t.pendingcb,n?(g.nextTick(r,i),g.nextTick(Pt,e,t),e._writableState.errorEmitted=!0,St(e,i)):(r(i),e._writableState.errorEmitted=!0,St(e,i),Pt(e,t))}function Ou(e){e.writing=!1,e.writecb=null,e.length-=e.writelen,e.writelen=0}function Bu(e,t){var n=e._writableState,i=n.sync,r=n.writecb;if(typeof r!="function")throw new xu;if(Ou(n),t)Nu(e,n,i,t,r);else{var a=Ha(n)||e.destroyed;!a&&!n.corked&&!n.bufferProcessing&&n.bufferedRequest&&ja(e,n),i?g.nextTick(Pa,e,n,a,r):Pa(e,n,a,r)}}function Pa(e,t,n,i){n||Fu(e,t),t.pendingcb--,i(),Pt(e,t)}function Fu(e,t){t.length===0&&t.needDrain&&(t.needDrain=!1,e.emit("drain"))}function ja(e,t){t.bufferProcessing=!0;var n=t.bufferedRequest;if(e._writev&&n&&n.next){var i=t.bufferedRequestCount,r=new Array(i),a=t.corkedRequestsFree;a.entry=n;for(var o=0,s=!0;n;)r[o]=n,n.isBuf||(s=!1),n=n.next,o+=1;r.allBuffers=s,Ii(e,t,!0,t.length,r,"",a.finish),t.pendingcb++,t.lastBufferedRequest=null,a.next?(t.corkedRequestsFree=a.next,a.next=null):t.corkedRequestsFree=new qa(t),t.bufferedRequestCount=0}else{for(;n;){var u=n.chunk,l=n.encoding,f=n.callback,h=t.objectMode?1:u.length;if(Ii(e,t,!1,h,u,l,f),n=n.next,t.bufferedRequestCount--,t.writing)break}n===null&&(t.lastBufferedRequest=null)}t.bufferedRequest=n,t.bufferProcessing=!1}z.prototype._write=function(e,t,n){n(new Eu("_write()"))};z.prototype._writev=null;z.prototype.end=function(e,t,n){var i=this._writableState;return typeof e=="function"?(n=e,e=null,t=null):typeof t=="function"&&(n=t,t=null),e!=null&&this.write(e,t),i.corked&&(i.corked=1,this.uncork()),i.ending||Pu(this,i,n),this};Object.defineProperty(z.prototype,"writableLength",{enumerable:!1,get:function(){return this._writableState.length}});function Ha(e){return e.ending&&e.length===0&&e.bufferedRequest===null&&!e.finished&&!e.writing}function Mu(e,t){e._final(function(n){t.pendingcb--,n&&St(e,n),t.prefinished=!0,e.emit("prefinish"),Pt(e,t)})}function Uu(e,t){!t.prefinished&&!t.finalCalled&&(typeof e._final=="function"&&!t.destroyed?(t.pendingcb++,t.finalCalled=!0,g.nextTick(Mu,e,t)):(t.prefinished=!0,e.emit("prefinish")))}function Pt(e,t){var n=Ha(t);if(n&&(Uu(e,t),t.pendingcb===0&&(t.finished=!0,e.emit("finish"),t.autoDestroy))){var i=e._readableState;(!i||i.autoDestroy&&i.endEmitted)&&e.destroy()}return n}function Pu(e,t,n){t.ending=!0,Pt(e,t),n&&(t.finished?g.nextTick(n):e.once("finish",n)),t.ended=!0,e.writable=!1}function qu(e,t,n){var i=e.entry;for(e.entry=null;i;){var r=i.callback;t.pendingcb--,r(n),i=i.next}t.corkedRequestsFree.next=e}Object.defineProperty(z.prototype,"destroyed",{enumerable:!1,get:function(){return this._writableState===void 0?!1:this._writableState.destroyed},set:function(t){!this._writableState||(this._writableState.destroyed=t)}});z.prototype.destroy=Di.destroy;z.prototype._undestroy=Di.undestroy;z.prototype._destroy=function(e,t){t(e)}});var et=v((V0,Ya)=>{"use strict";_();var zu=Object.keys||function(e){var t=[];for(var n in e)t.push(n);return t};Ya.exports=ce;var Za=Bi(),Oi=Li();xt()(ce,Za);for(Ni=zu(Oi.prototype),Rn=0;Rn<Ni.length;Rn++)Tn=Ni[Rn],ce.prototype[Tn]||(ce.prototype[Tn]=Oi.prototype[Tn]);var Ni,Tn,Rn;function ce(e){if(!(this instanceof ce))return new ce(e);Za.call(this,e),Oi.call(this,e),this.allowHalfOpen=!0,e&&(e.readable===!1&&(this.readable=!1),e.writable===!1&&(this.writable=!1),e.allowHalfOpen===!1&&(this.allowHalfOpen=!1,this.once("end",ju)))}Object.defineProperty(ce.prototype,"writableHighWaterMark",{enumerable:!1,get:function(){return this._writableState.highWaterMark}});Object.defineProperty(ce.prototype,"writableBuffer",{enumerable:!1,get:function(){return this._writableState&&this._writableState.getBuffer()}});Object.defineProperty(ce.prototype,"writableLength",{enumerable:!1,get:function(){return this._writableState.length}});function ju(){this._writableState.ended||g.nextTick(Hu,this)}function Hu(e){e.end()}Object.defineProperty(ce.prototype,"destroyed",{enumerable:!1,get:function(){return this._readableState===void 0||this._writableState===void 0?!1:this._readableState.destroyed&&this._writableState.destroyed},set:function(t){this._readableState===void 0||this._writableState===void 0||(this._readableState.destroyed=t,this._writableState.destroyed=t)}})});var Ui=v($a=>{"use strict";_();var Mi=bi().Buffer,Ga=Mi.isEncoding||function(e){switch(e=""+e,e&&e.toLowerCase()){case"hex":case"utf8":case"utf-8":case"ascii":case"binary":case"base64":case"ucs2":case"ucs-2":case"utf16le":case"utf-16le":case"raw":return!0;default:return!1}};function Wu(e){if(!e)return"utf8";for(var t;;)switch(e){case"utf8":case"utf-8":return"utf8";case"ucs2":case"ucs-2":case"utf16le":case"utf-16le":return"utf16le";case"latin1":case"binary":return"latin1";case"base64":case"ascii":case"hex":return e;default:if(t)return;e=(""+e).toLowerCase(),t=!0}}function Zu(e){var t=Wu(e);if(typeof t!="string"&&(Mi.isEncoding===Ga||!Ga(e)))throw new Error("Unknown encoding: "+e);return t||e}$a.StringDecoder=zt;function zt(e){this.encoding=Zu(e);var t;switch(this.encoding){case"utf16le":this.text=Vu,this.end=Ju,t=4;break;case"utf8":this.fillLast=$u,t=4;break;case"base64":this.text=Qu,this.end=eh,t=3;break;default:this.write=th,this.end=nh;return}this.lastNeed=0,this.lastTotal=0,this.lastChar=Mi.allocUnsafe(t)}zt.prototype.write=function(e){if(e.length===0)return"";var t,n;if(this.lastNeed){if(t=this.fillLast(e),t===void 0)return"";n=this.lastNeed,this.lastNeed=0}else n=0;return n<e.length?t?t+this.text(e,n):this.text(e,n):t||""};zt.prototype.end=Xu;zt.prototype.text=Ku;zt.prototype.fillLast=function(e){if(this.lastNeed<=e.length)return e.copy(this.lastChar,this.lastTotal-this.lastNeed,0,this.lastNeed),this.lastChar.toString(this.encoding,0,this.lastTotal);e.copy(this.lastChar,this.lastTotal-this.lastNeed,0,e.length),this.lastNeed-=e.length};function Fi(e){return e<=127?0:e>>5===6?2:e>>4===14?3:e>>3===30?4:e>>6===2?-1:-2}function Yu(e,t,n){var i=t.length-1;if(i<n)return 0;var r=Fi(t[i]);return r>=0?(r>0&&(e.lastNeed=r-1),r):--i<n||r===-2?0:(r=Fi(t[i]),r>=0?(r>0&&(e.lastNeed=r-2),r):--i<n||r===-2?0:(r=Fi(t[i]),r>=0?(r>0&&(r===2?r=0:e.lastNeed=r-3),r):0))}function Gu(e,t,n){if((t[0]&192)!==128)return e.lastNeed=0,"\uFFFD";if(e.lastNeed>1&&t.length>1){if((t[1]&192)!==128)return e.lastNeed=1,"\uFFFD";if(e.lastNeed>2&&t.length>2&&(t[2]&192)!==128)return e.lastNeed=2,"\uFFFD"}}function $u(e){var t=this.lastTotal-this.lastNeed,n=Gu(this,e,t);if(n!==void 0)return n;if(this.lastNeed<=e.length)return e.copy(this.lastChar,t,0,this.lastNeed),this.lastChar.toString(this.encoding,0,this.lastTotal);e.copy(this.lastChar,t,0,e.length),this.lastNeed-=e.length}function Ku(e,t){var n=Yu(this,e,t);if(!this.lastNeed)return e.toString("utf8",t);this.lastTotal=n;var i=e.length-(n-this.lastNeed);return e.copy(this.lastChar,0,i),e.toString("utf8",t,i)}function Xu(e){var t=e&&e.length?this.write(e):"";return this.lastNeed?t+"\uFFFD":t}function Vu(e,t){if((e.length-t)%2===0){var n=e.toString("utf16le",t);if(n){var i=n.charCodeAt(n.length-1);if(i>=55296&&i<=56319)return this.lastNeed=2,this.lastTotal=4,this.lastChar[0]=e[e.length-2],this.lastChar[1]=e[e.length-1],n.slice(0,-1)}return n}return this.lastNeed=1,this.lastTotal=2,this.lastChar[0]=e[e.length-1],e.toString("utf16le",t,e.length-1)}function Ju(e){var t=e&&e.length?this.write(e):"";if(this.lastNeed){var n=this.lastTotal-this.lastNeed;return t+this.lastChar.toString("utf16le",0,n)}return t}function Qu(e,t){var n=(e.length-t)%3;return n===0?e.toString("base64",t):(this.lastNeed=3-n,this.lastTotal=3,n===1?this.lastChar[0]=e[e.length-1]:(this.lastChar[0]=e[e.length-2],this.lastChar[1]=e[e.length-1]),e.toString("base64",t,e.length-n))}function eh(e){var t=e&&e.length?this.write(e):"";return this.lastNeed?t+this.lastChar.toString("base64",0,3-this.lastNeed):t}function th(e){return e.toString(this.encoding)}function nh(e){return e&&e.length?this.write(e):""}});var Cn=v((Q0,Va)=>{"use strict";_();var Ka=Qe().codes.ERR_STREAM_PREMATURE_CLOSE;function ih(e){var t=!1;return function(){if(!t){t=!0;for(var n=arguments.length,i=new Array(n),r=0;r<n;r++)i[r]=arguments[r];e.apply(this,i)}}}function rh(){}function ah(e){return e.setHeader&&typeof e.abort=="function"}function Xa(e,t,n){if(typeof t=="function")return Xa(e,null,t);t||(t={}),n=ih(n||rh);var i=t.readable||t.readable!==!1&&e.readable,r=t.writable||t.writable!==!1&&e.writable,a=function(){e.writable||s()},o=e._writableState&&e._writableState.finished,s=function(){r=!1,o=!0,i||n.call(e)},u=e._readableState&&e._readableState.endEmitted,l=function(){i=!1,u=!0,r||n.call(e)},f=function(y){n.call(e,y)},h=function(){var y;if(i&&!u)return(!e._readableState||!e._readableState.ended)&&(y=new Ka),n.call(e,y);if(r&&!o)return(!e._writableState||!e._writableState.ended)&&(y=new Ka),n.call(e,y)},p=function(){e.req.on("finish",s)};return ah(e)?(e.on("complete",s),e.on("abort",h),e.req?p():e.on("request",p)):r&&!e._writableState&&(e.on("end",a),e.on("close",a)),e.on("end",l),e.on("finish",s),t.error!==!1&&e.on("error",f),e.on("close",h),function(){e.removeListener("complete",s),e.removeListener("abort",h),e.removeListener("request",p),e.req&&e.req.removeListener("finish",s),e.removeListener("end",a),e.removeListener("close",a),e.removeListener("finish",s),e.removeListener("end",l),e.removeListener("error",f),e.removeListener("close",h)}}Va.exports=Xa});var Qa=v((ep,Ja)=>{"use strict";_();var An;function Oe(e,t,n){return t in e?Object.defineProperty(e,t,{value:n,enumerable:!0,configurable:!0,writable:!0}):e[t]=n,e}var oh=Cn(),Be=Symbol("lastResolve"),tt=Symbol("lastReject"),jt=Symbol("error"),kn=Symbol("ended"),nt=Symbol("lastPromise"),Pi=Symbol("handlePromise"),it=Symbol("stream");function Fe(e,t){return{value:e,done:t}}function sh(e){var t=e[Be];if(t!==null){var n=e[it].read();n!==null&&(e[nt]=null,e[Be]=null,e[tt]=null,t(Fe(n,!1)))}}function lh(e){g.nextTick(sh,e)}function fh(e,t){return function(n,i){e.then(function(){if(t[kn]){n(Fe(void 0,!0));return}t[Pi](n,i)},i)}}var uh=Object.getPrototypeOf(function(){}),hh=Object.setPrototypeOf((An={get stream(){return this[it]},next:function(){var t=this,n=this[jt];if(n!==null)return Promise.reject(n);if(this[kn])return Promise.resolve(Fe(void 0,!0));if(this[it].destroyed)return new Promise(function(o,s){g.nextTick(function(){t[jt]?s(t[jt]):o(Fe(void 0,!0))})});var i=this[nt],r;if(i)r=new Promise(fh(i,this));else{var a=this[it].read();if(a!==null)return Promise.resolve(Fe(a,!1));r=new Promise(this[Pi])}return this[nt]=r,r}},Oe(An,Symbol.asyncIterator,function(){return this}),Oe(An,"return",function(){var t=this;return new Promise(function(n,i){t[it].destroy(null,function(r){if(r){i(r);return}n(Fe(void 0,!0))})})}),An),uh),ch=function(t){var n,i=Object.create(hh,(n={},Oe(n,it,{value:t,writable:!0}),Oe(n,Be,{value:null,writable:!0}),Oe(n,tt,{value:null,writable:!0}),Oe(n,jt,{value:null,writable:!0}),Oe(n,kn,{value:t._readableState.endEmitted,writable:!0}),Oe(n,Pi,{value:function(a,o){var s=i[it].read();s?(i[nt]=null,i[Be]=null,i[tt]=null,a(Fe(s,!1))):(i[Be]=a,i[tt]=o)},writable:!0}),n));return i[nt]=null,oh(t,function(r){if(r&&r.code!=="ERR_STREAM_PREMATURE_CLOSE"){var a=i[tt];a!==null&&(i[nt]=null,i[Be]=null,i[tt]=null,a(r)),i[jt]=r;return}var o=i[Be];o!==null&&(i[nt]=null,i[Be]=null,i[tt]=null,o(Fe(void 0,!0))),i[kn]=!0}),t.on("readable",lh.bind(null,i)),i};Ja.exports=ch});var to=v((tp,eo)=>{_();eo.exports=function(){throw new Error("Readable.from is not available in the browser")}});var Bi=v((ip,ho)=>{"use strict";_();ho.exports=B;var Rt;B.ReadableState=ao;var np=gn().EventEmitter,ro=function(t,n){return t.listeners(n).length},Wt=xi(),In=Xe().Buffer,dh=window.Uint8Array||function(){};function ph(e){return In.from(e)}function _h(e){return In.isBuffer(e)||e instanceof dh}var qi=vi(),D;qi&&qi.debuglog?D=qi.debuglog("stream"):D=function(){};var gh=Ia(),Gi=Ti(),wh=Ci(),yh=wh.getHighWaterMark,Dn=Qe().codes,bh=Dn.ERR_INVALID_ARG_TYPE,mh=Dn.ERR_STREAM_PUSH_AFTER_EOF,Eh=Dn.ERR_METHOD_NOT_IMPLEMENTED,xh=Dn.ERR_STREAM_UNSHIFT_AFTER_END_EVENT,Tt,zi,ji;xt()(B,Wt);var Ht=Gi.errorOrDestroy,Hi=["error","close","destroy","pause","resume"];function vh(e,t,n){if(typeof e.prependListener=="function")return e.prependListener(t,n);!e._events||!e._events[t]?e.on(t,n):Array.isArray(e._events[t])?e._events[t].unshift(n):e._events[t]=[n,e._events[t]]}function ao(e,t,n){Rt=Rt||et(),e=e||{},typeof n!="boolean"&&(n=t instanceof Rt),this.objectMode=!!e.objectMode,n&&(this.objectMode=this.objectMode||!!e.readableObjectMode),this.highWaterMark=yh(this,e,"readableHighWaterMark",n),this.buffer=new gh,this.length=0,this.pipes=null,this.pipesCount=0,this.flowing=null,this.ended=!1,this.endEmitted=!1,this.reading=!1,this.sync=!0,this.needReadable=!1,this.emittedReadable=!1,this.readableListening=!1,this.resumeScheduled=!1,this.paused=!0,this.emitClose=e.emitClose!==!1,this.autoDestroy=!!e.autoDestroy,this.destroyed=!1,this.defaultEncoding=e.defaultEncoding||"utf8",this.awaitDrain=0,this.readingMore=!1,this.decoder=null,this.encoding=null,e.encoding&&(Tt||(Tt=Ui().StringDecoder),this.decoder=new Tt(e.encoding),this.encoding=e.encoding)}function B(e){if(Rt=Rt||et(),!(this instanceof B))return new B(e);var t=this instanceof Rt;this._readableState=new ao(e,this,t),this.readable=!0,e&&(typeof e.read=="function"&&(this._read=e.read),typeof e.destroy=="function"&&(this._destroy=e.destroy)),Wt.call(this)}Object.defineProperty(B.prototype,"destroyed",{enumerable:!1,get:function(){return this._readableState===void 0?!1:this._readableState.destroyed},set:function(t){!this._readableState||(this._readableState.destroyed=t)}});B.prototype.destroy=Gi.destroy;B.prototype._undestroy=Gi.undestroy;B.prototype._destroy=function(e,t){t(e)};B.prototype.push=function(e,t){var n=this._readableState,i;return n.objectMode?i=!0:typeof e=="string"&&(t=t||n.defaultEncoding,t!==n.encoding&&(e=In.from(e,t),t=""),i=!0),oo(this,e,t,!1,i)};B.prototype.unshift=function(e){return oo(this,e,null,!0,!1)};function oo(e,t,n,i,r){D("readableAddChunk",t);var a=e._readableState;if(t===null)a.reading=!1,Th(e,a);else{var o;if(r||(o=Sh(a,t)),o)Ht(e,o);else if(a.objectMode||t&&t.length>0)if(typeof t!="string"&&!a.objectMode&&Object.getPrototypeOf(t)!==In.prototype&&(t=ph(t)),i)a.endEmitted?Ht(e,new xh):Wi(e,a,t,!0);else if(a.ended)Ht(e,new mh);else{if(a.destroyed)return!1;a.reading=!1,a.decoder&&!n?(t=a.decoder.write(t),a.objectMode||t.length!==0?Wi(e,a,t,!1):Yi(e,a)):Wi(e,a,t,!1)}else i||(a.reading=!1,Yi(e,a))}return!a.ended&&(a.length<a.highWaterMark||a.length===0)}function Wi(e,t,n,i){t.flowing&&t.length===0&&!t.sync?(t.awaitDrain=0,e.emit("data",n)):(t.length+=t.objectMode?1:n.length,i?t.buffer.unshift(n):t.buffer.push(n),t.needReadable&&Ln(e)),Yi(e,t)}function Sh(e,t){var n;return!_h(t)&&typeof t!="string"&&t!==void 0&&!e.objectMode&&(n=new bh("chunk",["string","Buffer","Uint8Array"],t)),n}B.prototype.isPaused=function(){return this._readableState.flowing===!1};B.prototype.setEncoding=function(e){Tt||(Tt=Ui().StringDecoder);var t=new Tt(e);this._readableState.decoder=t,this._readableState.encoding=this._readableState.decoder.encoding;for(var n=this._readableState.buffer.head,i="";n!==null;)i+=t.write(n.data),n=n.next;return this._readableState.buffer.clear(),i!==""&&this._readableState.buffer.push(i),this._readableState.length=i.length,this};var no=1073741824;function Rh(e){return e>=no?e=no:(e--,e|=e>>>1,e|=e>>>2,e|=e>>>4,e|=e>>>8,e|=e>>>16,e++),e}function io(e,t){return e<=0||t.length===0&&t.ended?0:t.objectMode?1:e!==e?t.flowing&&t.length?t.buffer.head.data.length:t.length:(e>t.highWaterMark&&(t.highWaterMark=Rh(e)),e<=t.length?e:t.ended?t.length:(t.needReadable=!0,0))}B.prototype.read=function(e){D("read",e),e=parseInt(e,10);var t=this._readableState,n=e;if(e!==0&&(t.emittedReadable=!1),e===0&&t.needReadable&&((t.highWaterMark!==0?t.length>=t.highWaterMark:t.length>0)||t.ended))return D("read: emitReadable",t.length,t.ended),t.length===0&&t.ended?Zi(this):Ln(this),null;if(e=io(e,t),e===0&&t.ended)return t.length===0&&Zi(this),null;var i=t.needReadable;D("need readable",i),(t.length===0||t.length-e<t.highWaterMark)&&(i=!0,D("length less than watermark",i)),t.ended||t.reading?(i=!1,D("reading or ended",i)):i&&(D("do read"),t.reading=!0,t.sync=!0,t.length===0&&(t.needReadable=!0),this._read(t.highWaterMark),t.sync=!1,t.reading||(e=io(n,t)));var r;return e>0?r=fo(e,t):r=null,r===null?(t.needReadable=t.length<=t.highWaterMark,e=0):(t.length-=e,t.awaitDrain=0),t.length===0&&(t.ended||(t.needReadable=!0),n!==e&&t.ended&&Zi(this)),r!==null&&this.emit("data",r),r};function Th(e,t){if(D("onEofChunk"),!t.ended){if(t.decoder){var n=t.decoder.end();n&&n.length&&(t.buffer.push(n),t.length+=t.objectMode?1:n.length)}t.ended=!0,t.sync?Ln(e):(t.needReadable=!1,t.emittedReadable||(t.emittedReadable=!0,so(e)))}}function Ln(e){var t=e._readableState;D("emitReadable",t.needReadable,t.emittedReadable),t.needReadable=!1,t.emittedReadable||(D("emitReadable",t.flowing),t.emittedReadable=!0,g.nextTick(so,e))}function so(e){var t=e._readableState;D("emitReadable_",t.destroyed,t.length,t.ended),!t.destroyed&&(t.length||t.ended)&&(e.emit("readable"),t.emittedReadable=!1),t.needReadable=!t.flowing&&!t.ended&&t.length<=t.highWaterMark,$i(e)}function Yi(e,t){t.readingMore||(t.readingMore=!0,g.nextTick(Ch,e,t))}function Ch(e,t){for(;!t.reading&&!t.ended&&(t.length<t.highWaterMark||t.flowing&&t.length===0);){var n=t.length;if(D("maybeReadMore read 0"),e.read(0),n===t.length)break}t.readingMore=!1}B.prototype._read=function(e){Ht(this,new Eh("_read()"))};B.prototype.pipe=function(e,t){var n=this,i=this._readableState;switch(i.pipesCount){case 0:i.pipes=e;break;case 1:i.pipes=[i.pipes,e];break;default:i.pipes.push(e);break}i.pipesCount+=1,D("pipe count=%d opts=%j",i.pipesCount,t);var r=(!t||t.end!==!1)&&e!==g.stdout&&e!==g.stderr,a=r?s:E;i.endEmitted?g.nextTick(a):n.once("end",a),e.on("unpipe",o);function o(m,b){D("onunpipe"),m===n&&b&&b.hasUnpiped===!1&&(b.hasUnpiped=!0,f())}function s(){D("onend"),e.end()}var u=Ah(n);e.on("drain",u);var l=!1;function f(){D("cleanup"),e.removeListener("close",c),e.removeListener("finish",y),e.removeListener("drain",u),e.removeListener("error",p),e.removeListener("unpipe",o),n.removeListener("end",s),n.removeListener("end",E),n.removeListener("data",h),l=!0,i.awaitDrain&&(!e._writableState||e._writableState.needDrain)&&u()}n.on("data",h);function h(m){D("ondata");var b=e.write(m);D("dest.write",b),b===!1&&((i.pipesCount===1&&i.pipes===e||i.pipesCount>1&&uo(i.pipes,e)!==-1)&&!l&&(D("false write response, pause",i.awaitDrain),i.awaitDrain++),n.pause())}function p(m){D("onerror",m),E(),e.removeListener("error",p),ro(e,"error")===0&&Ht(e,m)}vh(e,"error",p);function c(){e.removeListener("finish",y),E()}e.once("close",c);function y(){D("onfinish"),e.removeListener("close",c),E()}e.once("finish",y);function E(){D("unpipe"),n.unpipe(e)}return e.emit("pipe",n),i.flowing||(D("pipe resume"),n.resume()),e};function Ah(e){return function(){var n=e._readableState;D("pipeOnDrain",n.awaitDrain),n.awaitDrain&&n.awaitDrain--,n.awaitDrain===0&&ro(e,"data")&&(n.flowing=!0,$i(e))}}B.prototype.unpipe=function(e){var t=this._readableState,n={hasUnpiped:!1};if(t.pipesCount===0)return this;if(t.pipesCount===1)return e&&e!==t.pipes?this:(e||(e=t.pipes),t.pipes=null,t.pipesCount=0,t.flowing=!1,e&&e.emit("unpipe",this,n),this);if(!e){var i=t.pipes,r=t.pipesCount;t.pipes=null,t.pipesCount=0,t.flowing=!1;for(var a=0;a<r;a++)i[a].emit("unpipe",this,{hasUnpiped:!1});return this}var o=uo(t.pipes,e);return o===-1?this:(t.pipes.splice(o,1),t.pipesCount-=1,t.pipesCount===1&&(t.pipes=t.pipes[0]),e.emit("unpipe",this,n),this)};B.prototype.on=function(e,t){var n=Wt.prototype.on.call(this,e,t),i=this._readableState;return e==="data"?(i.readableListening=this.listenerCount("readable")>0,i.flowing!==!1&&this.resume()):e==="readable"&&!i.endEmitted&&!i.readableListening&&(i.readableListening=i.needReadable=!0,i.flowing=!1,i.emittedReadable=!1,D("on readable",i.length,i.reading),i.length?Ln(this):i.reading||g.nextTick(kh,this)),n};B.prototype.addListener=B.prototype.on;B.prototype.removeListener=function(e,t){var n=Wt.prototype.removeListener.call(this,e,t);return e==="readable"&&g.nextTick(lo,this),n};B.prototype.removeAllListeners=function(e){var t=Wt.prototype.removeAllListeners.apply(this,arguments);return(e==="readable"||e===void 0)&&g.nextTick(lo,this),t};function lo(e){var t=e._readableState;t.readableListening=e.listenerCount("readable")>0,t.resumeScheduled&&!t.paused?t.flowing=!0:e.listenerCount("data")>0&&e.resume()}function kh(e){D("readable nexttick read 0"),e.read(0)}B.prototype.resume=function(){var e=this._readableState;return e.flowing||(D("resume"),e.flowing=!e.readableListening,Ih(this,e)),e.paused=!1,this};function Ih(e,t){t.resumeScheduled||(t.resumeScheduled=!0,g.nextTick(Dh,e,t))}function Dh(e,t){D("resume",t.reading),t.reading||e.read(0),t.resumeScheduled=!1,e.emit("resume"),$i(e),t.flowing&&!t.reading&&e.read(0)}B.prototype.pause=function(){return D("call pause flowing=%j",this._readableState.flowing),this._readableState.flowing!==!1&&(D("pause"),this._readableState.flowing=!1,this.emit("pause")),this._readableState.paused=!0,this};function $i(e){var t=e._readableState;for(D("flow",t.flowing);t.flowing&&e.read()!==null;);}B.prototype.wrap=function(e){var t=this,n=this._readableState,i=!1;e.on("end",function(){if(D("wrapped end"),n.decoder&&!n.ended){var o=n.decoder.end();o&&o.length&&t.push(o)}t.push(null)}),e.on("data",function(o){if(D("wrapped data"),n.decoder&&(o=n.decoder.write(o)),!(n.objectMode&&o==null)&&!(!n.objectMode&&(!o||!o.length))){var s=t.push(o);s||(i=!0,e.pause())}});for(var r in e)this[r]===void 0&&typeof e[r]=="function"&&(this[r]=function(s){return function(){return e[s].apply(e,arguments)}}(r));for(var a=0;a<Hi.length;a++)e.on(Hi[a],this.emit.bind(this,Hi[a]));return this._read=function(o){D("wrapped _read",o),i&&(i=!1,e.resume())},this};typeof Symbol=="function"&&(B.prototype[Symbol.asyncIterator]=function(){return zi===void 0&&(zi=Qa()),zi(this)});Object.defineProperty(B.prototype,"readableHighWaterMark",{enumerable:!1,get:function(){return this._readableState.highWaterMark}});Object.defineProperty(B.prototype,"readableBuffer",{enumerable:!1,get:function(){return this._readableState&&this._readableState.buffer}});Object.defineProperty(B.prototype,"readableFlowing",{enumerable:!1,get:function(){return this._readableState.flowing},set:function(t){this._readableState&&(this._readableState.flowing=t)}});B._fromList=fo;Object.defineProperty(B.prototype,"readableLength",{enumerable:!1,get:function(){return this._readableState.length}});function fo(e,t){if(t.length===0)return null;var n;return t.objectMode?n=t.buffer.shift():!e||e>=t.length?(t.decoder?n=t.buffer.join(""):t.buffer.length===1?n=t.buffer.first():n=t.buffer.concat(t.length),t.buffer.clear()):n=t.buffer.consume(e,t.decoder),n}function Zi(e){var t=e._readableState;D("endReadable",t.endEmitted),t.endEmitted||(t.ended=!0,g.nextTick(Lh,t,e))}function Lh(e,t){if(D("endReadableNT",e.endEmitted,e.length),!e.endEmitted&&e.length===0&&(e.endEmitted=!0,t.readable=!1,t.emit("end"),e.autoDestroy)){var n=t._writableState;(!n||n.autoDestroy&&n.finished)&&t.destroy()}}typeof Symbol=="function"&&(B.from=function(e,t){return ji===void 0&&(ji=to()),ji(B,e,t)});function uo(e,t){for(var n=0,i=e.length;n<i;n++)if(e[n]===t)return n;return-1}});var Ki=v((rp,po)=>{"use strict";_();po.exports=Te;var Nn=Qe().codes,Nh=Nn.ERR_METHOD_NOT_IMPLEMENTED,Oh=Nn.ERR_MULTIPLE_CALLBACK,Bh=Nn.ERR_TRANSFORM_ALREADY_TRANSFORMING,Fh=Nn.ERR_TRANSFORM_WITH_LENGTH_0,On=et();xt()(Te,On);function Mh(e,t){var n=this._transformState;n.transforming=!1;var i=n.writecb;if(i===null)return this.emit("error",new Oh);n.writechunk=null,n.writecb=null,t!=null&&this.push(t),i(e);var r=this._readableState;r.reading=!1,(r.needReadable||r.length<r.highWaterMark)&&this._read(r.highWaterMark)}function Te(e){if(!(this instanceof Te))return new Te(e);On.call(this,e),this._transformState={afterTransform:Mh.bind(this),needTransform:!1,transforming:!1,writecb:null,writechunk:null,writeencoding:null},this._readableState.needReadable=!0,this._readableState.sync=!1,e&&(typeof e.transform=="function"&&(this._transform=e.transform),typeof e.flush=="function"&&(this._flush=e.flush)),this.on("prefinish",Uh)}function Uh(){var e=this;typeof this._flush=="function"&&!this._readableState.destroyed?this._flush(function(t,n){co(e,t,n)}):co(this,null,null)}Te.prototype.push=function(e,t){return this._transformState.needTransform=!1,On.prototype.push.call(this,e,t)};Te.prototype._transform=function(e,t,n){n(new Nh("_transform()"))};Te.prototype._write=function(e,t,n){var i=this._transformState;if(i.writecb=n,i.writechunk=e,i.writeencoding=t,!i.transforming){var r=this._readableState;(i.needTransform||r.needReadable||r.length<r.highWaterMark)&&this._read(r.highWaterMark)}};Te.prototype._read=function(e){var t=this._transformState;t.writechunk!==null&&!t.transforming?(t.transforming=!0,this._transform(t.writechunk,t.writeencoding,t.afterTransform)):t.needTransform=!0};Te.prototype._destroy=function(e,t){On.prototype._destroy.call(this,e,function(n){t(n)})};function co(e,t,n){if(t)return e.emit("error",t);if(n!=null&&e.push(n),e._writableState.length)throw new Fh;if(e._transformState.transforming)throw new Bh;return e.push(null)}});var wo=v((ap,go)=>{"use strict";_();go.exports=Zt;var _o=Ki();xt()(Zt,_o);function Zt(e){if(!(this instanceof Zt))return new Zt(e);_o.call(this,e)}Zt.prototype._transform=function(e,t,n){n(null,e)}});var xo=v((op,Eo)=>{"use strict";_();var Xi;function Ph(e){var t=!1;return function(){t||(t=!0,e.apply(void 0,arguments))}}var mo=Qe().codes,qh=mo.ERR_MISSING_ARGS,zh=mo.ERR_STREAM_DESTROYED;function yo(e){if(e)throw e}function jh(e){return e.setHeader&&typeof e.abort=="function"}function Hh(e,t,n,i){i=Ph(i);var r=!1;e.on("close",function(){r=!0}),Xi===void 0&&(Xi=Cn()),Xi(e,{readable:t,writable:n},function(o){if(o)return i(o);r=!0,i()});var a=!1;return function(o){if(!r&&!a){if(a=!0,jh(e))return e.abort();if(typeof e.destroy=="function")return e.destroy();i(o||new zh("pipe"))}}}function bo(e){e()}function Wh(e,t){return e.pipe(t)}function Zh(e){return!e.length||typeof e[e.length-1]!="function"?yo:e.pop()}function Yh(){for(var e=arguments.length,t=new Array(e),n=0;n<e;n++)t[n]=arguments[n];var i=Zh(t);if(Array.isArray(t[0])&&(t=t[0]),t.length<2)throw new qh("streams");var r,a=t.map(function(o,s){var u=s<t.length-1,l=s>0;return Hh(o,u,l,function(f){r||(r=f),f&&a.forEach(bo),!u&&(a.forEach(bo),i(r))})});return t.reduce(Wh)}Eo.exports=Yh});var So=v((ie,vo)=>{_();ie=vo.exports=Bi();ie.Stream=ie;ie.Readable=ie;ie.Writable=Li();ie.Duplex=et();ie.Transform=Ki();ie.PassThrough=wo();ie.finished=Cn();ie.pipeline=xo()});var Co=v((sp,To)=>{_();var Ro;To.exports=typeof queueMicrotask=="function"?queueMicrotask.bind(window):e=>(Ro||(Ro=Promise.resolve())).then(e).catch(t=>setTimeout(()=>{throw t},0))});var Io=v((lp,ko)=>{"use strict";_();function Ao(e,t){for(let n in t)Object.defineProperty(e,n,{value:t[n],enumerable:!0,configurable:!0});return e}function Gh(e,t,n){if(!e||typeof e=="string")throw new TypeError("Please pass an Error to err-code");n||(n={}),typeof t=="object"&&(n=t,t=""),t&&(n.code=t);try{return Ao(e,n)}catch{n.message=e.message,n.stack=e.stack;let r=function(){};return r.prototype=Object.create(Object.getPrototypeOf(e)),Ao(new r,n)}}ko.exports=Gh});var Bo=v((fp,Oo)=>{_();var $h=xa()("simple-peer"),No=pi(),Do=Ra(),Kh=So(),Vi=Co(),N=Io(),{Buffer:Xh}=Xe(),Ji=64*1024,Vh=5*1e3,Jh=5*1e3;function Lo(e){return e.replace(/a=ice-options:trickle\s\n/g,"")}function Qh(e){console.warn(e)}var Ce=class extends Kh.Duplex{constructor(t){if(t=Object.assign({allowHalfOpen:!1},t),super(t),this._id=Do(4).toString("hex").slice(0,7),this._debug("new peer %o",t),this.channelName=t.initiator?t.channelName||Do(20).toString("hex"):null,this.initiator=t.initiator||!1,this.channelConfig=t.channelConfig||Ce.channelConfig,this.channelNegotiated=this.channelConfig.negotiated,this.config=Object.assign({},Ce.config,t.config),this.offerOptions=t.offerOptions||{},this.answerOptions=t.answerOptions||{},this.sdpTransform=t.sdpTransform||(n=>n),this.streams=t.streams||(t.stream?[t.stream]:[]),this.trickle=t.trickle!==void 0?t.trickle:!0,this.allowHalfTrickle=t.allowHalfTrickle!==void 0?t.allowHalfTrickle:!1,this.iceCompleteTimeout=t.iceCompleteTimeout||Vh,this.destroyed=!1,this.destroying=!1,this._connected=!1,this.remoteAddress=void 0,this.remoteFamily=void 0,this.remotePort=void 0,this.localAddress=void 0,this.localFamily=void 0,this.localPort=void 0,this._wrtc=t.wrtc&&typeof t.wrtc=="object"?t.wrtc:No(),!this._wrtc)throw N(typeof window>"u"?new Error("No WebRTC support: Specify `opts.wrtc` option in this environment"):new Error("No WebRTC support: Not a supported browser"),"ERR_WEBRTC_SUPPORT");this._pcReady=!1,this._channelReady=!1,this._iceComplete=!1,this._iceCompleteTimer=null,this._channel=null,this._pendingCandidates=[],this._isNegotiating=!1,this._firstNegotiation=!0,this._batchedNegotiation=!1,this._queuedNegotiation=!1,this._sendersAwaitingStable=[],this._senderMap=new Map,this._closingInterval=null,this._remoteTracks=[],this._remoteStreams=[],this._chunk=null,this._cb=null,this._interval=null;try{this._pc=new this._wrtc.RTCPeerConnection(this.config)}catch(n){this.destroy(N(n,"ERR_PC_CONSTRUCTOR"));return}this._isReactNativeWebrtc=typeof this._pc._peerConnectionId=="number",this._pc.oniceconnectionstatechange=()=>{this._onIceStateChange()},this._pc.onicegatheringstatechange=()=>{this._onIceStateChange()},this._pc.onconnectionstatechange=()=>{this._onConnectionStateChange()},this._pc.onsignalingstatechange=()=>{this._onSignalingStateChange()},this._pc.onicecandidate=n=>{this._onIceCandidate(n)},typeof this._pc.peerIdentity=="object"&&this._pc.peerIdentity.catch(n=>{this.destroy(N(n,"ERR_PC_PEER_IDENTITY"))}),this.initiator||this.channelNegotiated?this._setupData({channel:this._pc.createDataChannel(this.channelName,this.channelConfig)}):this._pc.ondatachannel=n=>{this._setupData(n)},this.streams&&this.streams.forEach(n=>{this.addStream(n)}),this._pc.ontrack=n=>{this._onTrack(n)},this._debug("initial negotiation"),this._needsNegotiation(),this._onFinishBound=()=>{this._onFinish()},this.once("finish",this._onFinishBound)}get bufferSize(){return this._channel&&this._channel.bufferedAmount||0}get connected(){return this._connected&&this._channel.readyState==="open"}address(){return{port:this.localPort,family:this.localFamily,address:this.localAddress}}signal(t){if(!this.destroying){if(this.destroyed)throw N(new Error("cannot signal after peer is destroyed"),"ERR_DESTROYED");if(typeof t=="string")try{t=JSON.parse(t)}catch{t={}}this._debug("signal()"),t.renegotiate&&this.initiator&&(this._debug("got request to renegotiate"),this._needsNegotiation()),t.transceiverRequest&&this.initiator&&(this._debug("got request for transceiver"),this.addTransceiver(t.transceiverRequest.kind,t.transceiverRequest.init)),t.candidate&&(this._pc.remoteDescription&&this._pc.remoteDescription.type?this._addIceCandidate(t.candidate):this._pendingCandidates.push(t.candidate)),t.sdp&&this._pc.setRemoteDescription(new this._wrtc.RTCSessionDescription(t)).then(()=>{this.destroyed||(this._pendingCandidates.forEach(n=>{this._addIceCandidate(n)}),this._pendingCandidates=[],this._pc.remoteDescription.type==="offer"&&this._createAnswer())}).catch(n=>{this.destroy(N(n,"ERR_SET_REMOTE_DESCRIPTION"))}),!t.sdp&&!t.candidate&&!t.renegotiate&&!t.transceiverRequest&&this.destroy(N(new Error("signal() called with invalid signal data"),"ERR_SIGNALING"))}}_addIceCandidate(t){let n=new this._wrtc.RTCIceCandidate(t);this._pc.addIceCandidate(n).catch(i=>{!n.address||n.address.endsWith(".local")?Qh("Ignoring unsupported ICE candidate."):this.destroy(N(i,"ERR_ADD_ICE_CANDIDATE"))})}send(t){if(!this.destroying){if(this.destroyed)throw N(new Error("cannot send after peer is destroyed"),"ERR_DESTROYED");this._channel.send(t)}}addTransceiver(t,n){if(!this.destroying){if(this.destroyed)throw N(new Error("cannot addTransceiver after peer is destroyed"),"ERR_DESTROYED");if(this._debug("addTransceiver()"),this.initiator)try{this._pc.addTransceiver(t,n),this._needsNegotiation()}catch(i){this.destroy(N(i,"ERR_ADD_TRANSCEIVER"))}else this.emit("signal",{type:"transceiverRequest",transceiverRequest:{kind:t,init:n}})}}addStream(t){if(!this.destroying){if(this.destroyed)throw N(new Error("cannot addStream after peer is destroyed"),"ERR_DESTROYED");this._debug("addStream()"),t.getTracks().forEach(n=>{this.addTrack(n,t)})}}addTrack(t,n){if(this.destroying)return;if(this.destroyed)throw N(new Error("cannot addTrack after peer is destroyed"),"ERR_DESTROYED");this._debug("addTrack()");let i=this._senderMap.get(t)||new Map,r=i.get(n);if(!r)r=this._pc.addTrack(t,n),i.set(n,r),this._senderMap.set(t,i),this._needsNegotiation();else throw r.removed?N(new Error("Track has been removed. You should enable/disable tracks that you want to re-add."),"ERR_SENDER_REMOVED"):N(new Error("Track has already been added to that stream."),"ERR_SENDER_ALREADY_ADDED")}replaceTrack(t,n,i){if(this.destroying)return;if(this.destroyed)throw N(new Error("cannot replaceTrack after peer is destroyed"),"ERR_DESTROYED");this._debug("replaceTrack()");let r=this._senderMap.get(t),a=r?r.get(i):null;if(!a)throw N(new Error("Cannot replace track that was never added."),"ERR_TRACK_NOT_ADDED");n&&this._senderMap.set(n,r),a.replaceTrack!=null?a.replaceTrack(n):this.destroy(N(new Error("replaceTrack is not supported in this browser"),"ERR_UNSUPPORTED_REPLACETRACK"))}removeTrack(t,n){if(this.destroying)return;if(this.destroyed)throw N(new Error("cannot removeTrack after peer is destroyed"),"ERR_DESTROYED");this._debug("removeSender()");let i=this._senderMap.get(t),r=i?i.get(n):null;if(!r)throw N(new Error("Cannot remove track that was never added."),"ERR_TRACK_NOT_ADDED");try{r.removed=!0,this._pc.removeTrack(r)}catch(a){a.name==="NS_ERROR_UNEXPECTED"?this._sendersAwaitingStable.push(r):this.destroy(N(a,"ERR_REMOVE_TRACK"))}this._needsNegotiation()}removeStream(t){if(!this.destroying){if(this.destroyed)throw N(new Error("cannot removeStream after peer is destroyed"),"ERR_DESTROYED");this._debug("removeSenders()"),t.getTracks().forEach(n=>{this.removeTrack(n,t)})}}_needsNegotiation(){this._debug("_needsNegotiation"),!this._batchedNegotiation&&(this._batchedNegotiation=!0,Vi(()=>{this._batchedNegotiation=!1,this.initiator||!this._firstNegotiation?(this._debug("starting batched negotiation"),this.negotiate()):this._debug("non-initiator initial negotiation request discarded"),this._firstNegotiation=!1}))}negotiate(){if(!this.destroying){if(this.destroyed)throw N(new Error("cannot negotiate after peer is destroyed"),"ERR_DESTROYED");this.initiator?this._isNegotiating?(this._queuedNegotiation=!0,this._debug("already negotiating, queueing")):(this._debug("start negotiation"),setTimeout(()=>{this._createOffer()},0)):this._isNegotiating?(this._queuedNegotiation=!0,this._debug("already negotiating, queueing")):(this._debug("requesting negotiation from initiator"),this.emit("signal",{type:"renegotiate",renegotiate:!0})),this._isNegotiating=!0}}destroy(t){this._destroy(t,()=>{})}_destroy(t,n){this.destroyed||this.destroying||(this.destroying=!0,this._debug("destroying (error: %s)",t&&(t.message||t)),Vi(()=>{if(this.destroyed=!0,this.destroying=!1,this._debug("destroy (error: %s)",t&&(t.message||t)),this.readable=this.writable=!1,this._readableState.ended||this.push(null),this._writableState.finished||this.end(),this._connected=!1,this._pcReady=!1,this._channelReady=!1,this._remoteTracks=null,this._remoteStreams=null,this._senderMap=null,clearInterval(this._closingInterval),this._closingInterval=null,clearInterval(this._interval),this._interval=null,this._chunk=null,this._cb=null,this._onFinishBound&&this.removeListener("finish",this._onFinishBound),this._onFinishBound=null,this._channel){try{this._channel.close()}catch{}this._channel.onmessage=null,this._channel.onopen=null,this._channel.onclose=null,this._channel.onerror=null}if(this._pc){try{this._pc.close()}catch{}this._pc.oniceconnectionstatechange=null,this._pc.onicegatheringstatechange=null,this._pc.onsignalingstatechange=null,this._pc.onicecandidate=null,this._pc.ontrack=null,this._pc.ondatachannel=null}this._pc=null,this._channel=null,t&&this.emit("error",t),this.emit("close"),n()}))}_setupData(t){if(!t.channel)return this.destroy(N(new Error("Data channel event is missing `channel` property"),"ERR_DATA_CHANNEL"));this._channel=t.channel,this._channel.binaryType="arraybuffer",typeof this._channel.bufferedAmountLowThreshold=="number"&&(this._channel.bufferedAmountLowThreshold=Ji),this.channelName=this._channel.label,this._channel.onmessage=i=>{this._onChannelMessage(i)},this._channel.onbufferedamountlow=()=>{this._onChannelBufferedAmountLow()},this._channel.onopen=()=>{this._onChannelOpen()},this._channel.onclose=()=>{this._onChannelClose()},this._channel.onerror=i=>{let r=i.error instanceof Error?i.error:new Error(`Datachannel error: ${i.message} ${i.filename}:${i.lineno}:${i.colno}`);this.destroy(N(r,"ERR_DATA_CHANNEL"))};let n=!1;this._closingInterval=setInterval(()=>{this._channel&&this._channel.readyState==="closing"?(n&&this._onChannelClose(),n=!0):n=!1},Jh)}_read(){}_write(t,n,i){if(this.destroyed)return i(N(new Error("cannot write after peer is destroyed"),"ERR_DATA_CHANNEL"));if(this._connected){try{this.send(t)}catch(r){return this.destroy(N(r,"ERR_DATA_CHANNEL"))}this._channel.bufferedAmount>Ji?(this._debug("start backpressure: bufferedAmount %d",this._channel.bufferedAmount),this._cb=i):i(null)}else this._debug("write before connect"),this._chunk=t,this._cb=i}_onFinish(){if(this.destroyed)return;let t=()=>{setTimeout(()=>this.destroy(),1e3)};this._connected?t():this.once("connect",t)}_startIceCompleteTimeout(){this.destroyed||this._iceCompleteTimer||(this._debug("started iceComplete timeout"),this._iceCompleteTimer=setTimeout(()=>{this._iceComplete||(this._iceComplete=!0,this._debug("iceComplete timeout completed"),this.emit("iceTimeout"),this.emit("_iceComplete"))},this.iceCompleteTimeout))}_createOffer(){this.destroyed||this._pc.createOffer(this.offerOptions).then(t=>{if(this.destroyed)return;!this.trickle&&!this.allowHalfTrickle&&(t.sdp=Lo(t.sdp)),t.sdp=this.sdpTransform(t.sdp);let n=()=>{if(this.destroyed)return;let a=this._pc.localDescription||t;this._debug("signal"),this.emit("signal",{type:a.type,sdp:a.sdp})},i=()=>{this._debug("createOffer success"),!this.destroyed&&(this.trickle||this._iceComplete?n():this.once("_iceComplete",n))},r=a=>{this.destroy(N(a,"ERR_SET_LOCAL_DESCRIPTION"))};this._pc.setLocalDescription(t).then(i).catch(r)}).catch(t=>{this.destroy(N(t,"ERR_CREATE_OFFER"))})}_requestMissingTransceivers(){this._pc.getTransceivers&&this._pc.getTransceivers().forEach(t=>{!t.mid&&t.sender.track&&!t.requested&&(t.requested=!0,this.addTransceiver(t.sender.track.kind))})}_createAnswer(){this.destroyed||this._pc.createAnswer(this.answerOptions).then(t=>{if(this.destroyed)return;!this.trickle&&!this.allowHalfTrickle&&(t.sdp=Lo(t.sdp)),t.sdp=this.sdpTransform(t.sdp);let n=()=>{if(this.destroyed)return;let a=this._pc.localDescription||t;this._debug("signal"),this.emit("signal",{type:a.type,sdp:a.sdp}),this.initiator||this._requestMissingTransceivers()},i=()=>{this.destroyed||(this.trickle||this._iceComplete?n():this.once("_iceComplete",n))},r=a=>{this.destroy(N(a,"ERR_SET_LOCAL_DESCRIPTION"))};this._pc.setLocalDescription(t).then(i).catch(r)}).catch(t=>{this.destroy(N(t,"ERR_CREATE_ANSWER"))})}_onConnectionStateChange(){this.destroyed||this._pc.connectionState==="failed"&&this.destroy(N(new Error("Connection failed."),"ERR_CONNECTION_FAILURE"))}_onIceStateChange(){if(this.destroyed)return;let t=this._pc.iceConnectionState,n=this._pc.iceGatheringState;this._debug("iceStateChange (connection: %s) (gathering: %s)",t,n),this.emit("iceStateChange",t,n),(t==="connected"||t==="completed")&&(this._pcReady=!0,this._maybeReady()),t==="failed"&&this.destroy(N(new Error("Ice connection failed."),"ERR_ICE_CONNECTION_FAILURE")),t==="closed"&&this.destroy(N(new Error("Ice connection closed."),"ERR_ICE_CONNECTION_CLOSED"))}getStats(t){let n=i=>(Object.prototype.toString.call(i.values)==="[object Array]"&&i.values.forEach(r=>{Object.assign(i,r)}),i);this._pc.getStats.length===0||this._isReactNativeWebrtc?this._pc.getStats().then(i=>{let r=[];i.forEach(a=>{r.push(n(a))}),t(null,r)},i=>t(i)):this._pc.getStats.length>0?this._pc.getStats(i=>{if(this.destroyed)return;let r=[];i.result().forEach(a=>{let o={};a.names().forEach(s=>{o[s]=a.stat(s)}),o.id=a.id,o.type=a.type,o.timestamp=a.timestamp,r.push(n(o))}),t(null,r)},i=>t(i)):t(null,[])}_maybeReady(){if(this._debug("maybeReady pc %s channel %s",this._pcReady,this._channelReady),this._connected||this._connecting||!this._pcReady||!this._channelReady)return;this._connecting=!0;let t=()=>{this.destroyed||this.getStats((n,i)=>{if(this.destroyed)return;n&&(i=[]);let r={},a={},o={},s=!1;i.forEach(l=>{(l.type==="remotecandidate"||l.type==="remote-candidate")&&(r[l.id]=l),(l.type==="localcandidate"||l.type==="local-candidate")&&(a[l.id]=l),(l.type==="candidatepair"||l.type==="candidate-pair")&&(o[l.id]=l)});let u=l=>{s=!0;let f=a[l.localCandidateId];f&&(f.ip||f.address)?(this.localAddress=f.ip||f.address,this.localPort=Number(f.port)):f&&f.ipAddress?(this.localAddress=f.ipAddress,this.localPort=Number(f.portNumber)):typeof l.googLocalAddress=="string"&&(f=l.googLocalAddress.split(":"),this.localAddress=f[0],this.localPort=Number(f[1])),this.localAddress&&(this.localFamily=this.localAddress.includes(":")?"IPv6":"IPv4");let h=r[l.remoteCandidateId];h&&(h.ip||h.address)?(this.remoteAddress=h.ip||h.address,this.remotePort=Number(h.port)):h&&h.ipAddress?(this.remoteAddress=h.ipAddress,this.remotePort=Number(h.portNumber)):typeof l.googRemoteAddress=="string"&&(h=l.googRemoteAddress.split(":"),this.remoteAddress=h[0],this.remotePort=Number(h[1])),this.remoteAddress&&(this.remoteFamily=this.remoteAddress.includes(":")?"IPv6":"IPv4"),this._debug("connect local: %s:%s remote: %s:%s",this.localAddress,this.localPort,this.remoteAddress,this.remotePort)};if(i.forEach(l=>{l.type==="transport"&&l.selectedCandidatePairId&&u(o[l.selectedCandidatePairId]),(l.type==="googCandidatePair"&&l.googActiveConnection==="true"||(l.type==="candidatepair"||l.type==="candidate-pair")&&l.selected)&&u(l)}),!s&&(!Object.keys(o).length||Object.keys(a).length)){setTimeout(t,100);return}else this._connecting=!1,this._connected=!0;if(this._chunk){try{this.send(this._chunk)}catch(f){return this.destroy(N(f,"ERR_DATA_CHANNEL"))}this._chunk=null,this._debug('sent chunk from "write before connect"');let l=this._cb;this._cb=null,l(null)}typeof this._channel.bufferedAmountLowThreshold!="number"&&(this._interval=setInterval(()=>this._onInterval(),150),this._interval.unref&&this._interval.unref()),this._debug("connect"),this.emit("connect")})};t()}_onInterval(){!this._cb||!this._channel||this._channel.bufferedAmount>Ji||this._onChannelBufferedAmountLow()}_onSignalingStateChange(){this.destroyed||(this._pc.signalingState==="stable"&&(this._isNegotiating=!1,this._debug("flushing sender queue",this._sendersAwaitingStable),this._sendersAwaitingStable.forEach(t=>{this._pc.removeTrack(t),this._queuedNegotiation=!0}),this._sendersAwaitingStable=[],this._queuedNegotiation?(this._debug("flushing negotiation queue"),this._queuedNegotiation=!1,this._needsNegotiation()):(this._debug("negotiated"),this.emit("negotiated"))),this._debug("signalingStateChange %s",this._pc.signalingState),this.emit("signalingStateChange",this._pc.signalingState))}_onIceCandidate(t){this.destroyed||(t.candidate&&this.trickle?this.emit("signal",{type:"candidate",candidate:{candidate:t.candidate.candidate,sdpMLineIndex:t.candidate.sdpMLineIndex,sdpMid:t.candidate.sdpMid}}):!t.candidate&&!this._iceComplete&&(this._iceComplete=!0,this.emit("_iceComplete")),t.candidate&&this._startIceCompleteTimeout())}_onChannelMessage(t){if(this.destroyed)return;let n=t.data;n instanceof ArrayBuffer&&(n=Xh.from(n)),this.push(n)}_onChannelBufferedAmountLow(){if(this.destroyed||!this._cb)return;this._debug("ending backpressure: bufferedAmount %d",this._channel.bufferedAmount);let t=this._cb;this._cb=null,t(null)}_onChannelOpen(){this._connected||this.destroyed||(this._debug("on channel open"),this._channelReady=!0,this._maybeReady())}_onChannelClose(){this.destroyed||(this._debug("on channel close"),this.destroy())}_onTrack(t){this.destroyed||t.streams.forEach(n=>{this._debug("on track"),this.emit("track",t.track,n),this._remoteTracks.push({track:t.track,stream:n}),!this._remoteStreams.some(i=>i.id===n.id)&&(this._remoteStreams.push(n),Vi(()=>{this._debug("on stream"),this.emit("stream",n)}))})}_debug(){let t=[].slice.call(arguments);t[0]="["+this._id+"] "+t[0],$h.apply(null,t)}};Ce.WEBRTC_SUPPORT=!!No();Ce.config={iceServers:[{urls:["stun:stun.l.google.com:19302","stun:global.stun.twilio.com:3478"]}],sdpSemantics:"unified-plan"};Ce.channelConfig={};Oo.exports=Ce});var ns=v((up,kt)=>{"use strict";_();function At(e){let t=e.length;for(;--t>=0;)e[t]=0}var ec=0,zo=1,tc=2,nc=3,ic=258,ar=29,Vt=256,Gt=Vt+1+ar,Ct=30,or=19,jo=2*Gt+1,rt=15,Qi=16,rc=7,sr=256,Ho=16,Wo=17,Zo=18,ir=new Uint8Array([0,0,0,0,0,0,0,0,1,1,1,1,2,2,2,2,3,3,3,3,4,4,4,4,5,5,5,5,0]),Bn=new Uint8Array([0,0,0,0,1,1,2,2,3,3,4,4,5,5,6,6,7,7,8,8,9,9,10,10,11,11,12,12,13,13]),ac=new Uint8Array([0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,3,7]),Yo=new Uint8Array([16,17,18,0,8,7,9,6,10,5,11,4,12,3,13,2,14,1,15]),oc=512,Ae=new Array((Gt+2)*2);At(Ae);var Yt=new Array(Ct*2);At(Yt);var $t=new Array(oc);At($t);var Kt=new Array(ic-nc+1);At(Kt);var lr=new Array(ar);At(lr);var Fn=new Array(Ct);At(Fn);function er(e,t,n,i,r){this.static_tree=e,this.extra_bits=t,this.extra_base=n,this.elems=i,this.max_length=r,this.has_stree=e&&e.length}var Go,$o,Ko;function tr(e,t){this.dyn_tree=e,this.max_code=0,this.stat_desc=t}var Xo=e=>e<256?$t[e]:$t[256+(e>>>7)],Xt=(e,t)=>{e.pending_buf[e.pending++]=t&255,e.pending_buf[e.pending++]=t>>>8&255},V=(e,t,n)=>{e.bi_valid>Qi-n?(e.bi_buf|=t<<e.bi_valid&65535,Xt(e,e.bi_buf),e.bi_buf=t>>Qi-e.bi_valid,e.bi_valid+=n-Qi):(e.bi_buf|=t<<e.bi_valid&65535,e.bi_valid+=n)},de=(e,t,n)=>{V(e,n[t*2],n[t*2+1])},Vo=(e,t)=>{let n=0;do n|=e&1,e>>>=1,n<<=1;while(--t>0);return n>>>1},sc=e=>{e.bi_valid===16?(Xt(e,e.bi_buf),e.bi_buf=0,e.bi_valid=0):e.bi_valid>=8&&(e.pending_buf[e.pending++]=e.bi_buf&255,e.bi_buf>>=8,e.bi_valid-=8)},lc=(e,t)=>{let n=t.dyn_tree,i=t.max_code,r=t.stat_desc.static_tree,a=t.stat_desc.has_stree,o=t.stat_desc.extra_bits,s=t.stat_desc.extra_base,u=t.stat_desc.max_length,l,f,h,p,c,y,E=0;for(p=0;p<=rt;p++)e.bl_count[p]=0;for(n[e.heap[e.heap_max]*2+1]=0,l=e.heap_max+1;l<jo;l++)f=e.heap[l],p=n[n[f*2+1]*2+1]+1,p>u&&(p=u,E++),n[f*2+1]=p,!(f>i)&&(e.bl_count[p]++,c=0,f>=s&&(c=o[f-s]),y=n[f*2],e.opt_len+=y*(p+c),a&&(e.static_len+=y*(r[f*2+1]+c)));if(E!==0){do{for(p=u-1;e.bl_count[p]===0;)p--;e.bl_count[p]--,e.bl_count[p+1]+=2,e.bl_count[u]--,E-=2}while(E>0);for(p=u;p!==0;p--)for(f=e.bl_count[p];f!==0;)h=e.heap[--l],!(h>i)&&(n[h*2+1]!==p&&(e.opt_len+=(p-n[h*2+1])*n[h*2],n[h*2+1]=p),f--)}},Jo=(e,t,n)=>{let i=new Array(rt+1),r=0,a,o;for(a=1;a<=rt;a++)i[a]=r=r+n[a-1]<<1;for(o=0;o<=t;o++){let s=e[o*2+1];s!==0&&(e[o*2]=Vo(i[s]++,s))}},fc=()=>{let e,t,n,i,r,a=new Array(rt+1);for(n=0,i=0;i<ar-1;i++)for(lr[i]=n,e=0;e<1<<ir[i];e++)Kt[n++]=i;for(Kt[n-1]=i,r=0,i=0;i<16;i++)for(Fn[i]=r,e=0;e<1<<Bn[i];e++)$t[r++]=i;for(r>>=7;i<Ct;i++)for(Fn[i]=r<<7,e=0;e<1<<Bn[i]-7;e++)$t[256+r++]=i;for(t=0;t<=rt;t++)a[t]=0;for(e=0;e<=143;)Ae[e*2+1]=8,e++,a[8]++;for(;e<=255;)Ae[e*2+1]=9,e++,a[9]++;for(;e<=279;)Ae[e*2+1]=7,e++,a[7]++;for(;e<=287;)Ae[e*2+1]=8,e++,a[8]++;for(Jo(Ae,Gt+1,a),e=0;e<Ct;e++)Yt[e*2+1]=5,Yt[e*2]=Vo(e,5);Go=new er(Ae,ir,Vt+1,Gt,rt),$o=new er(Yt,Bn,0,Ct,rt),Ko=new er(new Array(0),ac,0,or,rc)},Qo=e=>{let t;for(t=0;t<Gt;t++)e.dyn_ltree[t*2]=0;for(t=0;t<Ct;t++)e.dyn_dtree[t*2]=0;for(t=0;t<or;t++)e.bl_tree[t*2]=0;e.dyn_ltree[sr*2]=1,e.opt_len=e.static_len=0,e.last_lit=e.matches=0},es=e=>{e.bi_valid>8?Xt(e,e.bi_buf):e.bi_valid>0&&(e.pending_buf[e.pending++]=e.bi_buf),e.bi_buf=0,e.bi_valid=0},uc=(e,t,n,i)=>{es(e),i&&(Xt(e,n),Xt(e,~n)),e.pending_buf.set(e.window.subarray(t,t+n),e.pending),e.pending+=n},Fo=(e,t,n,i)=>{let r=t*2,a=n*2;return e[r]<e[a]||e[r]===e[a]&&i[t]<=i[n]},nr=(e,t,n)=>{let i=e.heap[n],r=n<<1;for(;r<=e.heap_len&&(r<e.heap_len&&Fo(t,e.heap[r+1],e.heap[r],e.depth)&&r++,!Fo(t,i,e.heap[r],e.depth));)e.heap[n]=e.heap[r],n=r,r<<=1;e.heap[n]=i},Mo=(e,t,n)=>{let i,r,a=0,o,s;if(e.last_lit!==0)do i=e.pending_buf[e.d_buf+a*2]<<8|e.pending_buf[e.d_buf+a*2+1],r=e.pending_buf[e.l_buf+a],a++,i===0?de(e,r,t):(o=Kt[r],de(e,o+Vt+1,t),s=ir[o],s!==0&&(r-=lr[o],V(e,r,s)),i--,o=Xo(i),de(e,o,n),s=Bn[o],s!==0&&(i-=Fn[o],V(e,i,s)));while(a<e.last_lit);de(e,sr,t)},rr=(e,t)=>{let n=t.dyn_tree,i=t.stat_desc.static_tree,r=t.stat_desc.has_stree,a=t.stat_desc.elems,o,s,u=-1,l;for(e.heap_len=0,e.heap_max=jo,o=0;o<a;o++)n[o*2]!==0?(e.heap[++e.heap_len]=u=o,e.depth[o]=0):n[o*2+1]=0;for(;e.heap_len<2;)l=e.heap[++e.heap_len]=u<2?++u:0,n[l*2]=1,e.depth[l]=0,e.opt_len--,r&&(e.static_len-=i[l*2+1]);for(t.max_code=u,o=e.heap_len>>1;o>=1;o--)nr(e,n,o);l=a;do o=e.heap[1],e.heap[1]=e.heap[e.heap_len--],nr(e,n,1),s=e.heap[1],e.heap[--e.heap_max]=o,e.heap[--e.heap_max]=s,n[l*2]=n[o*2]+n[s*2],e.depth[l]=(e.depth[o]>=e.depth[s]?e.depth[o]:e.depth[s])+1,n[o*2+1]=n[s*2+1]=l,e.heap[1]=l++,nr(e,n,1);while(e.heap_len>=2);e.heap[--e.heap_max]=e.heap[1],lc(e,t),Jo(n,u,e.bl_count)},Uo=(e,t,n)=>{let i,r=-1,a,o=t[0*2+1],s=0,u=7,l=4;for(o===0&&(u=138,l=3),t[(n+1)*2+1]=65535,i=0;i<=n;i++)a=o,o=t[(i+1)*2+1],!(++s<u&&a===o)&&(s<l?e.bl_tree[a*2]+=s:a!==0?(a!==r&&e.bl_tree[a*2]++,e.bl_tree[Ho*2]++):s<=10?e.bl_tree[Wo*2]++:e.bl_tree[Zo*2]++,s=0,r=a,o===0?(u=138,l=3):a===o?(u=6,l=3):(u=7,l=4))},Po=(e,t,n)=>{let i,r=-1,a,o=t[0*2+1],s=0,u=7,l=4;for(o===0&&(u=138,l=3),i=0;i<=n;i++)if(a=o,o=t[(i+1)*2+1],!(++s<u&&a===o)){if(s<l)do de(e,a,e.bl_tree);while(--s!==0);else a!==0?(a!==r&&(de(e,a,e.bl_tree),s--),de(e,Ho,e.bl_tree),V(e,s-3,2)):s<=10?(de(e,Wo,e.bl_tree),V(e,s-3,3)):(de(e,Zo,e.bl_tree),V(e,s-11,7));s=0,r=a,o===0?(u=138,l=3):a===o?(u=6,l=3):(u=7,l=4)}},hc=e=>{let t;for(Uo(e,e.dyn_ltree,e.l_desc.max_code),Uo(e,e.dyn_dtree,e.d_desc.max_code),rr(e,e.bl_desc),t=or-1;t>=3&&e.bl_tree[Yo[t]*2+1]===0;t--);return e.opt_len+=3*(t+1)+5+5+4,t},cc=(e,t,n,i)=>{let r;for(V(e,t-257,5),V(e,n-1,5),V(e,i-4,4),r=0;r<i;r++)V(e,e.bl_tree[Yo[r]*2+1],3);Po(e,e.dyn_ltree,t-1),Po(e,e.dyn_dtree,n-1)},dc=e=>{let t=4093624447,n;for(n=0;n<=31;n++,t>>>=1)if(t&1&&e.dyn_ltree[n*2]!==0)return 0;if(e.dyn_ltree[9*2]!==0||e.dyn_ltree[10*2]!==0||e.dyn_ltree[13*2]!==0)return 1;for(n=32;n<Vt;n++)if(e.dyn_ltree[n*2]!==0)return 1;return 0},qo=!1,pc=e=>{qo||(fc(),qo=!0),e.l_desc=new tr(e.dyn_ltree,Go),e.d_desc=new tr(e.dyn_dtree,$o),e.bl_desc=new tr(e.bl_tree,Ko),e.bi_buf=0,e.bi_valid=0,Qo(e)},ts=(e,t,n,i)=>{V(e,(ec<<1)+(i?1:0),3),uc(e,t,n,!0)},_c=e=>{V(e,zo<<1,3),de(e,sr,Ae),sc(e)},gc=(e,t,n,i)=>{let r,a,o=0;e.level>0?(e.strm.data_type===2&&(e.strm.data_type=dc(e)),rr(e,e.l_desc),rr(e,e.d_desc),o=hc(e),r=e.opt_len+3+7>>>3,a=e.static_len+3+7>>>3,a<=r&&(r=a)):r=a=n+5,n+4<=r&&t!==-1?ts(e,t,n,i):e.strategy===4||a===r?(V(e,(zo<<1)+(i?1:0),3),Mo(e,Ae,Yt)):(V(e,(tc<<1)+(i?1:0),3),cc(e,e.l_desc.max_code+1,e.d_desc.max_code+1,o+1),Mo(e,e.dyn_ltree,e.dyn_dtree)),Qo(e),i&&es(e)},wc=(e,t,n)=>(e.pending_buf[e.d_buf+e.last_lit*2]=t>>>8&255,e.pending_buf[e.d_buf+e.last_lit*2+1]=t&255,e.pending_buf[e.l_buf+e.last_lit]=n&255,e.last_lit++,t===0?e.dyn_ltree[n*2]++:(e.matches++,t--,e.dyn_ltree[(Kt[n]+Vt+1)*2]++,e.dyn_dtree[Xo(t)*2]++),e.last_lit===e.lit_bufsize-1);kt.exports._tr_init=pc;kt.exports._tr_stored_block=ts;kt.exports._tr_flush_block=gc;kt.exports._tr_tally=wc;kt.exports._tr_align=_c});var fr=v((hp,is)=>{"use strict";_();var yc=(e,t,n,i)=>{let r=e&65535|0,a=e>>>16&65535|0,o=0;for(;n!==0;){o=n>2e3?2e3:n,n-=o;do r=r+t[i++]|0,a=a+r|0;while(--o);r%=65521,a%=65521}return r|a<<16|0};is.exports=yc});var ur=v((cp,rs)=>{"use strict";_();var bc=()=>{let e,t=[];for(var n=0;n<256;n++){e=n;for(var i=0;i<8;i++)e=e&1?3988292384^e>>>1:e>>>1;t[n]=e}return t},mc=new Uint32Array(bc()),Ec=(e,t,n,i)=>{let r=mc,a=i+n;e^=-1;for(let o=i;o<a;o++)e=e>>>8^r[(e^t[o])&255];return e^-1};rs.exports=Ec});var Mn=v((dp,as)=>{"use strict";_();as.exports={2:"need dictionary",1:"stream end",0:"","-1":"file error","-2":"stream error","-3":"data error","-4":"insufficient memory","-5":"buffer error","-6":"incompatible version"}});var Me=v((pp,os)=>{"use strict";_();os.exports={Z_NO_FLUSH:0,Z_PARTIAL_FLUSH:1,Z_SYNC_FLUSH:2,Z_FULL_FLUSH:3,Z_FINISH:4,Z_BLOCK:5,Z_TREES:6,Z_OK:0,Z_STREAM_END:1,Z_NEED_DICT:2,Z_ERRNO:-1,Z_STREAM_ERROR:-2,Z_DATA_ERROR:-3,Z_MEM_ERROR:-4,Z_BUF_ERROR:-5,Z_NO_COMPRESSION:0,Z_BEST_SPEED:1,Z_BEST_COMPRESSION:9,Z_DEFAULT_COMPRESSION:-1,Z_FILTERED:1,Z_HUFFMAN_ONLY:2,Z_RLE:3,Z_FIXED:4,Z_DEFAULT_STRATEGY:0,Z_BINARY:0,Z_TEXT:1,Z_UNKNOWN:2,Z_DEFLATED:8}});var _s=v((_p,ge)=>{"use strict";_();var{_tr_init:xc,_tr_stored_block:vc,_tr_flush_block:Sc,_tr_tally:He,_tr_align:Rc}=ns(),us=fr(),Ue=ur(),Tc=Mn(),{Z_NO_FLUSH:lt,Z_PARTIAL_FLUSH:Cc,Z_FULL_FLUSH:Ac,Z_FINISH:We,Z_BLOCK:ss,Z_OK:_e,Z_STREAM_END:ls,Z_STREAM_ERROR:re,Z_DATA_ERROR:kc,Z_BUF_ERROR:hr,Z_DEFAULT_COMPRESSION:Ic,Z_FILTERED:Dc,Z_HUFFMAN_ONLY:Un,Z_RLE:Lc,Z_FIXED:Nc,Z_DEFAULT_STRATEGY:Oc,Z_UNKNOWN:Bc,Z_DEFLATED:jn}=Me(),Fc=9,Mc=15,Uc=8,Pc=29,qc=256,dr=qc+1+Pc,zc=30,jc=19,Hc=2*dr+1,Wc=15,O=3,ze=258,oe=ze+O+1,Zc=32,Hn=42,pr=69,Pn=73,qn=91,zn=103,at=113,Qt=666,W=1,tn=2,ot=3,Dt=4,Yc=3,je=(e,t)=>(e.msg=Tc[t],t),fs=e=>(e<<1)-(e>4?9:0),qe=e=>{let t=e.length;for(;--t>=0;)e[t]=0},Gc=(e,t,n)=>(t<<e.hash_shift^n)&e.hash_mask,Ze=Gc,Pe=e=>{let t=e.state,n=t.pending;n>e.avail_out&&(n=e.avail_out),n!==0&&(e.output.set(t.pending_buf.subarray(t.pending_out,t.pending_out+n),e.next_out),e.next_out+=n,t.pending_out+=n,e.total_out+=n,e.avail_out-=n,t.pending-=n,t.pending===0&&(t.pending_out=0))},Y=(e,t)=>{Sc(e,e.block_start>=0?e.block_start:-1,e.strstart-e.block_start,t),e.block_start=e.strstart,Pe(e.strm)},F=(e,t)=>{e.pending_buf[e.pending++]=t},Jt=(e,t)=>{e.pending_buf[e.pending++]=t>>>8&255,e.pending_buf[e.pending++]=t&255},$c=(e,t,n,i)=>{let r=e.avail_in;return r>i&&(r=i),r===0?0:(e.avail_in-=r,t.set(e.input.subarray(e.next_in,e.next_in+r),n),e.state.wrap===1?e.adler=us(e.adler,t,r,n):e.state.wrap===2&&(e.adler=Ue(e.adler,t,r,n)),e.next_in+=r,e.total_in+=r,r)},hs=(e,t)=>{let n=e.max_chain_length,i=e.strstart,r,a,o=e.prev_length,s=e.nice_match,u=e.strstart>e.w_size-oe?e.strstart-(e.w_size-oe):0,l=e.window,f=e.w_mask,h=e.prev,p=e.strstart+ze,c=l[i+o-1],y=l[i+o];e.prev_length>=e.good_match&&(n>>=2),s>e.lookahead&&(s=e.lookahead);do if(r=t,!(l[r+o]!==y||l[r+o-1]!==c||l[r]!==l[i]||l[++r]!==l[i+1])){i+=2,r++;do;while(l[++i]===l[++r]&&l[++i]===l[++r]&&l[++i]===l[++r]&&l[++i]===l[++r]&&l[++i]===l[++r]&&l[++i]===l[++r]&&l[++i]===l[++r]&&l[++i]===l[++r]&&i<p);if(a=ze-(p-i),i=p-ze,a>o){if(e.match_start=t,o=a,a>=s)break;c=l[i+o-1],y=l[i+o]}}while((t=h[t&f])>u&&--n!==0);return o<=e.lookahead?o:e.lookahead},st=e=>{let t=e.w_size,n,i,r,a,o;do{if(a=e.window_size-e.lookahead-e.strstart,e.strstart>=t+(t-oe)){e.window.set(e.window.subarray(t,t+t),0),e.match_start-=t,e.strstart-=t,e.block_start-=t,i=e.hash_size,n=i;do r=e.head[--n],e.head[n]=r>=t?r-t:0;while(--i);i=t,n=i;do r=e.prev[--n],e.prev[n]=r>=t?r-t:0;while(--i);a+=t}if(e.strm.avail_in===0)break;if(i=$c(e.strm,e.window,e.strstart+e.lookahead,a),e.lookahead+=i,e.lookahead+e.insert>=O)for(o=e.strstart-e.insert,e.ins_h=e.window[o],e.ins_h=Ze(e,e.ins_h,e.window[o+1]);e.insert&&(e.ins_h=Ze(e,e.ins_h,e.window[o+O-1]),e.prev[o&e.w_mask]=e.head[e.ins_h],e.head[e.ins_h]=o,o++,e.insert--,!(e.lookahead+e.insert<O)););}while(e.lookahead<oe&&e.strm.avail_in!==0)},Kc=(e,t)=>{let n=65535;for(n>e.pending_buf_size-5&&(n=e.pending_buf_size-5);;){if(e.lookahead<=1){if(st(e),e.lookahead===0&&t===lt)return W;if(e.lookahead===0)break}e.strstart+=e.lookahead,e.lookahead=0;let i=e.block_start+n;if((e.strstart===0||e.strstart>=i)&&(e.lookahead=e.strstart-i,e.strstart=i,Y(e,!1),e.strm.avail_out===0)||e.strstart-e.block_start>=e.w_size-oe&&(Y(e,!1),e.strm.avail_out===0))return W}return e.insert=0,t===We?(Y(e,!0),e.strm.avail_out===0?ot:Dt):(e.strstart>e.block_start&&(Y(e,!1),e.strm.avail_out===0),W)},cr=(e,t)=>{let n,i;for(;;){if(e.lookahead<oe){if(st(e),e.lookahead<oe&&t===lt)return W;if(e.lookahead===0)break}if(n=0,e.lookahead>=O&&(e.ins_h=Ze(e,e.ins_h,e.window[e.strstart+O-1]),n=e.prev[e.strstart&e.w_mask]=e.head[e.ins_h],e.head[e.ins_h]=e.strstart),n!==0&&e.strstart-n<=e.w_size-oe&&(e.match_length=hs(e,n)),e.match_length>=O)if(i=He(e,e.strstart-e.match_start,e.match_length-O),e.lookahead-=e.match_length,e.match_length<=e.max_lazy_match&&e.lookahead>=O){e.match_length--;do e.strstart++,e.ins_h=Ze(e,e.ins_h,e.window[e.strstart+O-1]),n=e.prev[e.strstart&e.w_mask]=e.head[e.ins_h],e.head[e.ins_h]=e.strstart;while(--e.match_length!==0);e.strstart++}else e.strstart+=e.match_length,e.match_length=0,e.ins_h=e.window[e.strstart],e.ins_h=Ze(e,e.ins_h,e.window[e.strstart+1]);else i=He(e,0,e.window[e.strstart]),e.lookahead--,e.strstart++;if(i&&(Y(e,!1),e.strm.avail_out===0))return W}return e.insert=e.strstart<O-1?e.strstart:O-1,t===We?(Y(e,!0),e.strm.avail_out===0?ot:Dt):e.last_lit&&(Y(e,!1),e.strm.avail_out===0)?W:tn},It=(e,t)=>{let n,i,r;for(;;){if(e.lookahead<oe){if(st(e),e.lookahead<oe&&t===lt)return W;if(e.lookahead===0)break}if(n=0,e.lookahead>=O&&(e.ins_h=Ze(e,e.ins_h,e.window[e.strstart+O-1]),n=e.prev[e.strstart&e.w_mask]=e.head[e.ins_h],e.head[e.ins_h]=e.strstart),e.prev_length=e.match_length,e.prev_match=e.match_start,e.match_length=O-1,n!==0&&e.prev_length<e.max_lazy_match&&e.strstart-n<=e.w_size-oe&&(e.match_length=hs(e,n),e.match_length<=5&&(e.strategy===Dc||e.match_length===O&&e.strstart-e.match_start>4096)&&(e.match_length=O-1)),e.prev_length>=O&&e.match_length<=e.prev_length){r=e.strstart+e.lookahead-O,i=He(e,e.strstart-1-e.prev_match,e.prev_length-O),e.lookahead-=e.prev_length-1,e.prev_length-=2;do++e.strstart<=r&&(e.ins_h=Ze(e,e.ins_h,e.window[e.strstart+O-1]),n=e.prev[e.strstart&e.w_mask]=e.head[e.ins_h],e.head[e.ins_h]=e.strstart);while(--e.prev_length!==0);if(e.match_available=0,e.match_length=O-1,e.strstart++,i&&(Y(e,!1),e.strm.avail_out===0))return W}else if(e.match_available){if(i=He(e,0,e.window[e.strstart-1]),i&&Y(e,!1),e.strstart++,e.lookahead--,e.strm.avail_out===0)return W}else e.match_available=1,e.strstart++,e.lookahead--}return e.match_available&&(i=He(e,0,e.window[e.strstart-1]),e.match_available=0),e.insert=e.strstart<O-1?e.strstart:O-1,t===We?(Y(e,!0),e.strm.avail_out===0?ot:Dt):e.last_lit&&(Y(e,!1),e.strm.avail_out===0)?W:tn},Xc=(e,t)=>{let n,i,r,a,o=e.window;for(;;){if(e.lookahead<=ze){if(st(e),e.lookahead<=ze&&t===lt)return W;if(e.lookahead===0)break}if(e.match_length=0,e.lookahead>=O&&e.strstart>0&&(r=e.strstart-1,i=o[r],i===o[++r]&&i===o[++r]&&i===o[++r])){a=e.strstart+ze;do;while(i===o[++r]&&i===o[++r]&&i===o[++r]&&i===o[++r]&&i===o[++r]&&i===o[++r]&&i===o[++r]&&i===o[++r]&&r<a);e.match_length=ze-(a-r),e.match_length>e.lookahead&&(e.match_length=e.lookahead)}if(e.match_length>=O?(n=He(e,1,e.match_length-O),e.lookahead-=e.match_length,e.strstart+=e.match_length,e.match_length=0):(n=He(e,0,e.window[e.strstart]),e.lookahead--,e.strstart++),n&&(Y(e,!1),e.strm.avail_out===0))return W}return e.insert=0,t===We?(Y(e,!0),e.strm.avail_out===0?ot:Dt):e.last_lit&&(Y(e,!1),e.strm.avail_out===0)?W:tn},Vc=(e,t)=>{let n;for(;;){if(e.lookahead===0&&(st(e),e.lookahead===0)){if(t===lt)return W;break}if(e.match_length=0,n=He(e,0,e.window[e.strstart]),e.lookahead--,e.strstart++,n&&(Y(e,!1),e.strm.avail_out===0))return W}return e.insert=0,t===We?(Y(e,!0),e.strm.avail_out===0?ot:Dt):e.last_lit&&(Y(e,!1),e.strm.avail_out===0)?W:tn};function pe(e,t,n,i,r){this.good_length=e,this.max_lazy=t,this.nice_length=n,this.max_chain=i,this.func=r}var en=[new pe(0,0,0,0,Kc),new pe(4,4,8,4,cr),new pe(4,5,16,8,cr),new pe(4,6,32,32,cr),new pe(4,4,16,16,It),new pe(8,16,32,32,It),new pe(8,16,128,128,It),new pe(8,32,128,256,It),new pe(32,128,258,1024,It),new pe(32,258,258,4096,It)],Jc=e=>{e.window_size=2*e.w_size,qe(e.head),e.max_lazy_match=en[e.level].max_lazy,e.good_match=en[e.level].good_length,e.nice_match=en[e.level].nice_length,e.max_chain_length=en[e.level].max_chain,e.strstart=0,e.block_start=0,e.lookahead=0,e.insert=0,e.match_length=e.prev_length=O-1,e.match_available=0,e.ins_h=0};function Qc(){this.strm=null,this.status=0,this.pending_buf=null,this.pending_buf_size=0,this.pending_out=0,this.pending=0,this.wrap=0,this.gzhead=null,this.gzindex=0,this.method=jn,this.last_flush=-1,this.w_size=0,this.w_bits=0,this.w_mask=0,this.window=null,this.window_size=0,this.prev=null,this.head=null,this.ins_h=0,this.hash_size=0,this.hash_bits=0,this.hash_mask=0,this.hash_shift=0,this.block_start=0,this.match_length=0,this.prev_match=0,this.match_available=0,this.strstart=0,this.match_start=0,this.lookahead=0,this.prev_length=0,this.max_chain_length=0,this.max_lazy_match=0,this.level=0,this.strategy=0,this.good_match=0,this.nice_match=0,this.dyn_ltree=new Uint16Array(Hc*2),this.dyn_dtree=new Uint16Array((2*zc+1)*2),this.bl_tree=new Uint16Array((2*jc+1)*2),qe(this.dyn_ltree),qe(this.dyn_dtree),qe(this.bl_tree),this.l_desc=null,this.d_desc=null,this.bl_desc=null,this.bl_count=new Uint16Array(Wc+1),this.heap=new Uint16Array(2*dr+1),qe(this.heap),this.heap_len=0,this.heap_max=0,this.depth=new Uint16Array(2*dr+1),qe(this.depth),this.l_buf=0,this.lit_bufsize=0,this.last_lit=0,this.d_buf=0,this.opt_len=0,this.static_len=0,this.matches=0,this.insert=0,this.bi_buf=0,this.bi_valid=0}var cs=e=>{if(!e||!e.state)return je(e,re);e.total_in=e.total_out=0,e.data_type=Bc;let t=e.state;return t.pending=0,t.pending_out=0,t.wrap<0&&(t.wrap=-t.wrap),t.status=t.wrap?Hn:at,e.adler=t.wrap===2?0:1,t.last_flush=lt,xc(t),_e},ds=e=>{let t=cs(e);return t===_e&&Jc(e.state),t},ed=(e,t)=>!e||!e.state||e.state.wrap!==2?re:(e.state.gzhead=t,_e),ps=(e,t,n,i,r,a)=>{if(!e)return re;let o=1;if(t===Ic&&(t=6),i<0?(o=0,i=-i):i>15&&(o=2,i-=16),r<1||r>Fc||n!==jn||i<8||i>15||t<0||t>9||a<0||a>Nc)return je(e,re);i===8&&(i=9);let s=new Qc;return e.state=s,s.strm=e,s.wrap=o,s.gzhead=null,s.w_bits=i,s.w_size=1<<s.w_bits,s.w_mask=s.w_size-1,s.hash_bits=r+7,s.hash_size=1<<s.hash_bits,s.hash_mask=s.hash_size-1,s.hash_shift=~~((s.hash_bits+O-1)/O),s.window=new Uint8Array(s.w_size*2),s.head=new Uint16Array(s.hash_size),s.prev=new Uint16Array(s.w_size),s.lit_bufsize=1<<r+6,s.pending_buf_size=s.lit_bufsize*4,s.pending_buf=new Uint8Array(s.pending_buf_size),s.d_buf=1*s.lit_bufsize,s.l_buf=(1+2)*s.lit_bufsize,s.level=t,s.strategy=a,s.method=n,ds(e)},td=(e,t)=>ps(e,t,jn,Mc,Uc,Oc),nd=(e,t)=>{let n,i;if(!e||!e.state||t>ss||t<0)return e?je(e,re):re;let r=e.state;if(!e.output||!e.input&&e.avail_in!==0||r.status===Qt&&t!==We)return je(e,e.avail_out===0?hr:re);r.strm=e;let a=r.last_flush;if(r.last_flush=t,r.status===Hn)if(r.wrap===2)e.adler=0,F(r,31),F(r,139),F(r,8),r.gzhead?(F(r,(r.gzhead.text?1:0)+(r.gzhead.hcrc?2:0)+(r.gzhead.extra?4:0)+(r.gzhead.name?8:0)+(r.gzhead.comment?16:0)),F(r,r.gzhead.time&255),F(r,r.gzhead.time>>8&255),F(r,r.gzhead.time>>16&255),F(r,r.gzhead.time>>24&255),F(r,r.level===9?2:r.strategy>=Un||r.level<2?4:0),F(r,r.gzhead.os&255),r.gzhead.extra&&r.gzhead.extra.length&&(F(r,r.gzhead.extra.length&255),F(r,r.gzhead.extra.length>>8&255)),r.gzhead.hcrc&&(e.adler=Ue(e.adler,r.pending_buf,r.pending,0)),r.gzindex=0,r.status=pr):(F(r,0),F(r,0),F(r,0),F(r,0),F(r,0),F(r,r.level===9?2:r.strategy>=Un||r.level<2?4:0),F(r,Yc),r.status=at);else{let o=jn+(r.w_bits-8<<4)<<8,s=-1;r.strategy>=Un||r.level<2?s=0:r.level<6?s=1:r.level===6?s=2:s=3,o|=s<<6,r.strstart!==0&&(o|=Zc),o+=31-o%31,r.status=at,Jt(r,o),r.strstart!==0&&(Jt(r,e.adler>>>16),Jt(r,e.adler&65535)),e.adler=1}if(r.status===pr)if(r.gzhead.extra){for(n=r.pending;r.gzindex<(r.gzhead.extra.length&65535)&&!(r.pending===r.pending_buf_size&&(r.gzhead.hcrc&&r.pending>n&&(e.adler=Ue(e.adler,r.pending_buf,r.pending-n,n)),Pe(e),n=r.pending,r.pending===r.pending_buf_size));)F(r,r.gzhead.extra[r.gzindex]&255),r.gzindex++;r.gzhead.hcrc&&r.pending>n&&(e.adler=Ue(e.adler,r.pending_buf,r.pending-n,n)),r.gzindex===r.gzhead.extra.length&&(r.gzindex=0,r.status=Pn)}else r.status=Pn;if(r.status===Pn)if(r.gzhead.name){n=r.pending;do{if(r.pending===r.pending_buf_size&&(r.gzhead.hcrc&&r.pending>n&&(e.adler=Ue(e.adler,r.pending_buf,r.pending-n,n)),Pe(e),n=r.pending,r.pending===r.pending_buf_size)){i=1;break}r.gzindex<r.gzhead.name.length?i=r.gzhead.name.charCodeAt(r.gzindex++)&255:i=0,F(r,i)}while(i!==0);r.gzhead.hcrc&&r.pending>n&&(e.adler=Ue(e.adler,r.pending_buf,r.pending-n,n)),i===0&&(r.gzindex=0,r.status=qn)}else r.status=qn;if(r.status===qn)if(r.gzhead.comment){n=r.pending;do{if(r.pending===r.pending_buf_size&&(r.gzhead.hcrc&&r.pending>n&&(e.adler=Ue(e.adler,r.pending_buf,r.pending-n,n)),Pe(e),n=r.pending,r.pending===r.pending_buf_size)){i=1;break}r.gzindex<r.gzhead.comment.length?i=r.gzhead.comment.charCodeAt(r.gzindex++)&255:i=0,F(r,i)}while(i!==0);r.gzhead.hcrc&&r.pending>n&&(e.adler=Ue(e.adler,r.pending_buf,r.pending-n,n)),i===0&&(r.status=zn)}else r.status=zn;if(r.status===zn&&(r.gzhead.hcrc?(r.pending+2>r.pending_buf_size&&Pe(e),r.pending+2<=r.pending_buf_size&&(F(r,e.adler&255),F(r,e.adler>>8&255),e.adler=0,r.status=at)):r.status=at),r.pending!==0){if(Pe(e),e.avail_out===0)return r.last_flush=-1,_e}else if(e.avail_in===0&&fs(t)<=fs(a)&&t!==We)return je(e,hr);if(r.status===Qt&&e.avail_in!==0)return je(e,hr);if(e.avail_in!==0||r.lookahead!==0||t!==lt&&r.status!==Qt){let o=r.strategy===Un?Vc(r,t):r.strategy===Lc?Xc(r,t):en[r.level].func(r,t);if((o===ot||o===Dt)&&(r.status=Qt),o===W||o===ot)return e.avail_out===0&&(r.last_flush=-1),_e;if(o===tn&&(t===Cc?Rc(r):t!==ss&&(vc(r,0,0,!1),t===Ac&&(qe(r.head),r.lookahead===0&&(r.strstart=0,r.block_start=0,r.insert=0))),Pe(e),e.avail_out===0))return r.last_flush=-1,_e}return t!==We?_e:r.wrap<=0?ls:(r.wrap===2?(F(r,e.adler&255),F(r,e.adler>>8&255),F(r,e.adler>>16&255),F(r,e.adler>>24&255),F(r,e.total_in&255),F(r,e.total_in>>8&255),F(r,e.total_in>>16&255),F(r,e.total_in>>24&255)):(Jt(r,e.adler>>>16),Jt(r,e.adler&65535)),Pe(e),r.wrap>0&&(r.wrap=-r.wrap),r.pending!==0?_e:ls)},id=e=>{if(!e||!e.state)return re;let t=e.state.status;return t!==Hn&&t!==pr&&t!==Pn&&t!==qn&&t!==zn&&t!==at&&t!==Qt?je(e,re):(e.state=null,t===at?je(e,kc):_e)},rd=(e,t)=>{let n=t.length;if(!e||!e.state)return re;let i=e.state,r=i.wrap;if(r===2||r===1&&i.status!==Hn||i.lookahead)return re;if(r===1&&(e.adler=us(e.adler,t,n,0)),i.wrap=0,n>=i.w_size){r===0&&(qe(i.head),i.strstart=0,i.block_start=0,i.insert=0);let u=new Uint8Array(i.w_size);u.set(t.subarray(n-i.w_size,n),0),t=u,n=i.w_size}let a=e.avail_in,o=e.next_in,s=e.input;for(e.avail_in=n,e.next_in=0,e.input=t,st(i);i.lookahead>=O;){let u=i.strstart,l=i.lookahead-(O-1);do i.ins_h=Ze(i,i.ins_h,i.window[u+O-1]),i.prev[u&i.w_mask]=i.head[i.ins_h],i.head[i.ins_h]=u,u++;while(--l);i.strstart=u,i.lookahead=O-1,st(i)}return i.strstart+=i.lookahead,i.block_start=i.strstart,i.insert=i.lookahead,i.lookahead=0,i.match_length=i.prev_length=O-1,i.match_available=0,e.next_in=o,e.input=s,e.avail_in=a,i.wrap=r,_e};ge.exports.deflateInit=td;ge.exports.deflateInit2=ps;ge.exports.deflateReset=ds;ge.exports.deflateResetKeep=cs;ge.exports.deflateSetHeader=ed;ge.exports.deflate=nd;ge.exports.deflateEnd=id;ge.exports.deflateSetDictionary=rd;ge.exports.deflateInfo="pako deflate (from Nodeca project)"});var gr=v((gp,_r)=>{"use strict";_();var ad=(e,t)=>Object.prototype.hasOwnProperty.call(e,t);_r.exports.assign=function(e){let t=Array.prototype.slice.call(arguments,1);for(;t.length;){let n=t.shift();if(!!n){if(typeof n!="object")throw new TypeError(n+"must be non-object");for(let i in n)ad(n,i)&&(e[i]=n[i])}}return e};_r.exports.flattenChunks=e=>{let t=0;for(let i=0,r=e.length;i<r;i++)t+=e[i].length;let n=new Uint8Array(t);for(let i=0,r=0,a=e.length;i<a;i++){let o=e[i];n.set(o,r),r+=o.length}return n}});var wr=v((wp,Wn)=>{"use strict";_();var gs=!0;try{String.fromCharCode.apply(null,new Uint8Array(1))}catch{gs=!1}var nn=new Uint8Array(256);for(let e=0;e<256;e++)nn[e]=e>=252?6:e>=248?5:e>=240?4:e>=224?3:e>=192?2:1;nn[254]=nn[254]=1;Wn.exports.string2buf=e=>{if(typeof TextEncoder=="function"&&TextEncoder.prototype.encode)return new TextEncoder().encode(e);let t,n,i,r,a,o=e.length,s=0;for(r=0;r<o;r++)n=e.charCodeAt(r),(n&64512)===55296&&r+1<o&&(i=e.charCodeAt(r+1),(i&64512)===56320&&(n=65536+(n-55296<<10)+(i-56320),r++)),s+=n<128?1:n<2048?2:n<65536?3:4;for(t=new Uint8Array(s),a=0,r=0;a<s;r++)n=e.charCodeAt(r),(n&64512)===55296&&r+1<o&&(i=e.charCodeAt(r+1),(i&64512)===56320&&(n=65536+(n-55296<<10)+(i-56320),r++)),n<128?t[a++]=n:n<2048?(t[a++]=192|n>>>6,t[a++]=128|n&63):n<65536?(t[a++]=224|n>>>12,t[a++]=128|n>>>6&63,t[a++]=128|n&63):(t[a++]=240|n>>>18,t[a++]=128|n>>>12&63,t[a++]=128|n>>>6&63,t[a++]=128|n&63);return t};var od=(e,t)=>{if(t<65534&&e.subarray&&gs)return String.fromCharCode.apply(null,e.length===t?e:e.subarray(0,t));let n="";for(let i=0;i<t;i++)n+=String.fromCharCode(e[i]);return n};Wn.exports.buf2string=(e,t)=>{let n=t||e.length;if(typeof TextDecoder=="function"&&TextDecoder.prototype.decode)return new TextDecoder().decode(e.subarray(0,t));let i,r,a=new Array(n*2);for(r=0,i=0;i<n;){let o=e[i++];if(o<128){a[r++]=o;continue}let s=nn[o];if(s>4){a[r++]=65533,i+=s-1;continue}for(o&=s===2?31:s===3?15:7;s>1&&i<n;)o=o<<6|e[i++]&63,s--;if(s>1){a[r++]=65533;continue}o<65536?a[r++]=o:(o-=65536,a[r++]=55296|o>>10&1023,a[r++]=56320|o&1023)}return od(a,r)};Wn.exports.utf8border=(e,t)=>{t=t||e.length,t>e.length&&(t=e.length);let n=t-1;for(;n>=0&&(e[n]&192)===128;)n--;return n<0||n===0?t:n+nn[e[n]]>t?n:t}});var yr=v((yp,ws)=>{"use strict";_();function sd(){this.input=null,this.next_in=0,this.avail_in=0,this.total_in=0,this.output=null,this.next_out=0,this.avail_out=0,this.total_out=0,this.msg="",this.state=null,this.data_type=2,this.adler=0}ws.exports=sd});var Es=v((bp,Lt)=>{"use strict";_();var rn=_s(),ys=gr(),bs=wr(),br=Mn(),ld=yr(),ms=Object.prototype.toString,{Z_NO_FLUSH:fd,Z_SYNC_FLUSH:ud,Z_FULL_FLUSH:hd,Z_FINISH:cd,Z_OK:Zn,Z_STREAM_END:dd,Z_DEFAULT_COMPRESSION:pd,Z_DEFAULT_STRATEGY:_d,Z_DEFLATED:gd}=Me();function an(e){this.options=ys.assign({level:pd,method:gd,chunkSize:16384,windowBits:15,memLevel:8,strategy:_d},e||{});let t=this.options;t.raw&&t.windowBits>0?t.windowBits=-t.windowBits:t.gzip&&t.windowBits>0&&t.windowBits<16&&(t.windowBits+=16),this.err=0,this.msg="",this.ended=!1,this.chunks=[],this.strm=new ld,this.strm.avail_out=0;let n=rn.deflateInit2(this.strm,t.level,t.method,t.windowBits,t.memLevel,t.strategy);if(n!==Zn)throw new Error(br[n]);if(t.header&&rn.deflateSetHeader(this.strm,t.header),t.dictionary){let i;if(typeof t.dictionary=="string"?i=bs.string2buf(t.dictionary):ms.call(t.dictionary)==="[object ArrayBuffer]"?i=new Uint8Array(t.dictionary):i=t.dictionary,n=rn.deflateSetDictionary(this.strm,i),n!==Zn)throw new Error(br[n]);this._dict_set=!0}}an.prototype.push=function(e,t){let n=this.strm,i=this.options.chunkSize,r,a;if(this.ended)return!1;for(t===~~t?a=t:a=t===!0?cd:fd,typeof e=="string"?n.input=bs.string2buf(e):ms.call(e)==="[object ArrayBuffer]"?n.input=new Uint8Array(e):n.input=e,n.next_in=0,n.avail_in=n.input.length;;){if(n.avail_out===0&&(n.output=new Uint8Array(i),n.next_out=0,n.avail_out=i),(a===ud||a===hd)&&n.avail_out<=6){this.onData(n.output.subarray(0,n.next_out)),n.avail_out=0;continue}if(r=rn.deflate(n,a),r===dd)return n.next_out>0&&this.onData(n.output.subarray(0,n.next_out)),r=rn.deflateEnd(this.strm),this.onEnd(r),this.ended=!0,r===Zn;if(n.avail_out===0){this.onData(n.output);continue}if(a>0&&n.next_out>0){this.onData(n.output.subarray(0,n.next_out)),n.avail_out=0;continue}if(n.avail_in===0)break}return!0};an.prototype.onData=function(e){this.chunks.push(e)};an.prototype.onEnd=function(e){e===Zn&&(this.result=ys.flattenChunks(this.chunks)),this.chunks=[],this.err=e,this.msg=this.strm.msg};function mr(e,t){let n=new an(t);if(n.push(e,!0),n.err)throw n.msg||br[n.err];return n.result}function wd(e,t){return t=t||{},t.raw=!0,mr(e,t)}function yd(e,t){return t=t||{},t.gzip=!0,mr(e,t)}Lt.exports.Deflate=an;Lt.exports.deflate=mr;Lt.exports.deflateRaw=wd;Lt.exports.gzip=yd;Lt.exports.constants=Me()});var vs=v((mp,xs)=>{"use strict";_();xs.exports=function(t,n){let i,r,a,o,s,u,l,f,h,p,c,y,E,m,b,x,C,w,k,M,S,I,L,A,T=t.state;i=t.next_in,L=t.input,r=i+(t.avail_in-5),a=t.next_out,A=t.output,o=a-(n-t.avail_out),s=a+(t.avail_out-257),u=T.dmax,l=T.wsize,f=T.whave,h=T.wnext,p=T.window,c=T.hold,y=T.bits,E=T.lencode,m=T.distcode,b=(1<<T.lenbits)-1,x=(1<<T.distbits)-1;e:do{y<15&&(c+=L[i++]<<y,y+=8,c+=L[i++]<<y,y+=8),C=E[c&b];t:for(;;){if(w=C>>>24,c>>>=w,y-=w,w=C>>>16&255,w===0)A[a++]=C&65535;else if(w&16){k=C&65535,w&=15,w&&(y<w&&(c+=L[i++]<<y,y+=8),k+=c&(1<<w)-1,c>>>=w,y-=w),y<15&&(c+=L[i++]<<y,y+=8,c+=L[i++]<<y,y+=8),C=m[c&x];n:for(;;){if(w=C>>>24,c>>>=w,y-=w,w=C>>>16&255,w&16){if(M=C&65535,w&=15,y<w&&(c+=L[i++]<<y,y+=8,y<w&&(c+=L[i++]<<y,y+=8)),M+=c&(1<<w)-1,M>u){t.msg="invalid distance too far back",T.mode=30;break e}if(c>>>=w,y-=w,w=a-o,M>w){if(w=M-w,w>f&&T.sane){t.msg="invalid distance too far back",T.mode=30;break e}if(S=0,I=p,h===0){if(S+=l-w,w<k){k-=w;do A[a++]=p[S++];while(--w);S=a-M,I=A}}else if(h<w){if(S+=l+h-w,w-=h,w<k){k-=w;do A[a++]=p[S++];while(--w);if(S=0,h<k){w=h,k-=w;do A[a++]=p[S++];while(--w);S=a-M,I=A}}}else if(S+=h-w,w<k){k-=w;do A[a++]=p[S++];while(--w);S=a-M,I=A}for(;k>2;)A[a++]=I[S++],A[a++]=I[S++],A[a++]=I[S++],k-=3;k&&(A[a++]=I[S++],k>1&&(A[a++]=I[S++]))}else{S=a-M;do A[a++]=A[S++],A[a++]=A[S++],A[a++]=A[S++],k-=3;while(k>2);k&&(A[a++]=A[S++],k>1&&(A[a++]=A[S++]))}}else if((w&64)===0){C=m[(C&65535)+(c&(1<<w)-1)];continue n}else{t.msg="invalid distance code",T.mode=30;break e}break}}else if((w&64)===0){C=E[(C&65535)+(c&(1<<w)-1)];continue t}else if(w&32){T.mode=12;break e}else{t.msg="invalid literal/length code",T.mode=30;break e}break}}while(i<r&&a<s);k=y>>3,i-=k,y-=k<<3,c&=(1<<y)-1,t.next_in=i,t.next_out=a,t.avail_in=i<r?5+(r-i):5-(i-r),t.avail_out=a<s?257+(s-a):257-(a-s),T.hold=c,T.bits=y}});var Rs=v((Ep,Ss)=>{"use strict";_();var bd=new Uint16Array([3,4,5,6,7,8,9,10,11,13,15,17,19,23,27,31,35,43,51,59,67,83,99,115,131,163,195,227,258,0,0]),md=new Uint8Array([16,16,16,16,16,16,16,16,17,17,17,17,18,18,18,18,19,19,19,19,20,20,20,20,21,21,21,21,16,72,78]),Ed=new Uint16Array([1,2,3,4,5,7,9,13,17,25,33,49,65,97,129,193,257,385,513,769,1025,1537,2049,3073,4097,6145,8193,12289,16385,24577,0,0]),xd=new Uint8Array([16,16,16,16,17,17,18,18,19,19,20,20,21,21,22,22,23,23,24,24,25,25,26,26,27,27,28,28,29,29,64,64]),vd=(e,t,n,i,r,a,o,s)=>{let u=s.bits,l=0,f=0,h=0,p=0,c=0,y=0,E=0,m=0,b=0,x=0,C,w,k,M,S,I=null,L=0,A,T=new Uint16Array(15+1),G=new Uint16Array(15+1),be=null,U=0,H,J,me;for(l=0;l<=15;l++)T[l]=0;for(f=0;f<i;f++)T[t[n+f]]++;for(c=u,p=15;p>=1&&T[p]===0;p--);if(c>p&&(c=p),p===0)return r[a++]=1<<24|64<<16|0,r[a++]=1<<24|64<<16|0,s.bits=1,0;for(h=1;h<p&&T[h]===0;h++);for(c<h&&(c=h),m=1,l=1;l<=15;l++)if(m<<=1,m-=T[l],m<0)return-1;if(m>0&&(e===0||p!==1))return-1;for(G[1]=0,l=1;l<15;l++)G[l+1]=G[l]+T[l];for(f=0;f<i;f++)t[n+f]!==0&&(o[G[t[n+f]]++]=f);if(e===0?(I=be=o,A=19):e===1?(I=bd,L-=257,be=md,U-=257,A=256):(I=Ed,be=xd,A=-1),x=0,f=0,l=h,S=a,y=c,E=0,k=-1,b=1<<c,M=b-1,e===1&&b>852||e===2&&b>592)return 1;for(;;){H=l-E,o[f]<A?(J=0,me=o[f]):o[f]>A?(J=be[U+o[f]],me=I[L+o[f]]):(J=32+64,me=0),C=1<<l-E,w=1<<y,h=w;do w-=C,r[S+(x>>E)+w]=H<<24|J<<16|me|0;while(w!==0);for(C=1<<l-1;x&C;)C>>=1;if(C!==0?(x&=C-1,x+=C):x=0,f++,--T[l]===0){if(l===p)break;l=t[n+o[f]]}if(l>c&&(x&M)!==k){for(E===0&&(E=c),S+=h,y=l-E,m=1<<y;y+E<p&&(m-=T[y+E],!(m<=0));)y++,m<<=1;if(b+=1<<y,e===1&&b>852||e===2&&b>592)return 1;k=x&M,r[k]=c<<24|y<<16|S-a|0}}return x!==0&&(r[S+x]=l-E<<24|64<<16|0),s.bits=c,0};Ss.exports=vd});var ol=v((xp,se)=>{"use strict";_();var Tr=fr(),we=ur(),Sd=vs(),on=Rs(),Rd=0,Vs=1,Js=2,{Z_FINISH:Ts,Z_BLOCK:Td,Z_TREES:Yn,Z_OK:ft,Z_STREAM_END:Cd,Z_NEED_DICT:Ad,Z_STREAM_ERROR:ae,Z_DATA_ERROR:Qs,Z_MEM_ERROR:Cr,Z_BUF_ERROR:kd,Z_DEFLATED:Cs}=Me(),el=1,As=2,ks=3,Is=4,Ds=5,Ls=6,Ns=7,Os=8,Bs=9,Fs=10,Kn=11,ke=12,Er=13,Ms=14,xr=15,Us=16,Ps=17,qs=18,zs=19,Gn=20,$n=21,js=22,Hs=23,Ws=24,Zs=25,Ys=26,vr=27,Gs=28,$s=29,q=30,Ar=31,Id=32,Dd=852,Ld=592,Nd=15,Od=Nd,Ks=e=>(e>>>24&255)+(e>>>8&65280)+((e&65280)<<8)+((e&255)<<24);function Bd(){this.mode=0,this.last=!1,this.wrap=0,this.havedict=!1,this.flags=0,this.dmax=0,this.check=0,this.total=0,this.head=null,this.wbits=0,this.wsize=0,this.whave=0,this.wnext=0,this.window=null,this.hold=0,this.bits=0,this.length=0,this.offset=0,this.extra=0,this.lencode=null,this.distcode=null,this.lenbits=0,this.distbits=0,this.ncode=0,this.nlen=0,this.ndist=0,this.have=0,this.next=null,this.lens=new Uint16Array(320),this.work=new Uint16Array(288),this.lendyn=null,this.distdyn=null,this.sane=0,this.back=0,this.was=0}var tl=e=>{if(!e||!e.state)return ae;let t=e.state;return e.total_in=e.total_out=t.total=0,e.msg="",t.wrap&&(e.adler=t.wrap&1),t.mode=el,t.last=0,t.havedict=0,t.dmax=32768,t.head=null,t.hold=0,t.bits=0,t.lencode=t.lendyn=new Int32Array(Dd),t.distcode=t.distdyn=new Int32Array(Ld),t.sane=1,t.back=-1,ft},nl=e=>{if(!e||!e.state)return ae;let t=e.state;return t.wsize=0,t.whave=0,t.wnext=0,tl(e)},il=(e,t)=>{let n;if(!e||!e.state)return ae;let i=e.state;return t<0?(n=0,t=-t):(n=(t>>4)+1,t<48&&(t&=15)),t&&(t<8||t>15)?ae:(i.window!==null&&i.wbits!==t&&(i.window=null),i.wrap=n,i.wbits=t,nl(e))},rl=(e,t)=>{if(!e)return ae;let n=new Bd;e.state=n,n.window=null;let i=il(e,t);return i!==ft&&(e.state=null),i},Fd=e=>rl(e,Od),Xs=!0,Sr,Rr,Md=e=>{if(Xs){Sr=new Int32Array(512),Rr=new Int32Array(32);let t=0;for(;t<144;)e.lens[t++]=8;for(;t<256;)e.lens[t++]=9;for(;t<280;)e.lens[t++]=7;for(;t<288;)e.lens[t++]=8;for(on(Vs,e.lens,0,288,Sr,0,e.work,{bits:9}),t=0;t<32;)e.lens[t++]=5;on(Js,e.lens,0,32,Rr,0,e.work,{bits:5}),Xs=!1}e.lencode=Sr,e.lenbits=9,e.distcode=Rr,e.distbits=5},al=(e,t,n,i)=>{let r,a=e.state;return a.window===null&&(a.wsize=1<<a.wbits,a.wnext=0,a.whave=0,a.window=new Uint8Array(a.wsize)),i>=a.wsize?(a.window.set(t.subarray(n-a.wsize,n),0),a.wnext=0,a.whave=a.wsize):(r=a.wsize-a.wnext,r>i&&(r=i),a.window.set(t.subarray(n-i,n-i+r),a.wnext),i-=r,i?(a.window.set(t.subarray(n-i,n),0),a.wnext=i,a.whave=a.wsize):(a.wnext+=r,a.wnext===a.wsize&&(a.wnext=0),a.whave<a.wsize&&(a.whave+=r))),0},Ud=(e,t)=>{let n,i,r,a,o,s,u,l,f,h,p,c,y,E,m=0,b,x,C,w,k,M,S,I,L=new Uint8Array(4),A,T,G=new Uint8Array([16,17,18,0,8,7,9,6,10,5,11,4,12,3,13,2,14,1,15]);if(!e||!e.state||!e.output||!e.input&&e.avail_in!==0)return ae;n=e.state,n.mode===ke&&(n.mode=Er),o=e.next_out,r=e.output,u=e.avail_out,a=e.next_in,i=e.input,s=e.avail_in,l=n.hold,f=n.bits,h=s,p=u,I=ft;e:for(;;)switch(n.mode){case el:if(n.wrap===0){n.mode=Er;break}for(;f<16;){if(s===0)break e;s--,l+=i[a++]<<f,f+=8}if(n.wrap&2&&l===35615){n.check=0,L[0]=l&255,L[1]=l>>>8&255,n.check=we(n.check,L,2,0),l=0,f=0,n.mode=As;break}if(n.flags=0,n.head&&(n.head.done=!1),!(n.wrap&1)||(((l&255)<<8)+(l>>8))%31){e.msg="incorrect header check",n.mode=q;break}if((l&15)!==Cs){e.msg="unknown compression method",n.mode=q;break}if(l>>>=4,f-=4,S=(l&15)+8,n.wbits===0)n.wbits=S;else if(S>n.wbits){e.msg="invalid window size",n.mode=q;break}n.dmax=1<<n.wbits,e.adler=n.check=1,n.mode=l&512?Fs:ke,l=0,f=0;break;case As:for(;f<16;){if(s===0)break e;s--,l+=i[a++]<<f,f+=8}if(n.flags=l,(n.flags&255)!==Cs){e.msg="unknown compression method",n.mode=q;break}if(n.flags&57344){e.msg="unknown header flags set",n.mode=q;break}n.head&&(n.head.text=l>>8&1),n.flags&512&&(L[0]=l&255,L[1]=l>>>8&255,n.check=we(n.check,L,2,0)),l=0,f=0,n.mode=ks;case ks:for(;f<32;){if(s===0)break e;s--,l+=i[a++]<<f,f+=8}n.head&&(n.head.time=l),n.flags&512&&(L[0]=l&255,L[1]=l>>>8&255,L[2]=l>>>16&255,L[3]=l>>>24&255,n.check=we(n.check,L,4,0)),l=0,f=0,n.mode=Is;case Is:for(;f<16;){if(s===0)break e;s--,l+=i[a++]<<f,f+=8}n.head&&(n.head.xflags=l&255,n.head.os=l>>8),n.flags&512&&(L[0]=l&255,L[1]=l>>>8&255,n.check=we(n.check,L,2,0)),l=0,f=0,n.mode=Ds;case Ds:if(n.flags&1024){for(;f<16;){if(s===0)break e;s--,l+=i[a++]<<f,f+=8}n.length=l,n.head&&(n.head.extra_len=l),n.flags&512&&(L[0]=l&255,L[1]=l>>>8&255,n.check=we(n.check,L,2,0)),l=0,f=0}else n.head&&(n.head.extra=null);n.mode=Ls;case Ls:if(n.flags&1024&&(c=n.length,c>s&&(c=s),c&&(n.head&&(S=n.head.extra_len-n.length,n.head.extra||(n.head.extra=new Uint8Array(n.head.extra_len)),n.head.extra.set(i.subarray(a,a+c),S)),n.flags&512&&(n.check=we(n.check,i,c,a)),s-=c,a+=c,n.length-=c),n.length))break e;n.length=0,n.mode=Ns;case Ns:if(n.flags&2048){if(s===0)break e;c=0;do S=i[a+c++],n.head&&S&&n.length<65536&&(n.head.name+=String.fromCharCode(S));while(S&&c<s);if(n.flags&512&&(n.check=we(n.check,i,c,a)),s-=c,a+=c,S)break e}else n.head&&(n.head.name=null);n.length=0,n.mode=Os;case Os:if(n.flags&4096){if(s===0)break e;c=0;do S=i[a+c++],n.head&&S&&n.length<65536&&(n.head.comment+=String.fromCharCode(S));while(S&&c<s);if(n.flags&512&&(n.check=we(n.check,i,c,a)),s-=c,a+=c,S)break e}else n.head&&(n.head.comment=null);n.mode=Bs;case Bs:if(n.flags&512){for(;f<16;){if(s===0)break e;s--,l+=i[a++]<<f,f+=8}if(l!==(n.check&65535)){e.msg="header crc mismatch",n.mode=q;break}l=0,f=0}n.head&&(n.head.hcrc=n.flags>>9&1,n.head.done=!0),e.adler=n.check=0,n.mode=ke;break;case Fs:for(;f<32;){if(s===0)break e;s--,l+=i[a++]<<f,f+=8}e.adler=n.check=Ks(l),l=0,f=0,n.mode=Kn;case Kn:if(n.havedict===0)return e.next_out=o,e.avail_out=u,e.next_in=a,e.avail_in=s,n.hold=l,n.bits=f,Ad;e.adler=n.check=1,n.mode=ke;case ke:if(t===Td||t===Yn)break e;case Er:if(n.last){l>>>=f&7,f-=f&7,n.mode=vr;break}for(;f<3;){if(s===0)break e;s--,l+=i[a++]<<f,f+=8}switch(n.last=l&1,l>>>=1,f-=1,l&3){case 0:n.mode=Ms;break;case 1:if(Md(n),n.mode=Gn,t===Yn){l>>>=2,f-=2;break e}break;case 2:n.mode=Ps;break;case 3:e.msg="invalid block type",n.mode=q}l>>>=2,f-=2;break;case Ms:for(l>>>=f&7,f-=f&7;f<32;){if(s===0)break e;s--,l+=i[a++]<<f,f+=8}if((l&65535)!==(l>>>16^65535)){e.msg="invalid stored block lengths",n.mode=q;break}if(n.length=l&65535,l=0,f=0,n.mode=xr,t===Yn)break e;case xr:n.mode=Us;case Us:if(c=n.length,c){if(c>s&&(c=s),c>u&&(c=u),c===0)break e;r.set(i.subarray(a,a+c),o),s-=c,a+=c,u-=c,o+=c,n.length-=c;break}n.mode=ke;break;case Ps:for(;f<14;){if(s===0)break e;s--,l+=i[a++]<<f,f+=8}if(n.nlen=(l&31)+257,l>>>=5,f-=5,n.ndist=(l&31)+1,l>>>=5,f-=5,n.ncode=(l&15)+4,l>>>=4,f-=4,n.nlen>286||n.ndist>30){e.msg="too many length or distance symbols",n.mode=q;break}n.have=0,n.mode=qs;case qs:for(;n.have<n.ncode;){for(;f<3;){if(s===0)break e;s--,l+=i[a++]<<f,f+=8}n.lens[G[n.have++]]=l&7,l>>>=3,f-=3}for(;n.have<19;)n.lens[G[n.have++]]=0;if(n.lencode=n.lendyn,n.lenbits=7,A={bits:n.lenbits},I=on(Rd,n.lens,0,19,n.lencode,0,n.work,A),n.lenbits=A.bits,I){e.msg="invalid code lengths set",n.mode=q;break}n.have=0,n.mode=zs;case zs:for(;n.have<n.nlen+n.ndist;){for(;m=n.lencode[l&(1<<n.lenbits)-1],b=m>>>24,x=m>>>16&255,C=m&65535,!(b<=f);){if(s===0)break e;s--,l+=i[a++]<<f,f+=8}if(C<16)l>>>=b,f-=b,n.lens[n.have++]=C;else{if(C===16){for(T=b+2;f<T;){if(s===0)break e;s--,l+=i[a++]<<f,f+=8}if(l>>>=b,f-=b,n.have===0){e.msg="invalid bit length repeat",n.mode=q;break}S=n.lens[n.have-1],c=3+(l&3),l>>>=2,f-=2}else if(C===17){for(T=b+3;f<T;){if(s===0)break e;s--,l+=i[a++]<<f,f+=8}l>>>=b,f-=b,S=0,c=3+(l&7),l>>>=3,f-=3}else{for(T=b+7;f<T;){if(s===0)break e;s--,l+=i[a++]<<f,f+=8}l>>>=b,f-=b,S=0,c=11+(l&127),l>>>=7,f-=7}if(n.have+c>n.nlen+n.ndist){e.msg="invalid bit length repeat",n.mode=q;break}for(;c--;)n.lens[n.have++]=S}}if(n.mode===q)break;if(n.lens[256]===0){e.msg="invalid code -- missing end-of-block",n.mode=q;break}if(n.lenbits=9,A={bits:n.lenbits},I=on(Vs,n.lens,0,n.nlen,n.lencode,0,n.work,A),n.lenbits=A.bits,I){e.msg="invalid literal/lengths set",n.mode=q;break}if(n.distbits=6,n.distcode=n.distdyn,A={bits:n.distbits},I=on(Js,n.lens,n.nlen,n.ndist,n.distcode,0,n.work,A),n.distbits=A.bits,I){e.msg="invalid distances set",n.mode=q;break}if(n.mode=Gn,t===Yn)break e;case Gn:n.mode=$n;case $n:if(s>=6&&u>=258){e.next_out=o,e.avail_out=u,e.next_in=a,e.avail_in=s,n.hold=l,n.bits=f,Sd(e,p),o=e.next_out,r=e.output,u=e.avail_out,a=e.next_in,i=e.input,s=e.avail_in,l=n.hold,f=n.bits,n.mode===ke&&(n.back=-1);break}for(n.back=0;m=n.lencode[l&(1<<n.lenbits)-1],b=m>>>24,x=m>>>16&255,C=m&65535,!(b<=f);){if(s===0)break e;s--,l+=i[a++]<<f,f+=8}if(x&&(x&240)===0){for(w=b,k=x,M=C;m=n.lencode[M+((l&(1<<w+k)-1)>>w)],b=m>>>24,x=m>>>16&255,C=m&65535,!(w+b<=f);){if(s===0)break e;s--,l+=i[a++]<<f,f+=8}l>>>=w,f-=w,n.back+=w}if(l>>>=b,f-=b,n.back+=b,n.length=C,x===0){n.mode=Ys;break}if(x&32){n.back=-1,n.mode=ke;break}if(x&64){e.msg="invalid literal/length code",n.mode=q;break}n.extra=x&15,n.mode=js;case js:if(n.extra){for(T=n.extra;f<T;){if(s===0)break e;s--,l+=i[a++]<<f,f+=8}n.length+=l&(1<<n.extra)-1,l>>>=n.extra,f-=n.extra,n.back+=n.extra}n.was=n.length,n.mode=Hs;case Hs:for(;m=n.distcode[l&(1<<n.distbits)-1],b=m>>>24,x=m>>>16&255,C=m&65535,!(b<=f);){if(s===0)break e;s--,l+=i[a++]<<f,f+=8}if((x&240)===0){for(w=b,k=x,M=C;m=n.distcode[M+((l&(1<<w+k)-1)>>w)],b=m>>>24,x=m>>>16&255,C=m&65535,!(w+b<=f);){if(s===0)break e;s--,l+=i[a++]<<f,f+=8}l>>>=w,f-=w,n.back+=w}if(l>>>=b,f-=b,n.back+=b,x&64){e.msg="invalid distance code",n.mode=q;break}n.offset=C,n.extra=x&15,n.mode=Ws;case Ws:if(n.extra){for(T=n.extra;f<T;){if(s===0)break e;s--,l+=i[a++]<<f,f+=8}n.offset+=l&(1<<n.extra)-1,l>>>=n.extra,f-=n.extra,n.back+=n.extra}if(n.offset>n.dmax){e.msg="invalid distance too far back",n.mode=q;break}n.mode=Zs;case Zs:if(u===0)break e;if(c=p-u,n.offset>c){if(c=n.offset-c,c>n.whave&&n.sane){e.msg="invalid distance too far back",n.mode=q;break}c>n.wnext?(c-=n.wnext,y=n.wsize-c):y=n.wnext-c,c>n.length&&(c=n.length),E=n.window}else E=r,y=o-n.offset,c=n.length;c>u&&(c=u),u-=c,n.length-=c;do r[o++]=E[y++];while(--c);n.length===0&&(n.mode=$n);break;case Ys:if(u===0)break e;r[o++]=n.length,u--,n.mode=$n;break;case vr:if(n.wrap){for(;f<32;){if(s===0)break e;s--,l|=i[a++]<<f,f+=8}if(p-=u,e.total_out+=p,n.total+=p,p&&(e.adler=n.check=n.flags?we(n.check,r,p,o-p):Tr(n.check,r,p,o-p)),p=u,(n.flags?l:Ks(l))!==n.check){e.msg="incorrect data check",n.mode=q;break}l=0,f=0}n.mode=Gs;case Gs:if(n.wrap&&n.flags){for(;f<32;){if(s===0)break e;s--,l+=i[a++]<<f,f+=8}if(l!==(n.total&4294967295)){e.msg="incorrect length check",n.mode=q;break}l=0,f=0}n.mode=$s;case $s:I=Cd;break e;case q:I=Qs;break e;case Ar:return Cr;case Id:default:return ae}return e.next_out=o,e.avail_out=u,e.next_in=a,e.avail_in=s,n.hold=l,n.bits=f,(n.wsize||p!==e.avail_out&&n.mode<q&&(n.mode<vr||t!==Ts))&&al(e,e.output,e.next_out,p-e.avail_out)?(n.mode=Ar,Cr):(h-=e.avail_in,p-=e.avail_out,e.total_in+=h,e.total_out+=p,n.total+=p,n.wrap&&p&&(e.adler=n.check=n.flags?we(n.check,r,p,e.next_out-p):Tr(n.check,r,p,e.next_out-p)),e.data_type=n.bits+(n.last?64:0)+(n.mode===ke?128:0)+(n.mode===Gn||n.mode===xr?256:0),(h===0&&p===0||t===Ts)&&I===ft&&(I=kd),I)},Pd=e=>{if(!e||!e.state)return ae;let t=e.state;return t.window&&(t.window=null),e.state=null,ft},qd=(e,t)=>{if(!e||!e.state)return ae;let n=e.state;return(n.wrap&2)===0?ae:(n.head=t,t.done=!1,ft)},zd=(e,t)=>{let n=t.length,i,r,a;return!e||!e.state||(i=e.state,i.wrap!==0&&i.mode!==Kn)?ae:i.mode===Kn&&(r=1,r=Tr(r,t,n,0),r!==i.check)?Qs:(a=al(e,t,n,n),a?(i.mode=Ar,Cr):(i.havedict=1,ft))};se.exports.inflateReset=nl;se.exports.inflateReset2=il;se.exports.inflateResetKeep=tl;se.exports.inflateInit=Fd;se.exports.inflateInit2=rl;se.exports.inflate=Ud;se.exports.inflateEnd=Pd;se.exports.inflateGetHeader=qd;se.exports.inflateSetDictionary=zd;se.exports.inflateInfo="pako inflate (from Nodeca project)"});var ll=v((vp,sl)=>{"use strict";_();function jd(){this.text=0,this.time=0,this.xflags=0,this.os=0,this.extra=null,this.extra_len=0,this.name="",this.comment="",this.hcrc=0,this.done=!1}sl.exports=jd});var cl=v((Sp,Nt)=>{"use strict";_();var Ie=ol(),ul=gr(),Dr=wr(),Lr=Mn(),Hd=yr(),Wd=ll(),hl=Object.prototype.toString,{Z_NO_FLUSH:Zd,Z_FINISH:Yd,Z_OK:sn,Z_STREAM_END:kr,Z_NEED_DICT:Ir,Z_STREAM_ERROR:Gd,Z_DATA_ERROR:fl,Z_MEM_ERROR:$d}=Me();function ln(e){this.options=ul.assign({chunkSize:1024*64,windowBits:15,to:""},e||{});let t=this.options;t.raw&&t.windowBits>=0&&t.windowBits<16&&(t.windowBits=-t.windowBits,t.windowBits===0&&(t.windowBits=-15)),t.windowBits>=0&&t.windowBits<16&&!(e&&e.windowBits)&&(t.windowBits+=32),t.windowBits>15&&t.windowBits<48&&(t.windowBits&15)===0&&(t.windowBits|=15),this.err=0,this.msg="",this.ended=!1,this.chunks=[],this.strm=new Hd,this.strm.avail_out=0;let n=Ie.inflateInit2(this.strm,t.windowBits);if(n!==sn)throw new Error(Lr[n]);if(this.header=new Wd,Ie.inflateGetHeader(this.strm,this.header),t.dictionary&&(typeof t.dictionary=="string"?t.dictionary=Dr.string2buf(t.dictionary):hl.call(t.dictionary)==="[object ArrayBuffer]"&&(t.dictionary=new Uint8Array(t.dictionary)),t.raw&&(n=Ie.inflateSetDictionary(this.strm,t.dictionary),n!==sn)))throw new Error(Lr[n])}ln.prototype.push=function(e,t){let n=this.strm,i=this.options.chunkSize,r=this.options.dictionary,a,o,s;if(this.ended)return!1;for(t===~~t?o=t:o=t===!0?Yd:Zd,hl.call(e)==="[object ArrayBuffer]"?n.input=new Uint8Array(e):n.input=e,n.next_in=0,n.avail_in=n.input.length;;){for(n.avail_out===0&&(n.output=new Uint8Array(i),n.next_out=0,n.avail_out=i),a=Ie.inflate(n,o),a===Ir&&r&&(a=Ie.inflateSetDictionary(n,r),a===sn?a=Ie.inflate(n,o):a===fl&&(a=Ir));n.avail_in>0&&a===kr&&n.state.wrap>0&&e[n.next_in]!==0;)Ie.inflateReset(n),a=Ie.inflate(n,o);switch(a){case Gd:case fl:case Ir:case $d:return this.onEnd(a),this.ended=!0,!1}if(s=n.avail_out,n.next_out&&(n.avail_out===0||a===kr))if(this.options.to==="string"){let u=Dr.utf8border(n.output,n.next_out),l=n.next_out-u,f=Dr.buf2string(n.output,u);n.next_out=l,n.avail_out=i-l,l&&n.output.set(n.output.subarray(u,u+l),0),this.onData(f)}else this.onData(n.output.length===n.next_out?n.output:n.output.subarray(0,n.next_out));if(!(a===sn&&s===0)){if(a===kr)return a=Ie.inflateEnd(this.strm),this.onEnd(a),this.ended=!0,!0;if(n.avail_in===0)break}}return!0};ln.prototype.onData=function(e){this.chunks.push(e)};ln.prototype.onEnd=function(e){e===sn&&(this.options.to==="string"?this.result=this.chunks.join(""):this.result=ul.flattenChunks(this.chunks)),this.chunks=[],this.err=e,this.msg=this.strm.msg};function Nr(e,t){let n=new ln(t);if(n.push(e),n.err)throw n.msg||Lr[n.err];return n.result}function Kd(e,t){return t=t||{},t.raw=!0,Nr(e,t)}Nt.exports.Inflate=ln;Nt.exports.inflate=Nr;Nt.exports.inflateRaw=Kd;Nt.exports.ungzip=Nr;Nt.exports.constants=Me()});var dl=v((Rp,ye)=>{"use strict";_();var{Deflate:Xd,deflate:Vd,deflateRaw:Jd,gzip:Qd}=Es(),{Inflate:e0,inflate:t0,inflateRaw:n0,ungzip:i0}=cl(),r0=Me();ye.exports.Deflate=Xd;ye.exports.deflate=Vd;ye.exports.deflateRaw=Jd;ye.exports.gzip=Qd;ye.exports.Inflate=e0;ye.exports.inflate=t0;ye.exports.inflateRaw=n0;ye.exports.ungzip=i0;ye.exports.constants=r0});var Or=v((Xn,pl)=>{_();(function(e,t){typeof Xn=="object"&&typeof pl<"u"?t(Xn):typeof define=="function"&&define.amd?define(["exports"],t):(e=typeof globalThis<"u"?globalThis:e||self,t(e["base64-arraybuffer"]={}))})(Xn,function(e){"use strict";for(var t="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/",n=typeof Uint8Array>"u"?[]:new Uint8Array(256),i=0;i<t.length;i++)n[t.charCodeAt(i)]=i;var r=function(o){var s=new Uint8Array(o),u,l=s.length,f="";for(u=0;u<l;u+=3)f+=t[s[u]>>2],f+=t[(s[u]&3)<<4|s[u+1]>>4],f+=t[(s[u+1]&15)<<2|s[u+2]>>6],f+=t[s[u+2]&63];return l%3===2?f=f.substring(0,f.length-1)+"=":l%3===1&&(f=f.substring(0,f.length-2)+"=="),f},a=function(o){var s=o.length*.75,u=o.length,l,f=0,h,p,c,y;o[o.length-1]==="="&&(s--,o[o.length-2]==="="&&s--);var E=new ArrayBuffer(s),m=new Uint8Array(E);for(l=0;l<u;l+=4)h=n[o.charCodeAt(l)],p=n[o.charCodeAt(l+1)],c=n[o.charCodeAt(l+2)],y=n[o.charCodeAt(l+3)],m[f++]=h<<2|p>>4,m[f++]=(p&15)<<4|c>>2,m[f++]=(c&3)<<6|y&63;return E};e.decode=a,e.encode=r,Object.defineProperty(e,"__esModule",{value:!0})})});var gl=v((_l,Vn)=>{_();(function(e){"use strict";var t={bytesToHex:function(r){return n(r)},hexToBytes:function(r){if(r.length%2===1)throw new Error("hexToBytes can't have a string with an odd number of characters.");return r.indexOf("0x")===0&&(r=r.slice(2)),r.match(/../g).map(function(a){return parseInt(a,16)})}};function n(r){return r.map(function(a){return i(a.toString(16),2)}).join("")}function i(r,a){return r.length>a?r:Array(a-r.length+1).join("0")+r}typeof Vn<"u"&&Vn.exports?Vn.exports=t:e.convertHex=t})(_l)});var wl=v((Tp,Fr)=>{"use strict";_();function a0(){throw new Error(`secure random number generation not supported by this browser
-use chrome, FireFox or Internet Explorer 11`)}var Br=window.crypto||window.msCrypto;Br&&Br.getRandomValues?Fr.exports=o0:Fr.exports=a0;function o0(e,t){if(e>65536)throw new Error("requested too many random bytes");var n=new window.Uint8Array(e);e>0&&Br.getRandomValues(n);var i=new R(n.buffer);return typeof t=="function"?g.nextTick(function(){t(null,i)}):i}});var yl=v((Cp,Jn)=>{"use strict";_();function s0(e){for(var t=[],n=0;n<e.length;n++)t.indexOf(e[n])===-1&&t.push(e[n]);return t}function l0(e){var t=new Set;return e.filter(function(n){if(!t.has(n))return t.add(n),!0})}function f0(e){var t=[];return new Set(e).forEach(function(n){t.push(n)}),t}function u0(){var e=!1;return new Set([!0]).forEach(function(t){e=t}),e===!0}"Set"in window?typeof Set.prototype.forEach=="function"&&u0()?Jn.exports=f0:Jn.exports=l0:Jn.exports=s0});var El=v((bl,ml)=>{_();var h0=yl();function fn(){this.chars=""}fn.prototype.setType=function(e){var t,n="0123456789",i="abcdefghijklmnopqrstuvwxyz",r=i.toUpperCase(),a="abcdef",o="01",s="01234567";e==="alphanumeric"?t=n+i+r:e==="numeric"?t=n:e==="alphabetic"?t=i+r:e==="hex"?t=n+a:e==="binary"?t=o:e==="octal"?t=s:t=e,this.chars=t};fn.prototype.removeUnreadable=function(){var e=/[0OIl]/g;this.chars=this.chars.replace(e,"")};fn.prototype.setcapitalization=function(e){e==="uppercase"?this.chars=this.chars.toUpperCase():e==="lowercase"&&(this.chars=this.chars.toLowerCase())};fn.prototype.removeDuplicates=function(){var e=this.chars.split("");e=h0(e),this.chars=e.join("")};ml.exports=bl=fn});var Tl=v(Rl=>{"use strict";_();var xl=wl(),c0=El();function d0(e){for(;;)try{return xl(e)}catch{continue}}function vl(e,t,n,i,r){for(var a=t,o=0;o<e.length&&a.length<i;o++){var s=e.readUInt8(o);s<r&&(a+=n.charAt(s%n.length))}return a}function Sl(e,t,n,i,r){xl(n,function(a,o){a&&r(a);var s=vl(o,e,t,n,i);s.length<n?Sl(s,t,n,i,r):r(null,s)})}Rl.generate=function(e,t){var n=new c0,i,r,a,o="";typeof e=="object"?(i=e.length||32,e.charset?n.setType(e.charset):n.setType("alphanumeric"),e.capitalization&&n.setcapitalization(e.capitalization),e.readable&&n.removeUnreadable(),n.removeDuplicates()):typeof e=="number"?(i=e,n.setType("alphanumeric")):(i=32,n.setType("alphanumeric"));var s=n.chars.length,u=256-256%s;if(!t){for(;o.length<i;){var l=d0(Math.ceil(i*256/u));o=vl(l,o,n.chars,i,u)}return o}Sl(o,n.chars,i,u,t)}});var Al=v((kp,Cl)=>{_();Cl.exports=Tl()});var Il=v((Ip,kl)=>{_();kl.exports=function(t){if(typeof t!="object"||t===null||typeof t.byteLength!="number")throw new TypeError("Expected input to be an ArrayBuffer");for(var n=new Uint8Array(t),i="",r,a=0;a<n.length;a++)r=n[a].toString(16),i+=r.length===1?"0"+r:r;return i}});var A0=v((Dp,Ml)=>{_();var p0=pi(),_0=gn(),Dl=Bo(),g0=dl(),{encode:Bl}=Or(),{hexToBytes:w0}=gl(),Qn=Al(),Fl=16e3,Bt=12,Mr=8121,Ot=Fl-Bt,De=[33451,33229,4757,41419],Ur={host:0,srflx:1,relay:2},y0={active:0,passive:1,so:2},ut={TYPE:0,PROTOCOL:1,IP:2,PORT:3,RELATED_IP:4,RELATED_PORT:5,TCP_TYPE:6},b0=[{urls:"stun:stun1.l.google.com:19302"},{urls:"stun:global.stun.twilio.com:3478"}],m0=[{urls:"turn:openrelay.metered.ca:80",username:"openrelayproject",credential:"openrelayproject"},{urls:"turn:openrelay.metered.ca:443",username:"openrelayproject",credential:"openrelayproject"},{urls:"turn:openrelay.metered.ca:443?transport=tcp",username:"openrelayproject",credential:"openrelayproject"}],ei=window.navigator.userAgent,E0=!!ei.match(/iPad/i)||!!ei.match(/iPhone/i),x0=!!ei.match(/WebKit/i),Ll=!!(E0&&x0&&!ei.match(/CriOS/i)),v0=navigator?.userAgent.toLowerCase().indexOf("firefox")>-1,{decode:S0}=Or(),R0=Il(),Nl=e=>Bl(w0(e)),T0=e=>R0(S0(e));function Ol(e,t,n,i){let r=T0(i),a="";for(let s=0;s<r.length;s+=2)a+=`${r[s]}${r[s+1]}${s===r.length-2?"":":"}`.toUpperCase();let o=["v=0","o=- 5498186869896684180 2 IN IP4 127.0.0.1","s=-","t=0 0","a=msid-semantic: WMS","m=application 9 UDP/DTLS/SCTP webrtc-datachannel","c=IN IP4 0.0.0.0","a=mid:0","a=sctp-port:5000"];return e?o.push("a=setup:actpass"):o.push("a=setup:active"),o.push(`a=ice-ufrag:${t}`),o.push(`a=ice-pwd:${n}`),o.push(`a=fingerprint:sha-256 ${a}`),o.join(`\r
-`)+`\r
-`}var C0=e=>{let t;e.indexOf("a=candidate:")===0?t=e.substring(12).split(" "):t=e.substring(10).split(" ");let n=[Ur[t[7]],t[2].toLowerCase()==="udp"?0:1,t[4],parseInt(t[5],10)];for(let i=8;i<t.length;i+=2)switch(t[i]){case"raddr":for(;n.length<5;)n.push(null);n[4]=t[i+1];break;case"rport":for(;n.length<6;)n.push(null);n[5]=parseInt(t[i+1],10);break;case"tcptype":for(;n.length<7;)n.push(null);n[6]=y0[t[i+1]];break;default:break}for(;n.length<8;)n.push(null);return n[7]=parseInt(t[3],10),n},Pr=class extends _0{constructor(t="",n="",i={}){if(super(),!t||t.length<4)throw new Error("Client ID must be at least four characters");if(!n||n.length<4)throw new Error("Room ID must be at least four characters");this._step=this._step.bind(this),this.peers=new Map,this.msgChunks=new Map,this.connectedSessions=[],this.clientId=t,this.roomId=n,this.sessionId=Qn.generate({length:20}),this.packages=[],this.dataTimestamp=null,this.lastPackages=null,this.lastProcessedReceivedDataTimestamps=new Map,this.packageReceivedFromPeers=new Set,this.startedAtTimestamp=null,this.workerUrl=i.workerUrl||"https://p2pcf.minddrop.workers.dev",this.workerUrl.endsWith("/")&&(this.workerUrl=this.workerUrl.substring(0,this.workerUrl.length-1)),this.stunIceServers=i.stunIceServers||b0,this.turnIceServers=i.turnIceServers||m0,this.networkChangePollIntervalMs=i.networkChangePollIntervalMs||15e3,this.stateExpirationIntervalMs=i.stateExpirationIntervalMs||2*60*1e3,this.stateHeartbeatWindowMs=i.stateHeartbeatWindowMs||3e4,this.fastPollingDurationMs=i.fastPollingDurationMs||1e4,this.fastPollingRateMs=i.fastPollingRateMs||750,this.slowPollingRateMs=i.slowPollingRateMs||5e3,this.wrtc=p0(),this.dtlsCert=null,this.udpEnabled=null,this.isSymmetric=null,this.reflexiveIps=null,this.dtlsFingerprint=null,this.isSending=!1,this.finished=!1,this.nextStepTime=-1,this.deleteKey=null,this.sentFirstPoll=!1,this.stopFastPollingAt=-1,window.history.state?._p2pcfContextId||window.history.replaceState({...window.history.state,_p2pcfContextId:Qn.generate({length:20})},window.location.href),this.contextId=window.history.state._p2pcfContextId}async _init(){this.dtlsCert===null&&(this.dtlsCert=await this.wrtc.RTCPeerConnection.generateCertificate({name:"ECDSA",namedCurve:"P-256"}))}async _step(t=!1){let{sessionId:n,clientId:i,roomId:r,contextId:a,stateExpirationIntervalMs:o,stateHeartbeatWindowMs:s,packages:u,fastPollingDurationMs:l,fastPollingRateMs:f,slowPollingRateMs:h}=this,p=new Date().getTime();if(t){if(this.finished||!this.deleteKey)return;this.finished=!0}else if(this.nextStepTime>p||this.isSending||this.reflexiveIps.length===0)return;this.isSending=!0;try{let c=Nl(this.dtlsFingerprint.replaceAll(":","")),y=[n,i,this.isSymmetric,c,this.startedAtTimestamp,[...this.reflexiveIps]],E={r,k:a};t&&(E.dk=this.deleteKey);let m=this.dataTimestamp===null||p-this.dataTimestamp>=o-s,b=this.lastPackages!==JSON.stringify(u),x=!1;if(m||b||t){this.dataTimestamp=p;for(let U=0;U<u.length;U++){let H=u[U][u[U].length-2];p-H>60*1e3&&(u[U]=null)}for(;u.indexOf(null)>=0;)u.splice(u.indexOf(null),1);x=!0}t&&(x=!1),this.sentFirstPoll&&(E.d=y,E.t=this.dataTimestamp,E.x=this.stateExpirationIntervalMs,x&&(E.p=u,this.lastPackages=JSON.stringify(u)));let C=JSON.stringify(E),w=Bl(g0.deflate(C)),k={"Content-Type":"application/json "},M=!1;C.length>w.length&&(C=w,k["Content-Type"]="application/json",k["Content-Encoding"]="text/plain",k["Content-Length"]=w.length),t&&(k["X-Worker-Method"]="DELETE",M=!0);let S=await fetch(this.workerUrl,{method:"POST",headers:k,body:C,keepalive:M}),{ps:I,pk:L,dk:A}=await S.json();if(A&&(this.deleteKey=A),t)return;if(I.length===0&&!this.sentFirstPoll){E.d=y,E.t=this.dataTimestamp,E.x=this.stateExpirationIntervalMs,E.p=u,this.lastPackages=JSON.stringify(u);let U=await fetch(this.workerUrl,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(E)}),{dk:H}=await U.json();H&&(this.deleteKey=H)}this.sentFirstPoll=!0;let T=[...this.peers.keys()];this._handleWorkerResponse(y,c,u,I,L);let G=I.map(U=>U[0]);(T.length!==G.length||G.find(U=>!T.includes(U))||T.find(U=>!G.includes(U)))&&(this.stopFastPollingAt=p+l),p<this.stopFastPollingAt?this.nextStepTime=p+f:this.nextStepTime=p+h}catch(c){console.error(c),this.nextStepTime=p+h}finally{this.isSending=!1}}_handleWorkerResponse(t,n,i,r,a){let o=this.startedAtTimestamp,{dtlsCert:s,peers:u,lastProcessedReceivedDataTimestamps:l,packageReceivedFromPeers:f,stunIceServers:h,turnIceServers:p}=this,[c,,y]=t,E=new Date().getTime();for(let b of r){let[x,C,w,k,M,S,I]=b;if(l.get(x)===I)continue;let L=y===w?o===M?c>x:o>M:y,A=y||w?p:h,T=v0,G=a.find(U=>U[1]===x),be={iceServers:A};if(s&&(be.certificates=[s]),L){if(u.has(x)||!G||(l.set(x,I),f.has(x)))continue;f.add(x);let[,,U,H,J,me,K,,Ee]=G,Q=new Dl({config:be,initiator:!1,iceCompleteTimeout:3e3,sdpTransform:$=>{let hn=[];for(let ti of $.split(`\r
-`))ti.startsWith("a=ice-ufrag")?hn.push(`a=ice-ufrag:${me}`):ti.startsWith("a=ice-pwd")?hn.push(`a=ice-pwd:${K}`):hn.push(ti);return hn.join(`\r
-`)}});Q.id=x,Q.client_id=C,this._wireUpCommonPeerEvents(Q),u.set(Q.id,Q);let Ye=[x,c,null,null,null,null,null,E,[]],un=Ye[Ye.length-1],Ft=$=>{!$.candidate?.candidate||un.push($.candidate.candidate)};Q.on("signal",Ft);let Ge=()=>{Q.removeListener("signal",Ft),!i.includes(Ye)&&un.length!==0&&i.push(Ye)};Q.once("_iceComplete",Ge);let Mt=Ol(!0,U,H,J);for(let $ of Ee)Q.signal({candidate:{candidate:$,sdpMLineIndex:0}});Q.signal({type:"offer",sdp:Mt})}else{if(!u.has(x)){l.set(x,I);let J=Qn.generate({length:12}),me=Qn.generate({length:32}),K=new Dl({config:be,iceCompleteTimeout:3e3,initiator:!0});K.id=x,K.client_id=C,this._wireUpCommonPeerEvents(K),u.set(K.id,K);let Ee=[x,c,null,null,null,J,me,E,[]],Q=Ee[Ee.length-1],Ye=Ge=>{!Ge.candidate?.candidate||Q.push(Ge.candidate.candidate)};K.on("signal",Ye);let un=()=>{K.removeListener("signal",Ye),!i.includes(Ee)&&Q.length!==0&&i.push(Ee)};K.once("_iceComplete",un);let Ft=Ge=>{if(Ge.type!=="offer")return;K.removeListener("signal",Ft);for(let $ of Ge.sdp.split(`\r
-`))switch($.split(":")[0]){case"a=ice-ufrag":Ee[2]=$.substring(12);break;case"a=ice-pwd":Ee[3]=$.substring(10);break;case"a=fingerprint":Ee[4]=Nl($.substring(22).replaceAll(":",""));break}let Mt=Ol(!1,J,me,k);for(let $=0;$<S.length;$++)Mt+=`a=candidate:0 1 udp ${$+1} ${S[$]} 30000 typ srflx\r
-`;T?K._pendingRemoteSdp=Mt:K.signal({type:"answer",sdp:Mt})};K.once("signal",Ft)}if(!G)continue;let[,,,,,,,,U]=G;if(f.has(x)||!u.has(x))continue;let H=u.get(x);if(T&&!H._pc.remoteDescription&&H._pendingRemoteSdp){if(!H.connected)for(let J of U)H.signal({candidate:{candidate:J,sdpMLineIndex:0}});H.signal({type:"answer",sdp:H._pendingRemoteSdp}),delete H._pendingRemoteSdp,f.add(x)}if(!T&&H._pc.remoteDescription&&U.length>0){if(!H.connected)for(let J of U)H.signal({candidate:{candidate:J,sdpMLineIndex:0}});f.add(x)}}}let m=r.map(b=>b[0]);for(let[b,x]of u.entries())m.includes(b)||this._removePeer(x,!0)}async start(){this.startedAtTimestamp=new Date().getTime(),await this._init();let[t,n,i,r]=await this._getNetworkSettings(this.dtlsCert);this.udpEnabled=t,this.isSymmetric=n,this.reflexiveIps=i,this.dtlsFingerprint=r,this.networkSettingsInterval=setInterval(async()=>{let[a,o,s,u]=await this._getNetworkSettings(this.dtlsCert),l=!1;for(let f of this.reflexiveIps)for(let h of s)f===h&&(l=!0);if(a!==this.udpEnabled||o!==this.isSymmetric||u!==this.dtlsFingerprint||!l){this.packages.length=0;for(let f of this.peers.values())this._removePeer(f,!0),this.lastProcessedReceivedDataTimestamps.delete(f.id);this.dataTimestamp=null,this.lastPackages=null,this.udpEnabled=a,this.isSymmetric=o,this.reflexiveIps=s,this.dtlsFingerprint=u}},this.networkChangePollIntervalMs),this._step=this._step.bind(this),this.stepInterval=setInterval(this._step,500),this.destroyOnUnload=()=>this.destroy();for(let a of Ll?["pagehide"]:["beforeunload","unload"])window.addEventListener(a,this.destroyOnUnload)}_removePeer(t,n=!1){let{packageReceivedFromPeers:i,packages:r,peers:a}=this;if(!!a.has(t.id)){for(let o=0;o<r.length;o++)r[o][0]===t.id&&(r[o]=null);for(;r.indexOf(null)>=0;)r.splice(r.indexOf(null),1);i.delete(t.id),a.delete(t.id),n&&t.destroy(),this.emit("peerclose",t)}}send(t,n){return new Promise((i,r)=>{let a=null,o=null;if(n instanceof ArrayBuffer)a=n;else if(n instanceof Uint8Array)n.buffer.byteLength===n.length?a=n.buffer:a=n.buffer.slice(n.byteOffset,n.byteLength+n.byteOffset);else throw new Error("Unsupported send data type",n);if((a.byteLength>Fl||new Uint16Array(a,0,1)===Mr)&&(o=Math.floor(Math.random()*256*128)),o!==null)for(let s=0,u=0;s<a.byteLength;s+=Ot,u++){let l=Math.min(Ot,a.byteLength-s),f=Bt+l;for(;f%4!==0;)f++;let h=new ArrayBuffer(f);new Uint8Array(h,Bt).set(new Uint8Array(a,s,l));let p=new Uint16Array(h),c=new Uint32Array(h);p[0]=Mr,p[1]=o,p[2]=u,p[3]=s+Ot>=a.byteLength?1:0,c[2]=a.byteLength,t.send(h)}else t.send(a)})}broadcast(t){let n=[];for(let i of this.peers.values())!i.connected||n.push(this.send(i,t));return Promise.all(n)}destroy(){if(this._step&&this._step(!0),this.networkSettingsInterval&&(clearInterval(this.networkSettingsInterval),this.networkSettingsInterval=null),this.stepInterval&&(clearInterval(this.stepInterval),this.stepInterval=null),this.destroyOnUnload){for(let t of Ll?["pagehide"]:["beforeunload","unload"])window.removeEventListener(t,this.destroyOnUnload);this.destroyOnUnload=null}for(let t of this.peers.values())t.destroy()}_chunkHandler(t,n,i){let r=null;if(this.msgChunks.has(n))r=this.msgChunks.get(n);else{let s=new Uint32Array(t.buffer,t.byteOffset,3)[2];r=new Uint8Array(s),this.msgChunks.set(n,r)}let a=i*Ot,o=Math.min(r.byteLength-a,Ot);return r.set(new Uint8Array(t.buffer,t.byteOffset+Bt,o),i*Ot),r}_updateConnectedSessions(){this.connectedSessions.length=0;for(let[t,n]of this.peers)if(n.connected){this.connectedSessions.push(t);continue}}async _getNetworkSettings(){await this._init();let t=null,n=[],i=new Set,r={iceServers:this.stunIceServers};this.dtlsCert&&(r.certificates=[this.dtlsCert]);let a=new this.wrtc.RTCPeerConnection(r);a.createDataChannel("x");let o=new Promise(l=>{setTimeout(()=>l(),5e3),a.onicecandidate=f=>{if(!f.candidate)return l();f.candidate.candidate&&n.push(C0(f.candidate.candidate))}});a.createOffer().then(l=>{for(let f of l.sdp.split(`
-`))f.indexOf("a=fingerprint")!==-1&&(t=f.split(" ")[1].trim());a.setLocalDescription(l)}),await o,a.close();let s=!1,u=!1;e:for(let l of n)if(l[0]===Ur.srflx){u=!0,i.add(l[ut.IP]);for(let f of n)if(f[0]===Ur.srflx&&l!==f&&typeof l[ut.RELATED_PORT]=="number"&&typeof f[ut.RELATED_PORT]=="number"&&l[ut.RELATED_PORT]===f[ut.RELATED_PORT]&&l[ut.PORT]!==f[ut.PORT]){s=!0;break}}return[u,s,i,t]}_handlePeerError(t,n){n.errorDetail==="sctp-failure"&&n.message.indexOf("User-Initiated Abort")>=0||console.error(n)}_checkForSignalOrEmitMessage(t,n){if(n.buffer.byteLength<De.length*2){this.emit("msg",t,n);return}let i=new Uint16Array(n.buffer,n.byteOffset,De.length);for(let o=0;o<De.length;o++)if(i[o]!==De[o]){this.emit("msg",t,n);return}let r=new Uint8Array(n.buffer,n.byteOffset+De.length*2),a=new TextDecoder("utf-8").decode(r);a.endsWith("\0")&&(a=a.substring(0,a.length-1)),t.signal(a)}_wireUpCommonPeerEvents(t){t.on("connect",()=>{this.emit("peerconnect",t),this._updateConnectedSessions()}),t.on("data",n=>{let i=null,r=null;if(n.length>=Bt&&(r=new Uint16Array(n.buffer,n.byteOffset,Bt/2),r[0]===Mr&&(i=r[1])),i!==null)try{let a=r[2],o=r[3]!==0,s=this._chunkHandler(n,i,a,o);o&&(this._checkForSignalOrEmitMessage(t,s),this.msgChunks.delete(i))}catch(a){console.error(a)}else this._checkForSignalOrEmitMessage(t,n)}),t.on("error",()=>{this._removePeer(t),this._updateConnectedSessions()}),t.on("close",()=>{this._removePeer(t),this._updateConnectedSessions()}),t.once("_iceComplete",()=>{t.on("signal",n=>{let i=new TextEncoder().encode(JSON.stringify(n)),r=i.byteLength+De.length*2;r%2!==0&&r++;let a=new ArrayBuffer(r),o=new Uint8Array(a),s=new Uint16Array(a);o.set(i,De.length*2);for(let u=0;u<De.length;u++)s[u]=De[u];this.send(t,a)})})}};Ml.exports=Pr});export default A0();
-/*!
- * The buffer module from node.js, for the browser.
- *
- * @author   Feross Aboukhadijeh <https://feross.org>
- * @license  MIT
- */
-/*! ieee754. BSD-3-Clause License. Feross Aboukhadijeh <https://feross.org/opensource> */
+var __create = Object.create;
+var __defProp = Object.defineProperty;
+var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
+var __getOwnPropNames = Object.getOwnPropertyNames;
+var __getProtoOf = Object.getPrototypeOf;
+var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __commonJS = (cb, mod) => function __require() {
+  return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
+};
+var __copyProps = (to, from, except, desc) => {
+  if (from && typeof from === "object" || typeof from === "function") {
+    for (let key of __getOwnPropNames(from))
+      if (!__hasOwnProp.call(to, key) && key !== except)
+        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
+  }
+  return to;
+};
+var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
+  isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
+  mod
+));
+
+// node_modules/get-browser-rtc/index.js
+var require_get_browser_rtc = __commonJS({
+  "node_modules/get-browser-rtc/index.js"(exports, module) {
+    module.exports = function getBrowserRTC2() {
+      if (typeof globalThis === "undefined")
+        return null;
+      var wrtc = {
+        RTCPeerConnection: globalThis.RTCPeerConnection || globalThis.mozRTCPeerConnection || globalThis.webkitRTCPeerConnection,
+        RTCSessionDescription: globalThis.RTCSessionDescription || globalThis.mozRTCSessionDescription || globalThis.webkitRTCSessionDescription,
+        RTCIceCandidate: globalThis.RTCIceCandidate || globalThis.mozRTCIceCandidate || globalThis.webkitRTCIceCandidate
+      };
+      if (!wrtc.RTCPeerConnection)
+        return null;
+      return wrtc;
+    };
+  }
+});
+
+// node_modules/events/events.js
+var require_events = __commonJS({
+  "node_modules/events/events.js"(exports, module) {
+    "use strict";
+    var R = typeof Reflect === "object" ? Reflect : null;
+    var ReflectApply = R && typeof R.apply === "function" ? R.apply : function ReflectApply2(target, receiver, args) {
+      return Function.prototype.apply.call(target, receiver, args);
+    };
+    var ReflectOwnKeys;
+    if (R && typeof R.ownKeys === "function") {
+      ReflectOwnKeys = R.ownKeys;
+    } else if (Object.getOwnPropertySymbols) {
+      ReflectOwnKeys = function ReflectOwnKeys2(target) {
+        return Object.getOwnPropertyNames(target).concat(Object.getOwnPropertySymbols(target));
+      };
+    } else {
+      ReflectOwnKeys = function ReflectOwnKeys2(target) {
+        return Object.getOwnPropertyNames(target);
+      };
+    }
+    function ProcessEmitWarning(warning) {
+      if (console && console.warn)
+        console.warn(warning);
+    }
+    var NumberIsNaN = Number.isNaN || function NumberIsNaN2(value) {
+      return value !== value;
+    };
+    function EventEmitter2() {
+      EventEmitter2.init.call(this);
+    }
+    module.exports = EventEmitter2;
+    module.exports.once = once;
+    EventEmitter2.EventEmitter = EventEmitter2;
+    EventEmitter2.prototype._events = void 0;
+    EventEmitter2.prototype._eventsCount = 0;
+    EventEmitter2.prototype._maxListeners = void 0;
+    var defaultMaxListeners = 10;
+    function checkListener(listener) {
+      if (typeof listener !== "function") {
+        throw new TypeError('The "listener" argument must be of type Function. Received type ' + typeof listener);
+      }
+    }
+    Object.defineProperty(EventEmitter2, "defaultMaxListeners", {
+      enumerable: true,
+      get: function() {
+        return defaultMaxListeners;
+      },
+      set: function(arg) {
+        if (typeof arg !== "number" || arg < 0 || NumberIsNaN(arg)) {
+          throw new RangeError('The value of "defaultMaxListeners" is out of range. It must be a non-negative number. Received ' + arg + ".");
+        }
+        defaultMaxListeners = arg;
+      }
+    });
+    EventEmitter2.init = function() {
+      if (this._events === void 0 || this._events === Object.getPrototypeOf(this)._events) {
+        this._events = /* @__PURE__ */ Object.create(null);
+        this._eventsCount = 0;
+      }
+      this._maxListeners = this._maxListeners || void 0;
+    };
+    EventEmitter2.prototype.setMaxListeners = function setMaxListeners(n) {
+      if (typeof n !== "number" || n < 0 || NumberIsNaN(n)) {
+        throw new RangeError('The value of "n" is out of range. It must be a non-negative number. Received ' + n + ".");
+      }
+      this._maxListeners = n;
+      return this;
+    };
+    function _getMaxListeners(that) {
+      if (that._maxListeners === void 0)
+        return EventEmitter2.defaultMaxListeners;
+      return that._maxListeners;
+    }
+    EventEmitter2.prototype.getMaxListeners = function getMaxListeners() {
+      return _getMaxListeners(this);
+    };
+    EventEmitter2.prototype.emit = function emit(type) {
+      var args = [];
+      for (var i = 1; i < arguments.length; i++)
+        args.push(arguments[i]);
+      var doError = type === "error";
+      var events = this._events;
+      if (events !== void 0)
+        doError = doError && events.error === void 0;
+      else if (!doError)
+        return false;
+      if (doError) {
+        var er;
+        if (args.length > 0)
+          er = args[0];
+        if (er instanceof Error) {
+          throw er;
+        }
+        var err = new Error("Unhandled error." + (er ? " (" + er.message + ")" : ""));
+        err.context = er;
+        throw err;
+      }
+      var handler = events[type];
+      if (handler === void 0)
+        return false;
+      if (typeof handler === "function") {
+        ReflectApply(handler, this, args);
+      } else {
+        var len = handler.length;
+        var listeners = arrayClone(handler, len);
+        for (var i = 0; i < len; ++i)
+          ReflectApply(listeners[i], this, args);
+      }
+      return true;
+    };
+    function _addListener(target, type, listener, prepend) {
+      var m;
+      var events;
+      var existing;
+      checkListener(listener);
+      events = target._events;
+      if (events === void 0) {
+        events = target._events = /* @__PURE__ */ Object.create(null);
+        target._eventsCount = 0;
+      } else {
+        if (events.newListener !== void 0) {
+          target.emit(
+            "newListener",
+            type,
+            listener.listener ? listener.listener : listener
+          );
+          events = target._events;
+        }
+        existing = events[type];
+      }
+      if (existing === void 0) {
+        existing = events[type] = listener;
+        ++target._eventsCount;
+      } else {
+        if (typeof existing === "function") {
+          existing = events[type] = prepend ? [listener, existing] : [existing, listener];
+        } else if (prepend) {
+          existing.unshift(listener);
+        } else {
+          existing.push(listener);
+        }
+        m = _getMaxListeners(target);
+        if (m > 0 && existing.length > m && !existing.warned) {
+          existing.warned = true;
+          var w = new Error("Possible EventEmitter memory leak detected. " + existing.length + " " + String(type) + " listeners added. Use emitter.setMaxListeners() to increase limit");
+          w.name = "MaxListenersExceededWarning";
+          w.emitter = target;
+          w.type = type;
+          w.count = existing.length;
+          ProcessEmitWarning(w);
+        }
+      }
+      return target;
+    }
+    EventEmitter2.prototype.addListener = function addListener(type, listener) {
+      return _addListener(this, type, listener, false);
+    };
+    EventEmitter2.prototype.on = EventEmitter2.prototype.addListener;
+    EventEmitter2.prototype.prependListener = function prependListener(type, listener) {
+      return _addListener(this, type, listener, true);
+    };
+    function onceWrapper() {
+      if (!this.fired) {
+        this.target.removeListener(this.type, this.wrapFn);
+        this.fired = true;
+        if (arguments.length === 0)
+          return this.listener.call(this.target);
+        return this.listener.apply(this.target, arguments);
+      }
+    }
+    function _onceWrap(target, type, listener) {
+      var state = { fired: false, wrapFn: void 0, target, type, listener };
+      var wrapped = onceWrapper.bind(state);
+      wrapped.listener = listener;
+      state.wrapFn = wrapped;
+      return wrapped;
+    }
+    EventEmitter2.prototype.once = function once2(type, listener) {
+      checkListener(listener);
+      this.on(type, _onceWrap(this, type, listener));
+      return this;
+    };
+    EventEmitter2.prototype.prependOnceListener = function prependOnceListener(type, listener) {
+      checkListener(listener);
+      this.prependListener(type, _onceWrap(this, type, listener));
+      return this;
+    };
+    EventEmitter2.prototype.removeListener = function removeListener(type, listener) {
+      var list, events, position, i, originalListener;
+      checkListener(listener);
+      events = this._events;
+      if (events === void 0)
+        return this;
+      list = events[type];
+      if (list === void 0)
+        return this;
+      if (list === listener || list.listener === listener) {
+        if (--this._eventsCount === 0)
+          this._events = /* @__PURE__ */ Object.create(null);
+        else {
+          delete events[type];
+          if (events.removeListener)
+            this.emit("removeListener", type, list.listener || listener);
+        }
+      } else if (typeof list !== "function") {
+        position = -1;
+        for (i = list.length - 1; i >= 0; i--) {
+          if (list[i] === listener || list[i].listener === listener) {
+            originalListener = list[i].listener;
+            position = i;
+            break;
+          }
+        }
+        if (position < 0)
+          return this;
+        if (position === 0)
+          list.shift();
+        else {
+          spliceOne(list, position);
+        }
+        if (list.length === 1)
+          events[type] = list[0];
+        if (events.removeListener !== void 0)
+          this.emit("removeListener", type, originalListener || listener);
+      }
+      return this;
+    };
+    EventEmitter2.prototype.off = EventEmitter2.prototype.removeListener;
+    EventEmitter2.prototype.removeAllListeners = function removeAllListeners(type) {
+      var listeners, events, i;
+      events = this._events;
+      if (events === void 0)
+        return this;
+      if (events.removeListener === void 0) {
+        if (arguments.length === 0) {
+          this._events = /* @__PURE__ */ Object.create(null);
+          this._eventsCount = 0;
+        } else if (events[type] !== void 0) {
+          if (--this._eventsCount === 0)
+            this._events = /* @__PURE__ */ Object.create(null);
+          else
+            delete events[type];
+        }
+        return this;
+      }
+      if (arguments.length === 0) {
+        var keys = Object.keys(events);
+        var key;
+        for (i = 0; i < keys.length; ++i) {
+          key = keys[i];
+          if (key === "removeListener")
+            continue;
+          this.removeAllListeners(key);
+        }
+        this.removeAllListeners("removeListener");
+        this._events = /* @__PURE__ */ Object.create(null);
+        this._eventsCount = 0;
+        return this;
+      }
+      listeners = events[type];
+      if (typeof listeners === "function") {
+        this.removeListener(type, listeners);
+      } else if (listeners !== void 0) {
+        for (i = listeners.length - 1; i >= 0; i--) {
+          this.removeListener(type, listeners[i]);
+        }
+      }
+      return this;
+    };
+    function _listeners(target, type, unwrap) {
+      var events = target._events;
+      if (events === void 0)
+        return [];
+      var evlistener = events[type];
+      if (evlistener === void 0)
+        return [];
+      if (typeof evlistener === "function")
+        return unwrap ? [evlistener.listener || evlistener] : [evlistener];
+      return unwrap ? unwrapListeners(evlistener) : arrayClone(evlistener, evlistener.length);
+    }
+    EventEmitter2.prototype.listeners = function listeners(type) {
+      return _listeners(this, type, true);
+    };
+    EventEmitter2.prototype.rawListeners = function rawListeners(type) {
+      return _listeners(this, type, false);
+    };
+    EventEmitter2.listenerCount = function(emitter, type) {
+      if (typeof emitter.listenerCount === "function") {
+        return emitter.listenerCount(type);
+      } else {
+        return listenerCount.call(emitter, type);
+      }
+    };
+    EventEmitter2.prototype.listenerCount = listenerCount;
+    function listenerCount(type) {
+      var events = this._events;
+      if (events !== void 0) {
+        var evlistener = events[type];
+        if (typeof evlistener === "function") {
+          return 1;
+        } else if (evlistener !== void 0) {
+          return evlistener.length;
+        }
+      }
+      return 0;
+    }
+    EventEmitter2.prototype.eventNames = function eventNames() {
+      return this._eventsCount > 0 ? ReflectOwnKeys(this._events) : [];
+    };
+    function arrayClone(arr, n) {
+      var copy = new Array(n);
+      for (var i = 0; i < n; ++i)
+        copy[i] = arr[i];
+      return copy;
+    }
+    function spliceOne(list, index) {
+      for (; index + 1 < list.length; index++)
+        list[index] = list[index + 1];
+      list.pop();
+    }
+    function unwrapListeners(arr) {
+      var ret = new Array(arr.length);
+      for (var i = 0; i < ret.length; ++i) {
+        ret[i] = arr[i].listener || arr[i];
+      }
+      return ret;
+    }
+    function once(emitter, name) {
+      return new Promise(function(resolve, reject) {
+        function errorListener(err) {
+          emitter.removeListener(name, resolver);
+          reject(err);
+        }
+        function resolver() {
+          if (typeof emitter.removeListener === "function") {
+            emitter.removeListener("error", errorListener);
+          }
+          resolve([].slice.call(arguments));
+        }
+        ;
+        eventTargetAgnosticAddListener(emitter, name, resolver, { once: true });
+        if (name !== "error") {
+          addErrorHandlerIfEventEmitter(emitter, errorListener, { once: true });
+        }
+      });
+    }
+    function addErrorHandlerIfEventEmitter(emitter, handler, flags) {
+      if (typeof emitter.on === "function") {
+        eventTargetAgnosticAddListener(emitter, "error", handler, flags);
+      }
+    }
+    function eventTargetAgnosticAddListener(emitter, name, listener, flags) {
+      if (typeof emitter.on === "function") {
+        if (flags.once) {
+          emitter.once(name, listener);
+        } else {
+          emitter.on(name, listener);
+        }
+      } else if (typeof emitter.addEventListener === "function") {
+        emitter.addEventListener(name, function wrapListener(arg) {
+          if (flags.once) {
+            emitter.removeEventListener(name, wrapListener);
+          }
+          listener(arg);
+        });
+      } else {
+        throw new TypeError('The "emitter" argument must be of type EventEmitter. Received type ' + typeof emitter);
+      }
+    }
+  }
+});
+
+// node_modules/ms/index.js
+var require_ms = __commonJS({
+  "node_modules/ms/index.js"(exports, module) {
+    var s = 1e3;
+    var m = s * 60;
+    var h = m * 60;
+    var d = h * 24;
+    var w = d * 7;
+    var y = d * 365.25;
+    module.exports = function(val, options) {
+      options = options || {};
+      var type = typeof val;
+      if (type === "string" && val.length > 0) {
+        return parse(val);
+      } else if (type === "number" && isFinite(val)) {
+        return options.long ? fmtLong(val) : fmtShort(val);
+      }
+      throw new Error(
+        "val is not a non-empty string or a valid number. val=" + JSON.stringify(val)
+      );
+    };
+    function parse(str) {
+      str = String(str);
+      if (str.length > 100) {
+        return;
+      }
+      var match = /^(-?(?:\d+)?\.?\d+) *(milliseconds?|msecs?|ms|seconds?|secs?|s|minutes?|mins?|m|hours?|hrs?|h|days?|d|weeks?|w|years?|yrs?|y)?$/i.exec(
+        str
+      );
+      if (!match) {
+        return;
+      }
+      var n = parseFloat(match[1]);
+      var type = (match[2] || "ms").toLowerCase();
+      switch (type) {
+        case "years":
+        case "year":
+        case "yrs":
+        case "yr":
+        case "y":
+          return n * y;
+        case "weeks":
+        case "week":
+        case "w":
+          return n * w;
+        case "days":
+        case "day":
+        case "d":
+          return n * d;
+        case "hours":
+        case "hour":
+        case "hrs":
+        case "hr":
+        case "h":
+          return n * h;
+        case "minutes":
+        case "minute":
+        case "mins":
+        case "min":
+        case "m":
+          return n * m;
+        case "seconds":
+        case "second":
+        case "secs":
+        case "sec":
+        case "s":
+          return n * s;
+        case "milliseconds":
+        case "millisecond":
+        case "msecs":
+        case "msec":
+        case "ms":
+          return n;
+        default:
+          return void 0;
+      }
+    }
+    function fmtShort(ms) {
+      var msAbs = Math.abs(ms);
+      if (msAbs >= d) {
+        return Math.round(ms / d) + "d";
+      }
+      if (msAbs >= h) {
+        return Math.round(ms / h) + "h";
+      }
+      if (msAbs >= m) {
+        return Math.round(ms / m) + "m";
+      }
+      if (msAbs >= s) {
+        return Math.round(ms / s) + "s";
+      }
+      return ms + "ms";
+    }
+    function fmtLong(ms) {
+      var msAbs = Math.abs(ms);
+      if (msAbs >= d) {
+        return plural(ms, msAbs, d, "day");
+      }
+      if (msAbs >= h) {
+        return plural(ms, msAbs, h, "hour");
+      }
+      if (msAbs >= m) {
+        return plural(ms, msAbs, m, "minute");
+      }
+      if (msAbs >= s) {
+        return plural(ms, msAbs, s, "second");
+      }
+      return ms + " ms";
+    }
+    function plural(ms, msAbs, n, name) {
+      var isPlural = msAbs >= n * 1.5;
+      return Math.round(ms / n) + " " + name + (isPlural ? "s" : "");
+    }
+  }
+});
+
+// node_modules/debug/src/common.js
+var require_common = __commonJS({
+  "node_modules/debug/src/common.js"(exports, module) {
+    function setup(env) {
+      createDebug.debug = createDebug;
+      createDebug.default = createDebug;
+      createDebug.coerce = coerce;
+      createDebug.disable = disable;
+      createDebug.enable = enable;
+      createDebug.enabled = enabled;
+      createDebug.humanize = require_ms();
+      createDebug.destroy = destroy;
+      Object.keys(env).forEach((key) => {
+        createDebug[key] = env[key];
+      });
+      createDebug.names = [];
+      createDebug.skips = [];
+      createDebug.formatters = {};
+      function selectColor(namespace) {
+        let hash = 0;
+        for (let i = 0; i < namespace.length; i++) {
+          hash = (hash << 5) - hash + namespace.charCodeAt(i);
+          hash |= 0;
+        }
+        return createDebug.colors[Math.abs(hash) % createDebug.colors.length];
+      }
+      createDebug.selectColor = selectColor;
+      function createDebug(namespace) {
+        let prevTime;
+        let enableOverride = null;
+        let namespacesCache;
+        let enabledCache;
+        function debug(...args) {
+          if (!debug.enabled) {
+            return;
+          }
+          const self = debug;
+          const curr = Number(new Date());
+          const ms = curr - (prevTime || curr);
+          self.diff = ms;
+          self.prev = prevTime;
+          self.curr = curr;
+          prevTime = curr;
+          args[0] = createDebug.coerce(args[0]);
+          if (typeof args[0] !== "string") {
+            args.unshift("%O");
+          }
+          let index = 0;
+          args[0] = args[0].replace(/%([a-zA-Z%])/g, (match, format) => {
+            if (match === "%%") {
+              return "%";
+            }
+            index++;
+            const formatter = createDebug.formatters[format];
+            if (typeof formatter === "function") {
+              const val = args[index];
+              match = formatter.call(self, val);
+              args.splice(index, 1);
+              index--;
+            }
+            return match;
+          });
+          createDebug.formatArgs.call(self, args);
+          const logFn = self.log || createDebug.log;
+          logFn.apply(self, args);
+        }
+        debug.namespace = namespace;
+        debug.useColors = createDebug.useColors();
+        debug.color = createDebug.selectColor(namespace);
+        debug.extend = extend;
+        debug.destroy = createDebug.destroy;
+        Object.defineProperty(debug, "enabled", {
+          enumerable: true,
+          configurable: false,
+          get: () => {
+            if (enableOverride !== null) {
+              return enableOverride;
+            }
+            if (namespacesCache !== createDebug.namespaces) {
+              namespacesCache = createDebug.namespaces;
+              enabledCache = createDebug.enabled(namespace);
+            }
+            return enabledCache;
+          },
+          set: (v) => {
+            enableOverride = v;
+          }
+        });
+        if (typeof createDebug.init === "function") {
+          createDebug.init(debug);
+        }
+        return debug;
+      }
+      function extend(namespace, delimiter) {
+        const newDebug = createDebug(this.namespace + (typeof delimiter === "undefined" ? ":" : delimiter) + namespace);
+        newDebug.log = this.log;
+        return newDebug;
+      }
+      function enable(namespaces) {
+        createDebug.save(namespaces);
+        createDebug.namespaces = namespaces;
+        createDebug.names = [];
+        createDebug.skips = [];
+        let i;
+        const split = (typeof namespaces === "string" ? namespaces : "").split(/[\s,]+/);
+        const len = split.length;
+        for (i = 0; i < len; i++) {
+          if (!split[i]) {
+            continue;
+          }
+          namespaces = split[i].replace(/\*/g, ".*?");
+          if (namespaces[0] === "-") {
+            createDebug.skips.push(new RegExp("^" + namespaces.slice(1) + "$"));
+          } else {
+            createDebug.names.push(new RegExp("^" + namespaces + "$"));
+          }
+        }
+      }
+      function disable() {
+        const namespaces = [
+          ...createDebug.names.map(toNamespace),
+          ...createDebug.skips.map(toNamespace).map((namespace) => "-" + namespace)
+        ].join(",");
+        createDebug.enable("");
+        return namespaces;
+      }
+      function enabled(name) {
+        if (name[name.length - 1] === "*") {
+          return true;
+        }
+        let i;
+        let len;
+        for (i = 0, len = createDebug.skips.length; i < len; i++) {
+          if (createDebug.skips[i].test(name)) {
+            return false;
+          }
+        }
+        for (i = 0, len = createDebug.names.length; i < len; i++) {
+          if (createDebug.names[i].test(name)) {
+            return true;
+          }
+        }
+        return false;
+      }
+      function toNamespace(regexp) {
+        return regexp.toString().substring(2, regexp.toString().length - 2).replace(/\.\*\?$/, "*");
+      }
+      function coerce(val) {
+        if (val instanceof Error) {
+          return val.stack || val.message;
+        }
+        return val;
+      }
+      function destroy() {
+        console.warn("Instance method `debug.destroy()` is deprecated and no longer does anything. It will be removed in the next major version of `debug`.");
+      }
+      createDebug.enable(createDebug.load());
+      return createDebug;
+    }
+    module.exports = setup;
+  }
+});
+
+// node_modules/debug/src/browser.js
+var require_browser = __commonJS({
+  "node_modules/debug/src/browser.js"(exports, module) {
+    exports.formatArgs = formatArgs;
+    exports.save = save;
+    exports.load = load;
+    exports.useColors = useColors;
+    exports.storage = localstorage();
+    exports.destroy = (() => {
+      let warned = false;
+      return () => {
+        if (!warned) {
+          warned = true;
+          console.warn("Instance method `debug.destroy()` is deprecated and no longer does anything. It will be removed in the next major version of `debug`.");
+        }
+      };
+    })();
+    exports.colors = [
+      "#0000CC",
+      "#0000FF",
+      "#0033CC",
+      "#0033FF",
+      "#0066CC",
+      "#0066FF",
+      "#0099CC",
+      "#0099FF",
+      "#00CC00",
+      "#00CC33",
+      "#00CC66",
+      "#00CC99",
+      "#00CCCC",
+      "#00CCFF",
+      "#3300CC",
+      "#3300FF",
+      "#3333CC",
+      "#3333FF",
+      "#3366CC",
+      "#3366FF",
+      "#3399CC",
+      "#3399FF",
+      "#33CC00",
+      "#33CC33",
+      "#33CC66",
+      "#33CC99",
+      "#33CCCC",
+      "#33CCFF",
+      "#6600CC",
+      "#6600FF",
+      "#6633CC",
+      "#6633FF",
+      "#66CC00",
+      "#66CC33",
+      "#9900CC",
+      "#9900FF",
+      "#9933CC",
+      "#9933FF",
+      "#99CC00",
+      "#99CC33",
+      "#CC0000",
+      "#CC0033",
+      "#CC0066",
+      "#CC0099",
+      "#CC00CC",
+      "#CC00FF",
+      "#CC3300",
+      "#CC3333",
+      "#CC3366",
+      "#CC3399",
+      "#CC33CC",
+      "#CC33FF",
+      "#CC6600",
+      "#CC6633",
+      "#CC9900",
+      "#CC9933",
+      "#CCCC00",
+      "#CCCC33",
+      "#FF0000",
+      "#FF0033",
+      "#FF0066",
+      "#FF0099",
+      "#FF00CC",
+      "#FF00FF",
+      "#FF3300",
+      "#FF3333",
+      "#FF3366",
+      "#FF3399",
+      "#FF33CC",
+      "#FF33FF",
+      "#FF6600",
+      "#FF6633",
+      "#FF9900",
+      "#FF9933",
+      "#FFCC00",
+      "#FFCC33"
+    ];
+    function useColors() {
+      if (typeof window !== "undefined" && window.process && (window.process.type === "renderer" || window.process.__nwjs)) {
+        return true;
+      }
+      if (typeof navigator !== "undefined" && navigator.userAgent && navigator.userAgent.toLowerCase().match(/(edge|trident)\/(\d+)/)) {
+        return false;
+      }
+      return typeof document !== "undefined" && document.documentElement && document.documentElement.style && document.documentElement.style.WebkitAppearance || typeof window !== "undefined" && window.console && (window.console.firebug || window.console.exception && window.console.table) || typeof navigator !== "undefined" && navigator.userAgent && navigator.userAgent.toLowerCase().match(/firefox\/(\d+)/) && parseInt(RegExp.$1, 10) >= 31 || typeof navigator !== "undefined" && navigator.userAgent && navigator.userAgent.toLowerCase().match(/applewebkit\/(\d+)/);
+    }
+    function formatArgs(args) {
+      args[0] = (this.useColors ? "%c" : "") + this.namespace + (this.useColors ? " %c" : " ") + args[0] + (this.useColors ? "%c " : " ") + "+" + module.exports.humanize(this.diff);
+      if (!this.useColors) {
+        return;
+      }
+      const c = "color: " + this.color;
+      args.splice(1, 0, c, "color: inherit");
+      let index = 0;
+      let lastC = 0;
+      args[0].replace(/%[a-zA-Z%]/g, (match) => {
+        if (match === "%%") {
+          return;
+        }
+        index++;
+        if (match === "%c") {
+          lastC = index;
+        }
+      });
+      args.splice(lastC, 0, c);
+    }
+    exports.log = console.debug || console.log || (() => {
+    });
+    function save(namespaces) {
+      try {
+        if (namespaces) {
+          exports.storage.setItem("debug", namespaces);
+        } else {
+          exports.storage.removeItem("debug");
+        }
+      } catch (error) {
+      }
+    }
+    function load() {
+      let r;
+      try {
+        r = exports.storage.getItem("debug");
+      } catch (error) {
+      }
+      if (!r && typeof process !== "undefined" && "env" in process) {
+        r = process.env.DEBUG;
+      }
+      return r;
+    }
+    function localstorage() {
+      try {
+        return localStorage;
+      } catch (error) {
+      }
+    }
+    module.exports = require_common()(exports);
+    var { formatters } = module.exports;
+    formatters.j = function(v) {
+      try {
+        return JSON.stringify(v);
+      } catch (error) {
+        return "[UnexpectedJSONParseError]: " + error.message;
+      }
+    };
+  }
+});
+
+// node_modules/random-string/lib/random-string.js
+var require_random_string = __commonJS({
+  "node_modules/random-string/lib/random-string.js"(exports, module) {
+    "use strict";
+    var numbers = "0123456789";
+    var letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+    var specials = "!$%^&*()_+|~-=`{}[]:;<>?,./";
+    function _defaults(opts) {
+      opts || (opts = {});
+      return {
+        length: opts.length || 8,
+        numeric: typeof opts.numeric === "boolean" ? opts.numeric : true,
+        letters: typeof opts.letters === "boolean" ? opts.letters : true,
+        special: typeof opts.special === "boolean" ? opts.special : false,
+        exclude: Array.isArray(opts.exclude) ? opts.exclude : []
+      };
+    }
+    function _buildChars(opts) {
+      var chars2 = "";
+      if (opts.numeric) {
+        chars2 += numbers;
+      }
+      if (opts.letters) {
+        chars2 += letters;
+      }
+      if (opts.special) {
+        chars2 += specials;
+      }
+      for (var i = 0; i <= opts.exclude.length; i++) {
+        chars2 = chars2.replace(opts.exclude[i], "");
+      }
+      return chars2;
+    }
+    module.exports = function randomString(opts) {
+      opts = _defaults(opts);
+      var i, rn, rnd = "", len = opts.length, exclude = opts.exclude, randomChars = _buildChars(opts);
+      for (i = 1; i <= len; i++) {
+        rnd += randomChars.substring(rn = Math.floor(Math.random() * randomChars.length), rn + 1);
+      }
+      return rnd;
+    };
+  }
+});
+
+// node_modules/queue-microtask/index.js
+var require_queue_microtask = __commonJS({
+  "node_modules/queue-microtask/index.js"(exports, module) {
+    var promise;
+    module.exports = typeof queueMicrotask === "function" ? queueMicrotask.bind(typeof window !== "undefined" ? window : window) : (cb) => (promise || (promise = Promise.resolve())).then(cb).catch((err) => setTimeout(() => {
+      throw err;
+    }, 0));
+  }
+});
+
+// node_modules/err-code/index.js
+var require_err_code = __commonJS({
+  "node_modules/err-code/index.js"(exports, module) {
+    "use strict";
+    function assign(obj, props) {
+      for (const key in props) {
+        Object.defineProperty(obj, key, {
+          value: props[key],
+          enumerable: true,
+          configurable: true
+        });
+      }
+      return obj;
+    }
+    function createError(err, code, props) {
+      if (!err || typeof err === "string") {
+        throw new TypeError("Please pass an Error to err-code");
+      }
+      if (!props) {
+        props = {};
+      }
+      if (typeof code === "object") {
+        props = code;
+        code = "";
+      }
+      if (code) {
+        props.code = code;
+      }
+      try {
+        return assign(err, props);
+      } catch (_) {
+        props.message = err.message;
+        props.stack = err.stack;
+        const ErrClass = function() {
+        };
+        ErrClass.prototype = Object.create(Object.getPrototypeOf(err));
+        const output = assign(new ErrClass(), props);
+        return output;
+      }
+    }
+    module.exports = createError;
+  }
+});
+
+// node_modules/tiny-simple-peer/index.js
+var require_tiny_simple_peer = __commonJS({
+  "node_modules/tiny-simple-peer/index.js"(exports, module) {
+    var debug = require_browser()("simple-peer");
+    var getBrowserRTC2 = require_get_browser_rtc();
+    var randomstring2 = require_random_string();
+    var queueMicrotask2 = require_queue_microtask();
+    var EventEmitter2 = require_events();
+    var errCode = require_err_code();
+    var MAX_BUFFERED_AMOUNT = 64 * 1024;
+    var ICECOMPLETE_TIMEOUT = 5 * 1e3;
+    var CHANNEL_CLOSING_TIMEOUT = 5 * 1e3;
+    function filterTrickle(sdp) {
+      return sdp.replace(/a=ice-options:trickle\s\n/g, "");
+    }
+    function warn(message) {
+      console.warn(message);
+    }
+    var Peer2 = class extends EventEmitter2 {
+      constructor(opts) {
+        opts = Object.assign({
+          allowHalfOpen: false
+        }, opts);
+        super(opts);
+        this.id = opts.id || randomstring2({ length: 20 });
+        this._debug("new peer %o", opts);
+        this.channelName = opts.initiator ? opts.channelName || randomstring2({ length: 20 }) : null;
+        this.initiator = opts.initiator || false;
+        this.channelConfig = opts.channelConfig || Peer2.channelConfig;
+        this.channelNegotiated = this.channelConfig.negotiated;
+        this.config = Object.assign({}, Peer2.config, opts.config);
+        this.offerOptions = opts.offerOptions || {};
+        this.answerOptions = opts.answerOptions || {};
+        this.sdpTransform = opts.sdpTransform || ((sdp) => sdp);
+        this.streams = opts.streams || (opts.stream ? [opts.stream] : []);
+        this.trickle = opts.trickle !== void 0 ? opts.trickle : true;
+        this.allowHalfTrickle = opts.allowHalfTrickle !== void 0 ? opts.allowHalfTrickle : false;
+        this.iceCompleteTimeout = opts.iceCompleteTimeout || ICECOMPLETE_TIMEOUT;
+        this.destroyed = false;
+        this.destroying = false;
+        this._connected = false;
+        this.remoteAddress = void 0;
+        this.remoteFamily = void 0;
+        this.remotePort = void 0;
+        this.localAddress = void 0;
+        this.localFamily = void 0;
+        this.localPort = void 0;
+        this._wrtc = opts.wrtc && typeof opts.wrtc === "object" ? opts.wrtc : getBrowserRTC2();
+        if (!this._wrtc) {
+          if (typeof window === "undefined") {
+            throw errCode(new Error("No WebRTC support: Specify `opts.wrtc` option in this environment"), "ERR_WEBRTC_SUPPORT");
+          } else {
+            throw errCode(new Error("No WebRTC support: Not a supported browser"), "ERR_WEBRTC_SUPPORT");
+          }
+        }
+        this._pcReady = false;
+        this._channelReady = false;
+        this._iceComplete = false;
+        this._iceCompleteTimer = null;
+        this._channel = null;
+        this._pendingCandidates = [];
+        this._isNegotiating = false;
+        this._firstNegotiation = true;
+        this._batchedNegotiation = false;
+        this._queuedNegotiation = false;
+        this._sendersAwaitingStable = [];
+        this._senderMap = /* @__PURE__ */ new Map();
+        this._closingInterval = null;
+        this._remoteTracks = [];
+        this._remoteStreams = [];
+        this._chunk = null;
+        this._cb = null;
+        this._interval = null;
+        try {
+          this._pc = new this._wrtc.RTCPeerConnection(this.config);
+        } catch (err) {
+          this.destroy(errCode(err, "ERR_PC_CONSTRUCTOR"));
+          return;
+        }
+        this._isReactNativeWebrtc = typeof this._pc._peerConnectionId === "number";
+        this._pc.oniceconnectionstatechange = () => {
+          this._onIceStateChange();
+        };
+        this._pc.onicegatheringstatechange = () => {
+          this._onIceStateChange();
+        };
+        this._pc.onconnectionstatechange = () => {
+          this._onConnectionStateChange();
+        };
+        this._pc.onsignalingstatechange = () => {
+          this._onSignalingStateChange();
+        };
+        this._pc.onicecandidate = (event) => {
+          this._onIceCandidate(event);
+        };
+        if (typeof this._pc.peerIdentity === "object") {
+          this._pc.peerIdentity.catch((err) => {
+            this.destroy(errCode(err, "ERR_PC_PEER_IDENTITY"));
+          });
+        }
+        if (this.initiator || this.channelNegotiated) {
+          this._setupData({
+            channel: this._pc.createDataChannel(this.channelName, this.channelConfig)
+          });
+        } else {
+          this._pc.ondatachannel = (event) => {
+            this._setupData(event);
+          };
+        }
+        if (this.streams) {
+          this.streams.forEach((stream) => {
+            this.addStream(stream);
+          });
+        }
+        this._pc.ontrack = (event) => {
+          this._onTrack(event);
+        };
+        this._debug("initial negotiation");
+        this._needsNegotiation();
+        this._onFinishBound = () => {
+          this._onFinish();
+        };
+        this.once("finish", this._onFinishBound);
+      }
+      get bufferSize() {
+        return this._channel && this._channel.bufferedAmount || 0;
+      }
+      get connected() {
+        return this._connected && this._channel.readyState === "open";
+      }
+      address() {
+        return { port: this.localPort, family: this.localFamily, address: this.localAddress };
+      }
+      signal(data) {
+        if (this.destroying)
+          return;
+        if (this.destroyed)
+          throw errCode(new Error("cannot signal after peer is destroyed"), "ERR_DESTROYED");
+        if (typeof data === "string") {
+          try {
+            data = JSON.parse(data);
+          } catch (err) {
+            data = {};
+          }
+        }
+        this._debug("signal()");
+        if (data.renegotiate && this.initiator) {
+          this._debug("got request to renegotiate");
+          this._needsNegotiation();
+        }
+        if (data.transceiverRequest && this.initiator) {
+          this._debug("got request for transceiver");
+          this.addTransceiver(data.transceiverRequest.kind, data.transceiverRequest.init);
+        }
+        if (data.candidate) {
+          if (this._pc.remoteDescription && this._pc.remoteDescription.type) {
+            this._addIceCandidate(data.candidate);
+          } else {
+            this._pendingCandidates.push(data.candidate);
+          }
+        }
+        if (data.sdp) {
+          this._pc.setRemoteDescription(new this._wrtc.RTCSessionDescription(data)).then(() => {
+            if (this.destroyed)
+              return;
+            this._pendingCandidates.forEach((candidate) => {
+              this._addIceCandidate(candidate);
+            });
+            this._pendingCandidates = [];
+            if (this._pc.remoteDescription.type === "offer")
+              this._createAnswer();
+          }).catch((err) => {
+            this.destroy(errCode(err, "ERR_SET_REMOTE_DESCRIPTION"));
+          });
+        }
+        if (!data.sdp && !data.candidate && !data.renegotiate && !data.transceiverRequest) {
+          this.destroy(errCode(new Error("signal() called with invalid signal data"), "ERR_SIGNALING"));
+        }
+      }
+      _addIceCandidate(candidate) {
+        const iceCandidateObj = new this._wrtc.RTCIceCandidate(candidate);
+        this._pc.addIceCandidate(iceCandidateObj).catch((err) => {
+          if (!iceCandidateObj.address || iceCandidateObj.address.endsWith(".local")) {
+            warn("Ignoring unsupported ICE candidate.");
+          } else {
+            this.destroy(errCode(err, "ERR_ADD_ICE_CANDIDATE"));
+          }
+        });
+      }
+      send(chunk) {
+        if (this.destroying)
+          return;
+        if (this.destroyed)
+          throw errCode(new Error("cannot send after peer is destroyed"), "ERR_DESTROYED");
+        this._channel.send(chunk);
+      }
+      addTransceiver(kind, init) {
+        if (this.destroying)
+          return;
+        if (this.destroyed)
+          throw errCode(new Error("cannot addTransceiver after peer is destroyed"), "ERR_DESTROYED");
+        this._debug("addTransceiver()");
+        if (this.initiator) {
+          try {
+            this._pc.addTransceiver(kind, init);
+            this._needsNegotiation();
+          } catch (err) {
+            this.destroy(errCode(err, "ERR_ADD_TRANSCEIVER"));
+          }
+        } else {
+          this.emit("signal", {
+            type: "transceiverRequest",
+            transceiverRequest: { kind, init }
+          });
+        }
+      }
+      addStream(stream) {
+        if (this.destroying)
+          return;
+        if (this.destroyed)
+          throw errCode(new Error("cannot addStream after peer is destroyed"), "ERR_DESTROYED");
+        this._debug("addStream()");
+        stream.getTracks().forEach((track) => {
+          this.addTrack(track, stream);
+        });
+      }
+      addTrack(track, stream) {
+        if (this.destroying)
+          return;
+        if (this.destroyed)
+          throw errCode(new Error("cannot addTrack after peer is destroyed"), "ERR_DESTROYED");
+        this._debug("addTrack()");
+        const submap = this._senderMap.get(track) || /* @__PURE__ */ new Map();
+        let sender = submap.get(stream);
+        if (!sender) {
+          sender = this._pc.addTrack(track, stream);
+          submap.set(stream, sender);
+          this._senderMap.set(track, submap);
+          this._needsNegotiation();
+        } else if (sender.removed) {
+          throw errCode(new Error("Track has been removed. You should enable/disable tracks that you want to re-add."), "ERR_SENDER_REMOVED");
+        } else {
+          throw errCode(new Error("Track has already been added to that stream."), "ERR_SENDER_ALREADY_ADDED");
+        }
+      }
+      replaceTrack(oldTrack, newTrack, stream) {
+        if (this.destroying)
+          return;
+        if (this.destroyed)
+          throw errCode(new Error("cannot replaceTrack after peer is destroyed"), "ERR_DESTROYED");
+        this._debug("replaceTrack()");
+        const submap = this._senderMap.get(oldTrack);
+        const sender = submap ? submap.get(stream) : null;
+        if (!sender) {
+          throw errCode(new Error("Cannot replace track that was never added."), "ERR_TRACK_NOT_ADDED");
+        }
+        if (newTrack)
+          this._senderMap.set(newTrack, submap);
+        if (sender.replaceTrack != null) {
+          sender.replaceTrack(newTrack);
+        } else {
+          this.destroy(errCode(new Error("replaceTrack is not supported in this browser"), "ERR_UNSUPPORTED_REPLACETRACK"));
+        }
+      }
+      removeTrack(track, stream) {
+        if (this.destroying)
+          return;
+        if (this.destroyed)
+          throw errCode(new Error("cannot removeTrack after peer is destroyed"), "ERR_DESTROYED");
+        this._debug("removeSender()");
+        const submap = this._senderMap.get(track);
+        const sender = submap ? submap.get(stream) : null;
+        if (!sender) {
+          throw errCode(new Error("Cannot remove track that was never added."), "ERR_TRACK_NOT_ADDED");
+        }
+        try {
+          sender.removed = true;
+          this._pc.removeTrack(sender);
+        } catch (err) {
+          if (err.name === "NS_ERROR_UNEXPECTED") {
+            this._sendersAwaitingStable.push(sender);
+          } else {
+            this.destroy(errCode(err, "ERR_REMOVE_TRACK"));
+          }
+        }
+        this._needsNegotiation();
+      }
+      removeStream(stream) {
+        if (this.destroying)
+          return;
+        if (this.destroyed)
+          throw errCode(new Error("cannot removeStream after peer is destroyed"), "ERR_DESTROYED");
+        this._debug("removeSenders()");
+        stream.getTracks().forEach((track) => {
+          this.removeTrack(track, stream);
+        });
+      }
+      _needsNegotiation() {
+        this._debug("_needsNegotiation");
+        if (this._batchedNegotiation)
+          return;
+        this._batchedNegotiation = true;
+        queueMicrotask2(() => {
+          this._batchedNegotiation = false;
+          if (this.initiator || !this._firstNegotiation) {
+            this._debug("starting batched negotiation");
+            this.negotiate();
+          } else {
+            this._debug("non-initiator initial negotiation request discarded");
+          }
+          this._firstNegotiation = false;
+        });
+      }
+      negotiate() {
+        if (this.destroying)
+          return;
+        if (this.destroyed)
+          throw errCode(new Error("cannot negotiate after peer is destroyed"), "ERR_DESTROYED");
+        if (this.initiator) {
+          if (this._isNegotiating) {
+            this._queuedNegotiation = true;
+            this._debug("already negotiating, queueing");
+          } else {
+            this._debug("start negotiation");
+            setTimeout(() => {
+              this._createOffer();
+            }, 0);
+          }
+        } else {
+          if (this._isNegotiating) {
+            this._queuedNegotiation = true;
+            this._debug("already negotiating, queueing");
+          } else {
+            this._debug("requesting negotiation from initiator");
+            this.emit("signal", {
+              type: "renegotiate",
+              renegotiate: true
+            });
+          }
+        }
+        this._isNegotiating = true;
+      }
+      destroy(err) {
+        this._destroy(err, () => {
+        });
+      }
+      _destroy(err, cb) {
+        if (this.destroyed || this.destroying)
+          return;
+        this.destroying = true;
+        this._debug("destroying (error: %s)", err && (err.message || err));
+        queueMicrotask2(() => {
+          this.destroyed = true;
+          this.destroying = false;
+          this._debug("destroy (error: %s)", err && (err.message || err));
+          this._connected = false;
+          this._pcReady = false;
+          this._channelReady = false;
+          this._remoteTracks = null;
+          this._remoteStreams = null;
+          this._senderMap = null;
+          clearInterval(this._closingInterval);
+          this._closingInterval = null;
+          clearInterval(this._interval);
+          this._interval = null;
+          this._chunk = null;
+          this._cb = null;
+          if (this._onFinishBound)
+            this.removeListener("finish", this._onFinishBound);
+          this._onFinishBound = null;
+          if (this._channel) {
+            try {
+              this._channel.close();
+            } catch (err2) {
+            }
+            this._channel.onmessage = null;
+            this._channel.onopen = null;
+            this._channel.onclose = null;
+            this._channel.onerror = null;
+          }
+          if (this._pc) {
+            try {
+              this._pc.close();
+            } catch (err2) {
+            }
+            this._pc.oniceconnectionstatechange = null;
+            this._pc.onicegatheringstatechange = null;
+            this._pc.onsignalingstatechange = null;
+            this._pc.onicecandidate = null;
+            this._pc.ontrack = null;
+            this._pc.ondatachannel = null;
+          }
+          this._pc = null;
+          this._channel = null;
+          if (err)
+            this.emit("error", err);
+          this.emit("close");
+          cb();
+        });
+      }
+      _setupData(event) {
+        if (!event.channel) {
+          return this.destroy(errCode(new Error("Data channel event is missing `channel` property"), "ERR_DATA_CHANNEL"));
+        }
+        this._channel = event.channel;
+        this._channel.binaryType = "arraybuffer";
+        if (typeof this._channel.bufferedAmountLowThreshold === "number") {
+          this._channel.bufferedAmountLowThreshold = MAX_BUFFERED_AMOUNT;
+        }
+        this.channelName = this._channel.label;
+        this._channel.onmessage = (event2) => {
+          this._onChannelMessage(event2);
+        };
+        this._channel.onbufferedamountlow = () => {
+          this._onChannelBufferedAmountLow();
+        };
+        this._channel.onopen = () => {
+          this._onChannelOpen();
+        };
+        this._channel.onclose = () => {
+          this._onChannelClose();
+        };
+        this._channel.onerror = (event2) => {
+          const err = event2.error instanceof Error ? event2.error : new Error(`Datachannel error: ${event2.message} ${event2.filename}:${event2.lineno}:${event2.colno}`);
+          this.destroy(errCode(err, "ERR_DATA_CHANNEL"));
+        };
+        let isClosing = false;
+        this._closingInterval = setInterval(() => {
+          if (this._channel && this._channel.readyState === "closing") {
+            if (isClosing)
+              this._onChannelClose();
+            isClosing = true;
+          } else {
+            isClosing = false;
+          }
+        }, CHANNEL_CLOSING_TIMEOUT);
+      }
+      _read() {
+      }
+      _write(chunk, encoding, cb) {
+        if (this.destroyed)
+          return cb(errCode(new Error("cannot write after peer is destroyed"), "ERR_DATA_CHANNEL"));
+        if (this._connected) {
+          try {
+            this.send(chunk);
+          } catch (err) {
+            return this.destroy(errCode(err, "ERR_DATA_CHANNEL"));
+          }
+          if (this._channel.bufferedAmount > MAX_BUFFERED_AMOUNT) {
+            this._debug("start backpressure: bufferedAmount %d", this._channel.bufferedAmount);
+            this._cb = cb;
+          } else {
+            cb(null);
+          }
+        } else {
+          this._debug("write before connect");
+          this._chunk = chunk;
+          this._cb = cb;
+        }
+      }
+      _onFinish() {
+        if (this.destroyed)
+          return;
+        const destroySoon = () => {
+          setTimeout(() => this.destroy(), 1e3);
+        };
+        if (this._connected) {
+          destroySoon();
+        } else {
+          this.once("connect", destroySoon);
+        }
+      }
+      _startIceCompleteTimeout() {
+        if (this.destroyed)
+          return;
+        if (this._iceCompleteTimer)
+          return;
+        this._debug("started iceComplete timeout");
+        this._iceCompleteTimer = setTimeout(() => {
+          if (!this._iceComplete) {
+            this._iceComplete = true;
+            this._debug("iceComplete timeout completed");
+            this.emit("iceTimeout");
+            this.emit("_iceComplete");
+          }
+        }, this.iceCompleteTimeout);
+      }
+      _createOffer() {
+        if (this.destroyed)
+          return;
+        this._pc.createOffer(this.offerOptions).then((offer) => {
+          if (this.destroyed)
+            return;
+          if (!this.trickle && !this.allowHalfTrickle)
+            offer.sdp = filterTrickle(offer.sdp);
+          offer.sdp = this.sdpTransform(offer.sdp);
+          const sendOffer = () => {
+            if (this.destroyed)
+              return;
+            const signal = this._pc.localDescription || offer;
+            this._debug("signal");
+            this.emit("signal", {
+              type: signal.type,
+              sdp: signal.sdp
+            });
+          };
+          const onSuccess = () => {
+            this._debug("createOffer success");
+            if (this.destroyed)
+              return;
+            if (this.trickle || this._iceComplete)
+              sendOffer();
+            else
+              this.once("_iceComplete", sendOffer);
+          };
+          const onError = (err) => {
+            this.destroy(errCode(err, "ERR_SET_LOCAL_DESCRIPTION"));
+          };
+          this._pc.setLocalDescription(offer).then(onSuccess).catch(onError);
+        }).catch((err) => {
+          this.destroy(errCode(err, "ERR_CREATE_OFFER"));
+        });
+      }
+      _requestMissingTransceivers() {
+        if (this._pc.getTransceivers) {
+          this._pc.getTransceivers().forEach((transceiver) => {
+            if (!transceiver.mid && transceiver.sender.track && !transceiver.requested) {
+              transceiver.requested = true;
+              this.addTransceiver(transceiver.sender.track.kind);
+            }
+          });
+        }
+      }
+      _createAnswer() {
+        if (this.destroyed)
+          return;
+        this._pc.createAnswer(this.answerOptions).then((answer) => {
+          if (this.destroyed)
+            return;
+          if (!this.trickle && !this.allowHalfTrickle)
+            answer.sdp = filterTrickle(answer.sdp);
+          answer.sdp = this.sdpTransform(answer.sdp);
+          const sendAnswer = () => {
+            if (this.destroyed)
+              return;
+            const signal = this._pc.localDescription || answer;
+            this._debug("signal");
+            this.emit("signal", {
+              type: signal.type,
+              sdp: signal.sdp
+            });
+            if (!this.initiator)
+              this._requestMissingTransceivers();
+          };
+          const onSuccess = () => {
+            if (this.destroyed)
+              return;
+            if (this.trickle || this._iceComplete)
+              sendAnswer();
+            else
+              this.once("_iceComplete", sendAnswer);
+          };
+          const onError = (err) => {
+            this.destroy(errCode(err, "ERR_SET_LOCAL_DESCRIPTION"));
+          };
+          this._pc.setLocalDescription(answer).then(onSuccess).catch(onError);
+        }).catch((err) => {
+          this.destroy(errCode(err, "ERR_CREATE_ANSWER"));
+        });
+      }
+      _onConnectionStateChange() {
+        if (this.destroyed)
+          return;
+        if (this._pc.connectionState === "failed") {
+          this.destroy(errCode(new Error("Connection failed."), "ERR_CONNECTION_FAILURE"));
+        }
+      }
+      _onIceStateChange() {
+        if (this.destroyed)
+          return;
+        const iceConnectionState = this._pc.iceConnectionState;
+        const iceGatheringState = this._pc.iceGatheringState;
+        this._debug(
+          "iceStateChange (connection: %s) (gathering: %s)",
+          iceConnectionState,
+          iceGatheringState
+        );
+        this.emit("iceStateChange", iceConnectionState, iceGatheringState);
+        if (iceConnectionState === "connected" || iceConnectionState === "completed") {
+          this._pcReady = true;
+          this._maybeReady();
+        }
+        if (iceConnectionState === "failed") {
+          this.destroy(errCode(new Error("Ice connection failed."), "ERR_ICE_CONNECTION_FAILURE"));
+        }
+        if (iceConnectionState === "closed") {
+          this.destroy(errCode(new Error("Ice connection closed."), "ERR_ICE_CONNECTION_CLOSED"));
+        }
+      }
+      getStats(cb) {
+        const flattenValues = (report) => {
+          if (Object.prototype.toString.call(report.values) === "[object Array]") {
+            report.values.forEach((value) => {
+              Object.assign(report, value);
+            });
+          }
+          return report;
+        };
+        if (this._pc.getStats.length === 0 || this._isReactNativeWebrtc) {
+          this._pc.getStats().then((res) => {
+            const reports = [];
+            res.forEach((report) => {
+              reports.push(flattenValues(report));
+            });
+            cb(null, reports);
+          }, (err) => cb(err));
+        } else if (this._pc.getStats.length > 0) {
+          this._pc.getStats((res) => {
+            if (this.destroyed)
+              return;
+            const reports = [];
+            res.result().forEach((result) => {
+              const report = {};
+              result.names().forEach((name) => {
+                report[name] = result.stat(name);
+              });
+              report.id = result.id;
+              report.type = result.type;
+              report.timestamp = result.timestamp;
+              reports.push(flattenValues(report));
+            });
+            cb(null, reports);
+          }, (err) => cb(err));
+        } else {
+          cb(null, []);
+        }
+      }
+      _maybeReady() {
+        this._debug("maybeReady pc %s channel %s", this._pcReady, this._channelReady);
+        if (this._connected || this._connecting || !this._pcReady || !this._channelReady)
+          return;
+        this._connecting = true;
+        const findCandidatePair = () => {
+          if (this.destroyed)
+            return;
+          this.getStats((err, items) => {
+            if (this.destroyed)
+              return;
+            if (err)
+              items = [];
+            const remoteCandidates = {};
+            const localCandidates = {};
+            const candidatePairs = {};
+            let foundSelectedCandidatePair = false;
+            items.forEach((item) => {
+              if (item.type === "remotecandidate" || item.type === "remote-candidate") {
+                remoteCandidates[item.id] = item;
+              }
+              if (item.type === "localcandidate" || item.type === "local-candidate") {
+                localCandidates[item.id] = item;
+              }
+              if (item.type === "candidatepair" || item.type === "candidate-pair") {
+                candidatePairs[item.id] = item;
+              }
+            });
+            const setSelectedCandidatePair = (selectedCandidatePair) => {
+              foundSelectedCandidatePair = true;
+              let local = localCandidates[selectedCandidatePair.localCandidateId];
+              if (local && (local.ip || local.address)) {
+                this.localAddress = local.ip || local.address;
+                this.localPort = Number(local.port);
+              } else if (local && local.ipAddress) {
+                this.localAddress = local.ipAddress;
+                this.localPort = Number(local.portNumber);
+              } else if (typeof selectedCandidatePair.googLocalAddress === "string") {
+                local = selectedCandidatePair.googLocalAddress.split(":");
+                this.localAddress = local[0];
+                this.localPort = Number(local[1]);
+              }
+              if (this.localAddress) {
+                this.localFamily = this.localAddress.includes(":") ? "IPv6" : "IPv4";
+              }
+              let remote = remoteCandidates[selectedCandidatePair.remoteCandidateId];
+              if (remote && (remote.ip || remote.address)) {
+                this.remoteAddress = remote.ip || remote.address;
+                this.remotePort = Number(remote.port);
+              } else if (remote && remote.ipAddress) {
+                this.remoteAddress = remote.ipAddress;
+                this.remotePort = Number(remote.portNumber);
+              } else if (typeof selectedCandidatePair.googRemoteAddress === "string") {
+                remote = selectedCandidatePair.googRemoteAddress.split(":");
+                this.remoteAddress = remote[0];
+                this.remotePort = Number(remote[1]);
+              }
+              if (this.remoteAddress) {
+                this.remoteFamily = this.remoteAddress.includes(":") ? "IPv6" : "IPv4";
+              }
+              this._debug(
+                "connect local: %s:%s remote: %s:%s",
+                this.localAddress,
+                this.localPort,
+                this.remoteAddress,
+                this.remotePort
+              );
+            };
+            items.forEach((item) => {
+              if (item.type === "transport" && item.selectedCandidatePairId) {
+                setSelectedCandidatePair(candidatePairs[item.selectedCandidatePairId]);
+              }
+              if (item.type === "googCandidatePair" && item.googActiveConnection === "true" || (item.type === "candidatepair" || item.type === "candidate-pair") && item.selected) {
+                setSelectedCandidatePair(item);
+              }
+            });
+            if (!foundSelectedCandidatePair && (!Object.keys(candidatePairs).length || Object.keys(localCandidates).length)) {
+              setTimeout(findCandidatePair, 100);
+              return;
+            } else {
+              this._connecting = false;
+              this._connected = true;
+            }
+            if (this._chunk) {
+              try {
+                this.send(this._chunk);
+              } catch (err2) {
+                return this.destroy(errCode(err2, "ERR_DATA_CHANNEL"));
+              }
+              this._chunk = null;
+              this._debug('sent chunk from "write before connect"');
+              const cb = this._cb;
+              this._cb = null;
+              cb(null);
+            }
+            if (typeof this._channel.bufferedAmountLowThreshold !== "number") {
+              this._interval = setInterval(() => this._onInterval(), 150);
+              if (this._interval.unref)
+                this._interval.unref();
+            }
+            this._debug("connect");
+            this.emit("connect");
+          });
+        };
+        findCandidatePair();
+      }
+      _onInterval() {
+        if (!this._cb || !this._channel || this._channel.bufferedAmount > MAX_BUFFERED_AMOUNT) {
+          return;
+        }
+        this._onChannelBufferedAmountLow();
+      }
+      _onSignalingStateChange() {
+        if (this.destroyed)
+          return;
+        if (this._pc.signalingState === "stable") {
+          this._isNegotiating = false;
+          this._debug("flushing sender queue", this._sendersAwaitingStable);
+          this._sendersAwaitingStable.forEach((sender) => {
+            this._pc.removeTrack(sender);
+            this._queuedNegotiation = true;
+          });
+          this._sendersAwaitingStable = [];
+          if (this._queuedNegotiation) {
+            this._debug("flushing negotiation queue");
+            this._queuedNegotiation = false;
+            this._needsNegotiation();
+          } else {
+            this._debug("negotiated");
+            this.emit("negotiated");
+          }
+        }
+        this._debug("signalingStateChange %s", this._pc.signalingState);
+        this.emit("signalingStateChange", this._pc.signalingState);
+      }
+      _onIceCandidate(event) {
+        if (this.destroyed)
+          return;
+        if (event.candidate && this.trickle) {
+          this.emit("signal", {
+            type: "candidate",
+            candidate: {
+              candidate: event.candidate.candidate,
+              sdpMLineIndex: event.candidate.sdpMLineIndex,
+              sdpMid: event.candidate.sdpMid
+            }
+          });
+        } else if (!event.candidate && !this._iceComplete) {
+          this._iceComplete = true;
+          this.emit("_iceComplete");
+        }
+        if (event.candidate) {
+          this._startIceCompleteTimeout();
+        }
+      }
+      _onChannelMessage(event) {
+        if (this.destroyed)
+          return;
+        this.emit("data", event.data);
+      }
+      _onChannelBufferedAmountLow() {
+        if (this.destroyed || !this._cb)
+          return;
+        this._debug("ending backpressure: bufferedAmount %d", this._channel.bufferedAmount);
+        const cb = this._cb;
+        this._cb = null;
+        cb(null);
+      }
+      _onChannelOpen() {
+        if (this._connected || this.destroyed)
+          return;
+        this._debug("on channel open");
+        this._channelReady = true;
+        this._maybeReady();
+      }
+      _onChannelClose() {
+        if (this.destroyed)
+          return;
+        this._debug("on channel close");
+        this.destroy();
+      }
+      _onTrack(event) {
+        if (this.destroyed)
+          return;
+        event.streams.forEach((eventStream) => {
+          this._debug("on track");
+          this.emit("track", event.track, eventStream);
+          this._remoteTracks.push({
+            track: event.track,
+            stream: eventStream
+          });
+          if (this._remoteStreams.some((remoteStream) => {
+            return remoteStream.id === eventStream.id;
+          }))
+            return;
+          this._remoteStreams.push(eventStream);
+          queueMicrotask2(() => {
+            this._debug("on stream");
+            this.emit("stream", eventStream);
+          });
+        });
+      }
+      _debug() {
+        const args = [].slice.call(arguments);
+        args[0] = "[" + this.id + "] " + args[0];
+        debug.apply(null, args);
+      }
+    };
+    Peer2.WEBRTC_SUPPORT = !!getBrowserRTC2();
+    Peer2.config = {
+      iceServers: [
+        {
+          urls: [
+            "stun:stun.l.google.com:19302",
+            "stun:global.stun.twilio.com:3478"
+          ]
+        }
+      ],
+      sdpSemantics: "unified-plan"
+    };
+    Peer2.channelConfig = {};
+    module.exports = Peer2;
+  }
+});
+
+// node_modules/convert-hex/convert-hex.js
+var require_convert_hex = __commonJS({
+  "node_modules/convert-hex/convert-hex.js"(exports, module) {
+    !function(globals) {
+      "use strict";
+      var convertHex = {
+        bytesToHex: function(bytes) {
+          return arrBytesToHex(bytes);
+        },
+        hexToBytes: function(hex) {
+          if (hex.length % 2 === 1)
+            throw new Error("hexToBytes can't have a string with an odd number of characters.");
+          if (hex.indexOf("0x") === 0)
+            hex = hex.slice(2);
+          return hex.match(/../g).map(function(x) {
+            return parseInt(x, 16);
+          });
+        }
+      };
+      function arrBytesToHex(bytes) {
+        return bytes.map(function(x) {
+          return padLeft(x.toString(16), 2);
+        }).join("");
+      }
+      function padLeft(orig, len) {
+        if (orig.length > len)
+          return orig;
+        return Array(len - orig.length + 1).join("0") + orig;
+      }
+      if (typeof module !== "undefined" && module.exports) {
+        module.exports = convertHex;
+      } else {
+        globals.convertHex = convertHex;
+      }
+    }(exports);
+  }
+});
+
+// node_modules/array-buffer-to-hex/index.js
+var require_array_buffer_to_hex = __commonJS({
+  "node_modules/array-buffer-to-hex/index.js"(exports, module) {
+    module.exports = function arrayBufferToHex2(arrayBuffer) {
+      if (typeof arrayBuffer !== "object" || arrayBuffer === null || typeof arrayBuffer.byteLength !== "number") {
+        throw new TypeError("Expected input to be an ArrayBuffer");
+      }
+      var view = new Uint8Array(arrayBuffer);
+      var result = "";
+      var value;
+      for (var i = 0; i < view.length; i++) {
+        value = view[i].toString(16);
+        result += value.length === 1 ? "0" + value : value;
+      }
+      return result;
+    };
+  }
+});
+
+// src/p2pcf.js
+var import_get_browser_rtc = __toESM(require_get_browser_rtc());
+var import_events = __toESM(require_events());
+var import_tiny_simple_peer = __toESM(require_tiny_simple_peer());
+
+// node_modules/base64-arraybuffer/dist/base64-arraybuffer.es5.js
+var chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+var lookup = typeof Uint8Array === "undefined" ? [] : new Uint8Array(256);
+for (i = 0; i < chars.length; i++) {
+  lookup[chars.charCodeAt(i)] = i;
+}
+var i;
+var encode = function(arraybuffer) {
+  var bytes = new Uint8Array(arraybuffer), i, len = bytes.length, base64 = "";
+  for (i = 0; i < len; i += 3) {
+    base64 += chars[bytes[i] >> 2];
+    base64 += chars[(bytes[i] & 3) << 4 | bytes[i + 1] >> 4];
+    base64 += chars[(bytes[i + 1] & 15) << 2 | bytes[i + 2] >> 6];
+    base64 += chars[bytes[i + 2] & 63];
+  }
+  if (len % 3 === 2) {
+    base64 = base64.substring(0, base64.length - 1) + "=";
+  } else if (len % 3 === 1) {
+    base64 = base64.substring(0, base64.length - 2) + "==";
+  }
+  return base64;
+};
+var decode = function(base64) {
+  var bufferLength = base64.length * 0.75, len = base64.length, i, p = 0, encoded1, encoded2, encoded3, encoded4;
+  if (base64[base64.length - 1] === "=") {
+    bufferLength--;
+    if (base64[base64.length - 2] === "=") {
+      bufferLength--;
+    }
+  }
+  var arraybuffer = new ArrayBuffer(bufferLength), bytes = new Uint8Array(arraybuffer);
+  for (i = 0; i < len; i += 4) {
+    encoded1 = lookup[base64.charCodeAt(i)];
+    encoded2 = lookup[base64.charCodeAt(i + 1)];
+    encoded3 = lookup[base64.charCodeAt(i + 2)];
+    encoded4 = lookup[base64.charCodeAt(i + 3)];
+    bytes[p++] = encoded1 << 2 | encoded2 >> 4;
+    bytes[p++] = (encoded2 & 15) << 4 | encoded3 >> 2;
+    bytes[p++] = (encoded3 & 3) << 6 | encoded4 & 63;
+  }
+  return arraybuffer;
+};
+
+// src/p2pcf.js
+var import_convert_hex = __toESM(require_convert_hex());
+var import_array_buffer_to_hex = __toESM(require_array_buffer_to_hex());
+var MAX_MESSAGE_LENGTH_BYTES = 16e3;
+var CHUNK_HEADER_LENGTH_BYTES = 12;
+var CHUNK_MAGIC_WORD = 8121;
+var CHUNK_MAX_LENGTH_BYTES = MAX_MESSAGE_LENGTH_BYTES - CHUNK_HEADER_LENGTH_BYTES;
+var SIGNAL_MESSAGE_HEADER_WORDS = [33451, 33229, 4757, 41419];
+var CANDIDATE_TYPES = {
+  host: 0,
+  srflx: 1,
+  relay: 2
+};
+var CANDIDATE_TCP_TYPES = {
+  active: 0,
+  passive: 1,
+  so: 2
+};
+var CANDIDATE_IDX = {
+  TYPE: 0,
+  PROTOCOL: 1,
+  IP: 2,
+  PORT: 3,
+  RELATED_IP: 4,
+  RELATED_PORT: 5,
+  TCP_TYPE: 6
+};
+var DEFAULT_STUN_ICE = [
+  { urls: "stun:stun1.l.google.com:19302" },
+  { urls: "stun:global.stun.twilio.com:3478" }
+];
+var DEFAULT_TURN_ICE = [
+  {
+    urls: "turn:openrelay.metered.ca:80",
+    username: "openrelayproject",
+    credential: "openrelayproject"
+  },
+  {
+    urls: "turn:openrelay.metered.ca:443",
+    username: "openrelayproject",
+    credential: "openrelayproject"
+  },
+  {
+    urls: "turn:openrelay.metered.ca:443?transport=tcp",
+    username: "openrelayproject",
+    credential: "openrelayproject"
+  }
+];
+var randomstring = (len) => {
+  const bytes = crypto.getRandomValues(new Uint8Array(len));
+  const str = bytes.reduce((accum, v) => accum + String.fromCharCode(v), "");
+  return btoa(str).replaceAll("=", "");
+};
+var removeInPlace = (a, condition) => {
+  let i = 0;
+  let j = 0;
+  while (i < a.length) {
+    const val = a[i];
+    if (!condition(val, i, a))
+      a[j++] = val;
+    i++;
+  }
+  a.length = j;
+  return a;
+};
+var ua = window.navigator.userAgent;
+var iOS = !!ua.match(/iPad/i) || !!ua.match(/iPhone/i);
+var webkit = !!ua.match(/WebKit/i);
+var iOSSafari = !!(iOS && webkit && !ua.match(/CriOS/i));
+var isFirefox = !!(navigator?.userAgent.toLowerCase().indexOf("firefox") > -1);
+var hexToBase64 = (hex) => encode((0, import_convert_hex.hexToBytes)(hex));
+var base64ToHex = (b64) => (0, import_array_buffer_to_hex.default)(decode(b64));
+function createSdp(isOffer, iceUFrag, icePwd, dtlsFingerprintBase64) {
+  const dtlsHex = base64ToHex(dtlsFingerprintBase64);
+  let dtlsFingerprint = "";
+  for (let i = 0; i < dtlsHex.length; i += 2) {
+    dtlsFingerprint += `${dtlsHex[i]}${dtlsHex[i + 1]}${i === dtlsHex.length - 2 ? "" : ":"}`.toUpperCase();
+  }
+  const sdp = [
+    "v=0",
+    "o=- 5498186869896684180 2 IN IP4 127.0.0.1",
+    "s=-",
+    "t=0 0",
+    "a=msid-semantic: WMS",
+    "m=application 9 UDP/DTLS/SCTP webrtc-datachannel",
+    "c=IN IP4 0.0.0.0",
+    "a=mid:0",
+    "a=sctp-port:5000"
+  ];
+  if (isOffer) {
+    sdp.push("a=setup:actpass");
+  } else {
+    sdp.push("a=setup:active");
+  }
+  sdp.push(`a=ice-ufrag:${iceUFrag}`);
+  sdp.push(`a=ice-pwd:${icePwd}`);
+  sdp.push(`a=fingerprint:sha-256 ${dtlsFingerprint}`);
+  return sdp.join("\r\n") + "\r\n";
+}
+var parseCandidate = (line) => {
+  let parts;
+  if (line.indexOf("a=candidate:") === 0) {
+    parts = line.substring(12).split(" ");
+  } else {
+    parts = line.substring(10).split(" ");
+  }
+  const candidate = [
+    CANDIDATE_TYPES[parts[7]],
+    parts[2].toLowerCase() === "udp" ? 0 : 1,
+    parts[4],
+    parseInt(parts[5], 10)
+  ];
+  for (let i = 8; i < parts.length; i += 2) {
+    switch (parts[i]) {
+      case "raddr":
+        while (candidate.length < 5)
+          candidate.push(null);
+        candidate[4] = parts[i + 1];
+        break;
+      case "rport":
+        while (candidate.length < 6)
+          candidate.push(null);
+        candidate[5] = parseInt(parts[i + 1], 10);
+        break;
+      case "tcptype":
+        while (candidate.length < 7)
+          candidate.push(null);
+        candidate[6] = CANDIDATE_TCP_TYPES[parts[i + 1]];
+        break;
+      default:
+        break;
+    }
+  }
+  while (candidate.length < 8)
+    candidate.push(null);
+  candidate[7] = parseInt(parts[3], 10);
+  return candidate;
+};
+var P2PCF = class extends import_events.default {
+  constructor(clientId = "", roomId = "", options = {}) {
+    super();
+    if (!clientId || clientId.length < 4) {
+      throw new Error("Client ID must be at least four characters");
+    }
+    if (!roomId || roomId.length < 4) {
+      throw new Error("Room ID must be at least four characters");
+    }
+    this._step = this._step.bind(this);
+    this.peers = /* @__PURE__ */ new Map();
+    this.msgChunks = /* @__PURE__ */ new Map();
+    this.connectedSessions = [];
+    this.clientId = clientId;
+    this.roomId = roomId;
+    this.sessionId = randomstring(20);
+    this.packages = [];
+    this.dataTimestamp = null;
+    this.lastPackages = null;
+    this.lastProcessedReceivedDataTimestamps = /* @__PURE__ */ new Map();
+    this.packageReceivedFromPeers = /* @__PURE__ */ new Set();
+    this.startedAtTimestamp = null;
+    this.workerUrl = options.workerUrl || "https://p2pcf.minddrop.workers.dev";
+    if (this.workerUrl.endsWith("/")) {
+      this.workerUrl = this.workerUrl.substring(0, this.workerUrl.length - 1);
+    }
+    this.stunIceServers = options.stunIceServers || DEFAULT_STUN_ICE;
+    this.turnIceServers = options.turnIceServers || DEFAULT_TURN_ICE;
+    this.networkChangePollIntervalMs = options.networkChangePollIntervalMs || 15e3;
+    this.stateExpirationIntervalMs = options.stateExpirationIntervalMs || 2 * 60 * 1e3;
+    this.stateHeartbeatWindowMs = options.stateHeartbeatWindowMs || 3e4;
+    this.fastPollingDurationMs = options.fastPollingDurationMs || 1e4;
+    this.fastPollingRateMs = options.fastPollingRateMs || 750;
+    this.slowPollingRateMs = options.slowPollingRateMs || 1500;
+    this.wrtc = (0, import_get_browser_rtc.default)();
+    this.dtlsCert = null;
+    this.udpEnabled = null;
+    this.isSymmetric = null;
+    this.dtlsFingerprint = null;
+    this.reflexiveIps = /* @__PURE__ */ new Set();
+    this.isSending = false;
+    this.finished = false;
+    this.nextStepTime = -1;
+    this.deleteKey = null;
+    this.sentFirstPoll = false;
+    this.stopFastPollingAt = -1;
+    if (!window.history.state?._p2pcfContextId) {
+      window.history.replaceState(
+        {
+          ...window.history.state,
+          _p2pcfContextId: randomstring(20)
+        },
+        window.location.href
+      );
+    }
+    this.contextId = window.history.state._p2pcfContextId;
+  }
+  async _init() {
+    if (this.dtlsCert === null) {
+      this.dtlsCert = await this.wrtc.RTCPeerConnection.generateCertificate({
+        name: "ECDSA",
+        namedCurve: "P-256"
+      });
+    }
+  }
+  async _step(finish = false) {
+    const {
+      sessionId,
+      clientId,
+      roomId,
+      contextId,
+      stateExpirationIntervalMs,
+      stateHeartbeatWindowMs,
+      packages,
+      fastPollingDurationMs,
+      fastPollingRateMs,
+      slowPollingRateMs
+    } = this;
+    const now = new Date().getTime();
+    if (finish) {
+      if (this.finished)
+        return;
+      if (!this.deleteKey)
+        return;
+      this.finished = true;
+    } else {
+      if (this.nextStepTime > now)
+        return;
+      if (this.isSending)
+        return;
+      if (this.reflexiveIps.length === 0)
+        return;
+    }
+    this.isSending = true;
+    try {
+      const localDtlsFingerprintBase64 = hexToBase64(
+        this.dtlsFingerprint.replaceAll(":", "")
+      );
+      const localPeerInfo = [
+        sessionId,
+        clientId,
+        this.isSymmetric,
+        localDtlsFingerprintBase64,
+        this.startedAtTimestamp,
+        [...this.reflexiveIps]
+      ];
+      const payload = { r: roomId, k: contextId };
+      if (finish) {
+        payload.dk = this.deleteKey;
+      }
+      const expired = this.dataTimestamp === null || now - this.dataTimestamp >= stateExpirationIntervalMs - stateHeartbeatWindowMs;
+      const packagesChanged = this.lastPackages !== JSON.stringify(packages);
+      let includePackages = false;
+      if (expired || packagesChanged || finish) {
+        this.dataTimestamp = now;
+        removeInPlace(packages, (pkg) => {
+          const sentAt = pkg[pkg.length - 2];
+          return now - sentAt > 60 * 1e3;
+        });
+        includePackages = true;
+      }
+      if (finish) {
+        includePackages = false;
+      }
+      if (this.sentFirstPoll) {
+        payload.d = localPeerInfo;
+        payload.t = this.dataTimestamp;
+        payload.x = this.stateExpirationIntervalMs;
+        if (includePackages) {
+          payload.p = packages;
+          this.lastPackages = JSON.stringify(packages);
+        }
+      }
+      const body = JSON.stringify(payload);
+      const headers = { "Content-Type": "application/json " };
+      let keepalive = false;
+      if (finish) {
+        headers["X-Worker-Method"] = "DELETE";
+        keepalive = true;
+      }
+      const res = await fetch(this.workerUrl, {
+        method: "POST",
+        headers,
+        body,
+        keepalive
+      });
+      const { ps: remotePeerDatas, pk: remotePackages, dk } = await res.json();
+      if (dk) {
+        this.deleteKey = dk;
+      }
+      if (finish)
+        return;
+      if (remotePeerDatas.length === 0 && !this.sentFirstPoll) {
+        payload.d = localPeerInfo;
+        payload.t = this.dataTimestamp;
+        payload.x = this.stateExpirationIntervalMs;
+        payload.p = packages;
+        this.lastPackages = JSON.stringify(packages);
+        const res2 = await fetch(this.workerUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        const { dk: dk2 } = await res2.json();
+        if (dk2) {
+          this.deleteKey = dk2;
+        }
+      }
+      this.sentFirstPoll = true;
+      const previousPeerSessionIds = [...this.peers.keys()];
+      this._handleWorkerResponse(
+        localPeerInfo,
+        localDtlsFingerprintBase64,
+        packages,
+        remotePeerDatas,
+        remotePackages
+      );
+      const activeSessionIds = remotePeerDatas.map((p) => p[0]);
+      const peersChanged = previousPeerSessionIds.length !== activeSessionIds.length || activeSessionIds.find((c) => !previousPeerSessionIds.includes(c)) || previousPeerSessionIds.find((c) => !activeSessionIds.includes(c));
+      if (peersChanged) {
+        this.stopFastPollingAt = now + fastPollingDurationMs;
+      }
+      if (now < this.stopFastPollingAt) {
+        this.nextStepTime = now + fastPollingRateMs;
+      } else {
+        this.nextStepTime = now + slowPollingRateMs;
+      }
+    } catch (e) {
+      console.error(e);
+      this.nextStepTime = now + slowPollingRateMs;
+    } finally {
+      this.isSending = false;
+    }
+  }
+  _handleWorkerResponse(localPeerData, localDtlsFingerprintBase64, localPackages, remotePeerDatas, remotePackages) {
+    const localStartedAtTimestamp = this.startedAtTimestamp;
+    const {
+      dtlsCert: localDtlsCert,
+      peers,
+      lastProcessedReceivedDataTimestamps,
+      packageReceivedFromPeers,
+      stunIceServers,
+      turnIceServers
+    } = this;
+    const [localSessionId, , localSymmetric] = localPeerData;
+    const now = new Date().getTime();
+    for (const remotePeerData of remotePeerDatas) {
+      const [
+        remoteSessionId,
+        remoteClientId,
+        remoteSymmetric,
+        remoteDtlsFingerprintBase64,
+        remoteStartedAtTimestamp,
+        remoteReflexiveIps,
+        remoteDataTimestamp
+      ] = remotePeerData;
+      if (lastProcessedReceivedDataTimestamps.get(remoteSessionId) === remoteDataTimestamp) {
+        continue;
+      }
+      const isPeerA = localSymmetric === remoteSymmetric ? localStartedAtTimestamp === remoteStartedAtTimestamp ? localSessionId > remoteSessionId : localStartedAtTimestamp > remoteStartedAtTimestamp : localSymmetric;
+      const iceServers = localSymmetric || remoteSymmetric ? turnIceServers : stunIceServers;
+      const delaySetRemoteUntilReceiveCandidates = isFirefox;
+      const remotePackage = remotePackages.find((p) => p[1] === remoteSessionId);
+      const peerOptions = { iceServers };
+      if (localDtlsCert) {
+        peerOptions.certificates = [localDtlsCert];
+      }
+      if (isPeerA) {
+        if (peers.has(remoteSessionId))
+          continue;
+        if (!remotePackage)
+          continue;
+        lastProcessedReceivedDataTimestamps.set(
+          remoteSessionId,
+          remoteDataTimestamp
+        );
+        if (packageReceivedFromPeers.has(remoteSessionId))
+          continue;
+        packageReceivedFromPeers.add(remoteSessionId);
+        const [
+          ,
+          ,
+          remoteIceUFrag,
+          remoteIcePwd,
+          remoteDtlsFingerprintBase642,
+          localIceUFrag,
+          localIcePwd,
+          ,
+          remoteCandidates
+        ] = remotePackage;
+        const peer = new import_tiny_simple_peer.default({
+          config: peerOptions,
+          initiator: false,
+          iceCompleteTimeout: 3e3,
+          sdpTransform: (sdp) => {
+            const lines = [];
+            for (const l of sdp.split("\r\n")) {
+              if (l.startsWith("a=ice-ufrag")) {
+                lines.push(`a=ice-ufrag:${localIceUFrag}`);
+              } else if (l.startsWith("a=ice-pwd")) {
+                lines.push(`a=ice-pwd:${localIcePwd}`);
+              } else {
+                lines.push(l);
+              }
+            }
+            return lines.join("\r\n");
+          }
+        });
+        peer.id = remoteSessionId;
+        peer.client_id = remoteClientId;
+        this._wireUpCommonPeerEvents(peer);
+        peers.set(peer.id, peer);
+        const pkg = [
+          remoteSessionId,
+          localSessionId,
+          null,
+          null,
+          null,
+          null,
+          null,
+          now,
+          []
+        ];
+        const pkgCandidates = pkg[pkg.length - 1];
+        const initialCandidateSignalling = (e) => {
+          if (!e.candidate?.candidate)
+            return;
+          pkgCandidates.push(e.candidate.candidate);
+        };
+        peer.on("signal", initialCandidateSignalling);
+        const finishIce = () => {
+          peer.removeListener("signal", initialCandidateSignalling);
+          if (localPackages.includes(pkg))
+            return;
+          if (pkgCandidates.length === 0)
+            return;
+          localPackages.push(pkg);
+        };
+        peer.once("_iceComplete", finishIce);
+        const remoteSdp = createSdp(
+          true,
+          remoteIceUFrag,
+          remoteIcePwd,
+          remoteDtlsFingerprintBase642
+        );
+        for (const candidate of remoteCandidates) {
+          peer.signal({ candidate: { candidate, sdpMLineIndex: 0 } });
+        }
+        peer.signal({ type: "offer", sdp: remoteSdp });
+      } else {
+        if (!peers.has(remoteSessionId)) {
+          lastProcessedReceivedDataTimestamps.set(
+            remoteSessionId,
+            remoteDataTimestamp
+          );
+          const remoteUfrag = randomstring(12);
+          const remotePwd = randomstring(32);
+          const peer2 = new import_tiny_simple_peer.default({
+            config: peerOptions,
+            iceCompleteTimeout: 3e3,
+            initiator: true
+          });
+          peer2.id = remoteSessionId;
+          peer2.client_id = remoteClientId;
+          this._wireUpCommonPeerEvents(peer2);
+          peers.set(peer2.id, peer2);
+          const pkg = [
+            remoteSessionId,
+            localSessionId,
+            null,
+            null,
+            null,
+            remoteUfrag,
+            remotePwd,
+            now,
+            []
+          ];
+          const pkgCandidates = pkg[pkg.length - 1];
+          const initialCandidateSignalling = (e) => {
+            if (!e.candidate?.candidate)
+              return;
+            pkgCandidates.push(e.candidate.candidate);
+          };
+          peer2.on("signal", initialCandidateSignalling);
+          const finishIce = () => {
+            peer2.removeListener("signal", initialCandidateSignalling);
+            if (localPackages.includes(pkg))
+              return;
+            if (pkgCandidates.length === 0)
+              return;
+            localPackages.push(pkg);
+          };
+          peer2.once("_iceComplete", finishIce);
+          const enqueuePackageFromOffer = (e) => {
+            if (e.type !== "offer")
+              return;
+            peer2.removeListener("signal", enqueuePackageFromOffer);
+            for (const l of e.sdp.split("\r\n")) {
+              switch (l.split(":")[0]) {
+                case "a=ice-ufrag":
+                  pkg[2] = l.substring(12);
+                  break;
+                case "a=ice-pwd":
+                  pkg[3] = l.substring(10);
+                  break;
+                case "a=fingerprint":
+                  pkg[4] = hexToBase64(l.substring(22).replaceAll(":", ""));
+                  break;
+              }
+            }
+            let remoteSdp = createSdp(
+              false,
+              remoteUfrag,
+              remotePwd,
+              remoteDtlsFingerprintBase64
+            );
+            for (let i = 0; i < remoteReflexiveIps.length; i++) {
+              remoteSdp += `a=candidate:0 1 udp ${i + 1} ${remoteReflexiveIps[i]} 30000 typ srflx\r
+`;
+            }
+            if (!delaySetRemoteUntilReceiveCandidates) {
+              peer2.signal({ type: "answer", sdp: remoteSdp });
+            } else {
+              peer2._pendingRemoteSdp = remoteSdp;
+            }
+          };
+          peer2.once("signal", enqueuePackageFromOffer);
+        }
+        if (!remotePackage)
+          continue;
+        const [, , , , , , , , remoteCandidates] = remotePackage;
+        if (packageReceivedFromPeers.has(remoteSessionId))
+          continue;
+        if (!peers.has(remoteSessionId))
+          continue;
+        const peer = peers.get(remoteSessionId);
+        if (delaySetRemoteUntilReceiveCandidates && !peer._pc.remoteDescription && peer._pendingRemoteSdp) {
+          if (!peer.connected) {
+            for (const candidate of remoteCandidates) {
+              peer.signal({ candidate: { candidate, sdpMLineIndex: 0 } });
+            }
+          }
+          peer.signal({ type: "answer", sdp: peer._pendingRemoteSdp });
+          delete peer._pendingRemoteSdp;
+          packageReceivedFromPeers.add(remoteSessionId);
+        }
+        if (!delaySetRemoteUntilReceiveCandidates && peer._pc.remoteDescription && remoteCandidates.length > 0) {
+          if (!peer.connected) {
+            for (const candidate of remoteCandidates) {
+              peer.signal({ candidate: { candidate, sdpMLineIndex: 0 } });
+            }
+          }
+          packageReceivedFromPeers.add(remoteSessionId);
+        }
+      }
+    }
+    const remoteSessionIds = remotePeerDatas.map((p) => p[0]);
+    for (const [sessionId, peer] of peers.entries()) {
+      if (remoteSessionIds.includes(sessionId))
+        continue;
+      this._removePeer(peer, true);
+    }
+  }
+  async start() {
+    this.startedAtTimestamp = new Date().getTime();
+    await this._init();
+    const [
+      udpEnabled,
+      isSymmetric,
+      reflexiveIps,
+      dtlsFingerprint
+    ] = await this._getNetworkSettings(this.dtlsCert);
+    this.udpEnabled = udpEnabled;
+    this.isSymmetric = isSymmetric;
+    this.reflexiveIps = reflexiveIps;
+    this.dtlsFingerprint = dtlsFingerprint;
+    this.networkSettingsInterval = setInterval(async () => {
+      const [
+        newUdpEnabled,
+        newIsSymmetric,
+        newReflexiveIps,
+        newDtlsFingerprint
+      ] = await this._getNetworkSettings(this.dtlsCert);
+      if (newUdpEnabled !== this.udpEnabled || newIsSymmetric !== this.isSymmetric || newDtlsFingerprint !== this.dtlsFingerprint || !![...newReflexiveIps].find((ip) => ![...this.reflexiveIps].find((ip2) => ip === ip2)) || !![...reflexiveIps].find((ip) => ![...newReflexiveIps].find((ip2) => ip === ip2))) {
+        this.dataTimestamp = null;
+      }
+      this.udpEnabled = newUdpEnabled;
+      this.isSymmetric = newIsSymmetric;
+      this.reflexiveIps = newReflexiveIps;
+      this.dtlsFingerprint = newDtlsFingerprint;
+    }, this.networkChangePollIntervalMs);
+    this._step = this._step.bind(this);
+    this.stepInterval = setInterval(this._step, 500);
+    this.destroyOnUnload = () => this.destroy();
+    for (const ev of iOSSafari ? ["pagehide"] : ["beforeunload", "unload"]) {
+      window.addEventListener(ev, this.destroyOnUnload);
+    }
+  }
+  _removePeer(peer, destroy = false) {
+    const { packageReceivedFromPeers, packages, peers } = this;
+    if (!peers.has(peer.id))
+      return;
+    removeInPlace(packages, (pkg) => pkg[0] === peer.id);
+    packageReceivedFromPeers.delete(peer.id);
+    peers.delete(peer.id);
+    if (destroy) {
+      peer.destroy();
+    }
+    this.emit("peerclose", peer);
+  }
+  send(peer, msg) {
+    return new Promise((resolve, reject) => {
+      let dataArrBuffer = null;
+      let messageId = null;
+      if (msg instanceof ArrayBuffer) {
+        dataArrBuffer = msg;
+      } else if (msg instanceof Uint8Array) {
+        if (msg.buffer.byteLength === msg.length) {
+          dataArrBuffer = msg.buffer;
+        } else {
+          dataArrBuffer = msg.buffer.slice(msg.byteOffset, msg.byteOffset + msg.byteLength);
+        }
+      } else {
+        throw new Error("Unsupported send data type", msg);
+      }
+      if (dataArrBuffer.byteLength > MAX_MESSAGE_LENGTH_BYTES || new Uint16Array(dataArrBuffer, 0, 1) === CHUNK_MAGIC_WORD) {
+        messageId = Math.floor(Math.random() * 256 * 128);
+      }
+      if (messageId !== null) {
+        for (let offset = 0, chunkId = 0; offset < dataArrBuffer.byteLength; offset += CHUNK_MAX_LENGTH_BYTES, chunkId++) {
+          const chunkSize = Math.min(
+            CHUNK_MAX_LENGTH_BYTES,
+            dataArrBuffer.byteLength - offset
+          );
+          let bufSize = CHUNK_HEADER_LENGTH_BYTES + chunkSize;
+          while (bufSize % 4 !== 0) {
+            bufSize++;
+          }
+          const buf = new ArrayBuffer(bufSize);
+          new Uint8Array(buf, CHUNK_HEADER_LENGTH_BYTES).set(
+            new Uint8Array(dataArrBuffer, offset, chunkSize)
+          );
+          const u16 = new Uint16Array(buf);
+          const u32 = new Uint32Array(buf);
+          u16[0] = CHUNK_MAGIC_WORD;
+          u16[1] = messageId;
+          u16[2] = chunkId;
+          u16[3] = offset + CHUNK_MAX_LENGTH_BYTES >= dataArrBuffer.byteLength ? 1 : 0;
+          u32[2] = dataArrBuffer.byteLength;
+          peer.send(buf);
+        }
+      } else {
+        peer.send(dataArrBuffer);
+      }
+    });
+  }
+  broadcast(msg) {
+    const ps = [];
+    for (const peer of this.peers.values()) {
+      if (!peer.connected)
+        continue;
+      ps.push(this.send(peer, msg));
+    }
+    return Promise.all(ps);
+  }
+  destroy() {
+    if (this._step) {
+      this._step(true);
+    }
+    if (this.networkSettingsInterval) {
+      clearInterval(this.networkSettingsInterval);
+      this.networkSettingsInterval = null;
+    }
+    if (this.stepInterval) {
+      clearInterval(this.stepInterval);
+      this.stepInterval = null;
+    }
+    if (this.destroyOnUnload) {
+      for (const ev of iOSSafari ? ["pagehide"] : ["beforeunload", "unload"]) {
+        window.removeEventListener(ev, this.destroyOnUnload);
+      }
+      this.destroyOnUnload = null;
+    }
+    for (const peer of this.peers.values()) {
+      peer.destroy();
+    }
+  }
+  _chunkHandler(data, messageId, chunkId) {
+    let target = null;
+    if (!this.msgChunks.has(messageId)) {
+      const totalLength = new Uint32Array(data, 0, 3)[2];
+      target = new Uint8Array(totalLength);
+      this.msgChunks.set(messageId, target);
+    } else {
+      target = this.msgChunks.get(messageId);
+    }
+    const offsetToSet = chunkId * CHUNK_MAX_LENGTH_BYTES;
+    const numBytesToSet = Math.min(
+      target.byteLength - offsetToSet,
+      CHUNK_MAX_LENGTH_BYTES
+    );
+    target.set(
+      new Uint8Array(data, CHUNK_HEADER_LENGTH_BYTES, numBytesToSet),
+      chunkId * CHUNK_MAX_LENGTH_BYTES
+    );
+    return target.buffer;
+  }
+  _updateConnectedSessions() {
+    this.connectedSessions.length = 0;
+    for (const [sessionId, peer] of this.peers) {
+      if (peer.connected) {
+        this.connectedSessions.push(sessionId);
+        continue;
+      }
+    }
+  }
+  async _getNetworkSettings() {
+    await this._init();
+    let dtlsFingerprint = null;
+    const candidates = [];
+    const reflexiveIps = /* @__PURE__ */ new Set();
+    const peerOptions = { iceServers: this.stunIceServers };
+    if (this.dtlsCert) {
+      peerOptions.certificates = [this.dtlsCert];
+    }
+    const pc = new this.wrtc.RTCPeerConnection(peerOptions);
+    pc.createDataChannel("x");
+    const p = new Promise((resolve) => {
+      setTimeout(() => resolve(), 5e3);
+      pc.onicecandidate = (e) => {
+        if (!e.candidate)
+          return resolve();
+        if (e.candidate.candidate) {
+          candidates.push(parseCandidate(e.candidate.candidate));
+        }
+      };
+    });
+    pc.createOffer().then((offer) => {
+      for (const l of offer.sdp.split("\n")) {
+        if (l.indexOf("a=fingerprint") === -1)
+          continue;
+        dtlsFingerprint = l.split(" ")[1].trim();
+      }
+      pc.setLocalDescription(offer);
+    });
+    await p;
+    pc.close();
+    let isSymmetric = false;
+    let udpEnabled = false;
+    loop:
+      for (const c of candidates) {
+        if (c[0] !== CANDIDATE_TYPES.srflx)
+          continue;
+        udpEnabled = true;
+        reflexiveIps.add(c[CANDIDATE_IDX.IP]);
+        for (const d of candidates) {
+          if (d[0] !== CANDIDATE_TYPES.srflx)
+            continue;
+          if (c === d)
+            continue;
+          if (typeof c[CANDIDATE_IDX.RELATED_PORT] === "number" && typeof d[CANDIDATE_IDX.RELATED_PORT] === "number" && c[CANDIDATE_IDX.RELATED_PORT] === d[CANDIDATE_IDX.RELATED_PORT] && c[CANDIDATE_IDX.PORT] !== d[CANDIDATE_IDX.PORT]) {
+            isSymmetric = true;
+            break;
+          }
+        }
+      }
+    return [udpEnabled, isSymmetric, reflexiveIps, dtlsFingerprint];
+  }
+  _handlePeerError(peer, err) {
+    if (err.errorDetail === "sctp-failure" && err.message.indexOf("User-Initiated Abort") >= 0) {
+      return;
+    }
+    console.error(err);
+  }
+  _checkForSignalOrEmitMessage(peer, msg) {
+    if (msg.byteLength < SIGNAL_MESSAGE_HEADER_WORDS.length * 2) {
+      this.emit("msg", peer, msg);
+      return;
+    }
+    const u16 = new Uint16Array(msg, 0, SIGNAL_MESSAGE_HEADER_WORDS.length);
+    for (let i = 0; i < SIGNAL_MESSAGE_HEADER_WORDS.length; i++) {
+      if (u16[i] !== SIGNAL_MESSAGE_HEADER_WORDS[i]) {
+        this.emit("msg", peer, msg);
+        return;
+      }
+    }
+    const u8 = new Uint8Array(msg, SIGNAL_MESSAGE_HEADER_WORDS.length * 2);
+    let payload = new TextDecoder("utf-8").decode(u8);
+    if (payload.endsWith("\0")) {
+      payload = payload.substring(0, payload.length - 1);
+    }
+    peer.signal(payload);
+  }
+  _wireUpCommonPeerEvents(peer) {
+    peer.on("connect", () => {
+      this.emit("peerconnect", peer);
+      removeInPlace(this.packages, (pkg) => pkg[0] === peer.id);
+      this._updateConnectedSessions();
+    });
+    peer.on("data", (data) => {
+      let messageId = null;
+      let u16 = null;
+      if (data.byteLength >= CHUNK_HEADER_LENGTH_BYTES) {
+        u16 = new Uint16Array(data, 0, CHUNK_HEADER_LENGTH_BYTES / 2);
+        if (u16[0] === CHUNK_MAGIC_WORD) {
+          messageId = u16[1];
+        }
+      }
+      if (messageId !== null) {
+        try {
+          const chunkId = u16[2];
+          const last = u16[3] !== 0;
+          const msg = this._chunkHandler(data, messageId, chunkId, last);
+          if (last) {
+            this._checkForSignalOrEmitMessage(peer, msg);
+            this.msgChunks.delete(messageId);
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      } else {
+        this._checkForSignalOrEmitMessage(peer, data);
+      }
+    });
+    peer.on("error", (err) => {
+      console.warn(err);
+    });
+    peer.on("close", () => {
+      this._removePeer(peer);
+      this._updateConnectedSessions();
+    });
+    peer.once("_iceComplete", () => {
+      peer.on("signal", (signalData) => {
+        const payloadBytes = new TextEncoder().encode(
+          JSON.stringify(signalData)
+        );
+        let len = payloadBytes.byteLength + SIGNAL_MESSAGE_HEADER_WORDS.length * 2;
+        if (len % 2 !== 0) {
+          len++;
+        }
+        const buf = new ArrayBuffer(len);
+        const u8 = new Uint8Array(buf);
+        const u16 = new Uint16Array(buf);
+        u8.set(payloadBytes, SIGNAL_MESSAGE_HEADER_WORDS.length * 2);
+        for (let i = 0; i < SIGNAL_MESSAGE_HEADER_WORDS.length; i++) {
+          u16[i] = SIGNAL_MESSAGE_HEADER_WORDS[i];
+        }
+        this.send(peer, buf);
+      });
+    });
+  }
+};
+export {
+  P2PCF as default
+};
 /*! queue-microtask. MIT License. Feross Aboukhadijeh <https://feross.org/opensource> */
 /*! simple-peer. MIT License. Feross Aboukhadijeh <https://feross.org/opensource> */
