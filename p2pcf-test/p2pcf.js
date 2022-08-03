@@ -2745,6 +2745,9 @@ var P2PCF = class extends import_events.default {
         this._checkForSignalOrEmitMessage(peer, data);
       }
     });
+    peer.on("error", (err) => {
+      console.error(err);
+    });
     peer.on("close", () => {
       this._removePeer(peer);
       this._updateConnectedSessions();
