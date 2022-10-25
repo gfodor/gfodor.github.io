@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <!-- DO NOT REMOVE/EDIT THIS COMMENT - META_TAGS -->
+
+    <meta charset="UTF-8">
+    <meta name = "viewport" content = "width=device-width, minimum-scale=1.0, maximum-scale = 1.0, user-scalable = no">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Book Reader</title>
+
+    <meta name="epub-url" content="book.epub">
+    <!-- meta name="ga-measurement-id" content="UA-XXXXX-Y" -->
+    <!-- meta name="hotjar-measurement-id" content="HOTJAR-XXXX" -->
+
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+
+    <!-- link rel="icon" href="favicon.png" type="image/png" -->
+    <link href="https://fonts.googleapis.com/css?family=Inter:400,400i,500,600,600i,700,700i" rel="stylesheet">
+    <link href="fonts.css" rel="stylesheet">
+    <link href="katex.css" rel="stylesheet">
+    <script src="init.js" async /></script>
+    <script src="index.js" async /></script>
+
+    <style>
+    .initial-loader {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: absolute;
+        z-index: -1;
+        transform: scale(0.5);
+        visibility: hidden;
+    }
+    .initial-loader-element,
+    .initial-loader-element:after {
+        border-radius: 50%;
+        width: 10em;
+        height: 10em;
+    }
+    .initial-loader-element {
+        margin: 60px auto;
+        font-size: 10px;
+        position: relative;
+        text-indent: -9999em;
+        border-top: 1.1em solid rgba(192, 192, 192, 0.5);
+        border-right: 1.1em solid rgba(192, 192, 192, 0.5);
+        border-bottom: 1.1em solid rgba(192, 192, 192, 0.5);
+        border-left: 1.1em solid #000;
+        -webkit-transform: translateZ(0);
+        -ms-transform: translateZ(0);
+        transform: translateZ(0);
+        -webkit-animation: initialload8 1.1s infinite linear;
+        animation: initialload8 1.1s infinite linear;
+    }
+
+    @-webkit-keyframes initialload8 {
+        0% {
+            -webkit-transform: rotate(0deg);
+            transform: rotate(0deg);
+        }
+        100% {
+            -webkit-transform: rotate(360deg);
+            transform: rotate(360deg);
+        }
+    }
+    @keyframes initialload8 {
+        0% {
+            -webkit-transform: rotate(0deg);
+            transform: rotate(0deg);
+        }
+        100% {
+            -webkit-transform: rotate(360deg);
+            transform: rotate(360deg);
+        }
+    }
+    </style>
+</head>
+
+<body style="margin: 0; padding: 0;">
+    <div id="initial-loader" class="initial-loader">
+        <div class="initial-loader-element">
+        </div>
+    </div>
+    <div style="display: flex; position: fixed; top: 0; left: 0; right: 0; bottom: 0;" id="root">
+    </div>
+</body>
+
+</html>

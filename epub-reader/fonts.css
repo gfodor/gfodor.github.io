@@ -1,0 +1,75 @@
+/* The main TNS site uses the fonts named here, but the urls have been replaces to a OTF licensed font.
+ * Feel free to license the appropriate fonts and replace the URLs to match the TNS site. */
+
+/* https://www.swisstypefaces.comfonts/suisse/ */
+/* https://typographyforlawyers.com/valkyrie.html */
+
+@font-face {
+    font-family: 'Suisse Works';
+    src: url('fonts/Sumana-Regular.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Suisse Works';
+    src: url('fonts/Sumana-Bold.otf') format('opentype');
+    font-weight: bold;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Valkyrie A';
+    src: url('fonts/Merriweather-Regular.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Valkyrie A';
+    src: url('fonts/Merriweather-Italic.otf') format('opentype');
+    font-weight: normal;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'Valkyrie A';
+    src: url('fonts/Merriweather-Bold.otf') format('opentype');
+    font-weight: bold;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Valkyrie A';
+    src: url('fonts/Merriweather-BoldItalic.otf') format('opentype');
+    font-weight: bold;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'Valkyrie B';
+    src: url('fonts/Merriweather-Regular.otf') format('opentype');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Valkyrie B';
+    src: url('fonts/Merriweather-Italic.otf') format('opentype');
+    font-weight: normal;
+    font-style: italic;
+}
+
+@font-face {
+    font-family: 'Valkyrie B';
+    src: url('fonts/Merriweather-Bold.otf') format('opentype');
+    font-weight: bold;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Valkyrie B';
+    src: url('fonts/Merriweather-BoldItalic.otf') format('opentype');
+    font-weight: bold;
+    font-style: italic;
+}
