@@ -22,7 +22,7 @@
 // /playground/playground.js
 // =====================================================
 
-import { Noise, imgToSvox, voxToSvox, ModelReader, Model, ModelWriter, SvoxMeshGenerator } from '../dist/smoothvoxels.js'
+import { Noise, imgToSvox, voxToSvox, ModelReader, Model, ModelWriter, SvoxMeshGenerator } from './smoothvoxels.js'
 
 const alert = x => console.error(x)
 /* ------ Startup functions ------ */
