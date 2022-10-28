@@ -1726,6 +1726,7 @@ var require_tiny_simple_peer = __commonJS({
         this.emit("signalingStateChange", this._pc.signalingState);
       }
       _onIceCandidate(event) {
+        console.log("on ice candidate", this.trickle, event.candidate);
         if (this.destroyed)
           return;
         if (event.candidate && this.trickle) {
