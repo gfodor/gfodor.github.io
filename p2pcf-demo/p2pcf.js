@@ -2589,13 +2589,9 @@ var P2PCF = class extends import_events.default {
     }
   }
   broadcast(msg) {
-    const ps = [];
     for (const peer of this.peers.values()) {
-      if (!peer.connected)
-        continue;
-      ps.push(this.send(peer, msg));
+      this.send(peer, msg);
     }
-    return Promise.all(ps);
   }
   destroy() {
     if (this._step) {
