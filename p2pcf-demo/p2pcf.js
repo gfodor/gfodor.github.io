@@ -2543,50 +2543,50 @@ var P2PCF = class extends import_events.default {
     this.emit("peerclose", peer);
   }
   send(peer, msg) {
-    return new Promise((resolve, reject) => {
-      let dataArrBuffer = null;
-      let messageId = null;
-      if (msg instanceof ArrayBuffer) {
-        dataArrBuffer = msg;
-      } else if (msg instanceof Uint8Array) {
-        if (msg.buffer.byteLength === msg.length) {
-          dataArrBuffer = msg.buffer;
-        } else {
-          dataArrBuffer = msg.buffer.slice(msg.byteOffset, msg.byteOffset + msg.byteLength);
-        }
+    if (!peer.connected)
+      return;
+    let dataArrBuffer = null;
+    let messageId = null;
+    if (msg instanceof ArrayBuffer) {
+      dataArrBuffer = msg;
+    } else if (msg instanceof Uint8Array) {
+      if (msg.buffer.byteLength === msg.length) {
+        dataArrBuffer = msg.buffer;
       } else {
-        throw new Error("Unsupported send data type", msg);
+        dataArrBuffer = msg.buffer.slice(msg.byteOffset, msg.byteOffset + msg.byteLength);
       }
-      if (dataArrBuffer.byteLength > MAX_MESSAGE_LENGTH_BYTES || new Uint16Array(dataArrBuffer, 0, 1) === CHUNK_MAGIC_WORD) {
-        messageId = Math.floor(Math.random() * 256 * 128);
-      }
-      if (messageId !== null) {
-        for (let offset = 0, chunkId = 0; offset < dataArrBuffer.byteLength; offset += CHUNK_MAX_LENGTH_BYTES, chunkId++) {
-          const chunkSize = Math.min(
-            CHUNK_MAX_LENGTH_BYTES,
-            dataArrBuffer.byteLength - offset
-          );
-          let bufSize = CHUNK_HEADER_LENGTH_BYTES + chunkSize;
-          while (bufSize % 4 !== 0) {
-            bufSize++;
-          }
-          const buf = new ArrayBuffer(bufSize);
-          new Uint8Array(buf, CHUNK_HEADER_LENGTH_BYTES).set(
-            new Uint8Array(dataArrBuffer, offset, chunkSize)
-          );
-          const u16 = new Uint16Array(buf);
-          const u32 = new Uint32Array(buf);
-          u16[0] = CHUNK_MAGIC_WORD;
-          u16[1] = messageId;
-          u16[2] = chunkId;
-          u16[3] = offset + CHUNK_MAX_LENGTH_BYTES >= dataArrBuffer.byteLength ? 1 : 0;
-          u32[2] = dataArrBuffer.byteLength;
-          peer.send(buf);
+    } else {
+      throw new Error("Unsupported send data type", msg);
+    }
+    if (dataArrBuffer.byteLength > MAX_MESSAGE_LENGTH_BYTES || new Uint16Array(dataArrBuffer, 0, 1) === CHUNK_MAGIC_WORD) {
+      messageId = Math.floor(Math.random() * 256 * 128);
+    }
+    if (messageId !== null) {
+      for (let offset = 0, chunkId = 0; offset < dataArrBuffer.byteLength; offset += CHUNK_MAX_LENGTH_BYTES, chunkId++) {
+        const chunkSize = Math.min(
+          CHUNK_MAX_LENGTH_BYTES,
+          dataArrBuffer.byteLength - offset
+        );
+        let bufSize = CHUNK_HEADER_LENGTH_BYTES + chunkSize;
+        while (bufSize % 4 !== 0) {
+          bufSize++;
         }
-      } else {
-        peer.send(dataArrBuffer);
+        const buf = new ArrayBuffer(bufSize);
+        new Uint8Array(buf, CHUNK_HEADER_LENGTH_BYTES).set(
+          new Uint8Array(dataArrBuffer, offset, chunkSize)
+        );
+        const u16 = new Uint16Array(buf);
+        const u32 = new Uint32Array(buf);
+        u16[0] = CHUNK_MAGIC_WORD;
+        u16[1] = messageId;
+        u16[2] = chunkId;
+        u16[3] = offset + CHUNK_MAX_LENGTH_BYTES >= dataArrBuffer.byteLength ? 1 : 0;
+        u32[2] = dataArrBuffer.byteLength;
+        peer.send(buf);
       }
-    });
+    } else {
+      peer.send(dataArrBuffer);
+    }
   }
   broadcast(msg) {
     const ps = [];
@@ -2773,9 +2773,8 @@ var P2PCF = class extends import_events.default {
       }
     });
     peer.once("_iceComplete", () => {
-      if (timedOutIce && !completedIce) {
+      if (timedOutIce && !completedIce && !peer.connected) {
         timedOutIce = false;
-        completedIce = false;
         this._removePeer(peer, true);
         this._updateConnectedSessions();
         return;
