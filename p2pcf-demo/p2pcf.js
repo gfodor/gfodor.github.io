@@ -2385,7 +2385,7 @@ var P2PCF = class extends import_events.default {
           const peer2 = new import_tiny_simple_peer.default({
             config: peerOptions,
             proprietaryConstraints: this.rtcPeerConnectionProprietaryConstraints,
-            iceCompleteTimeout: 15e3,
+            iceCompleteTimeout: 8e3,
             initiator: true,
             sdpTransform: this.peerSdpTransform
           });
@@ -2763,7 +2763,6 @@ var P2PCF = class extends import_events.default {
     let timedOutIce = false;
     let completedIce = false;
     peer.on("iceTimeout", () => {
-      console.warn("ICE timeout for peer", peer.id);
       if (!completedIce) {
         timedOutIce = true;
       }
@@ -2771,10 +2770,12 @@ var P2PCF = class extends import_events.default {
     peer.once("_iceComplete", () => {
       if (timedOutIce && !completedIce && !peer.connected) {
         timedOutIce = false;
+        console.warn("ICE timeout for peer, removing", peer.id);
         this._removePeer(peer, true);
         this._updateConnectedSessions();
         return;
       }
+      console.log("ICE complete for", peer.id);
       completedIce = true;
       peer.on("signal", (signalData) => {
         const payloadBytes = textToArr(
