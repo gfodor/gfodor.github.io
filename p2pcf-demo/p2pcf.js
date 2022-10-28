@@ -983,6 +983,7 @@ var require_tiny_simple_peer = __commonJS({
         this.channelConfig = opts.channelConfig || Peer2.channelConfig;
         this.channelNegotiated = this.channelConfig.negotiated;
         this.config = Object.assign({}, Peer2.config, opts.config);
+        this.proprietaryConstraints = Object.assign({}, Peer2.proprietaryConstraints, opts.proprietaryConstraints);
         this.offerOptions = opts.offerOptions || {};
         this.answerOptions = opts.answerOptions || {};
         this.sdpTransform = opts.sdpTransform || ((sdp) => sdp);
@@ -1026,7 +1027,7 @@ var require_tiny_simple_peer = __commonJS({
         this._cb = null;
         this._interval = null;
         try {
-          this._pc = new this._wrtc.RTCPeerConnection(this.config);
+          this._pc = new this._wrtc.RTCPeerConnection(this.config, this.proprietaryConstraints);
         } catch (err) {
           this.destroy(errCode(err, "ERR_PC_CONSTRUCTOR"));
           return;
@@ -1773,13 +1774,11 @@ var require_tiny_simple_peer = __commonJS({
       _onTrack(event) {
         if (this.destroyed)
           return;
-        event.streams.forEach((eventStream) => {
+        const { track, receiver, streams } = event;
+        streams.forEach((eventStream) => {
           this._debug("on track");
-          this.emit("track", event.track, eventStream);
-          this._remoteTracks.push({
-            track: event.track,
-            stream: eventStream
-          });
+          this.emit("track", track, eventStream, receiver);
+          this._remoteTracks.push({ track, stream: eventStream });
           if (this._remoteStreams.some((remoteStream) => {
             return remoteStream.id === eventStream.id;
           }))
@@ -1787,7 +1786,7 @@ var require_tiny_simple_peer = __commonJS({
           this._remoteStreams.push(eventStream);
           queueMicrotask2(() => {
             this._debug("on stream");
-            this.emit("stream", eventStream);
+            this.emit("stream", eventStream, receiver);
           });
         });
       }
@@ -1810,6 +1809,7 @@ var require_tiny_simple_peer = __commonJS({
       sdpSemantics: "unified-plan"
     };
     Peer2.channelConfig = {};
+    Peer2.proprietaryConstraints = {};
     module.exports = Peer2;
   }
 });
@@ -1972,6 +1972,10 @@ var randomstring = (len) => {
   const str = bytes.reduce((accum, v) => accum + String.fromCharCode(v), "");
   return btoa(str).replaceAll("=", "");
 };
+var textDecoder = new TextDecoder("utf-8");
+var textEncoder = new TextEncoder();
+var arrToText = textDecoder.decode.bind(textDecoder);
+var textToArr = textEncoder.encode.bind(textEncoder);
 var removeInPlace = (a, condition) => {
   let i = 0;
   let j = 0;
@@ -2079,6 +2083,9 @@ var P2PCF = class extends import_events.default {
     this.lastProcessedReceivedDataTimestamps = /* @__PURE__ */ new Map();
     this.packageReceivedFromPeers = /* @__PURE__ */ new Set();
     this.startedAtTimestamp = null;
+    this.peerOptions = options.rtcPeerConnectionOptions || {};
+    this.peerProprietaryConstraints = options.rtcPeerConnectionProprietaryConstraints || {};
+    this.peerSdpTransform = options.sdpTransform || ((sdp) => sdp);
     this.workerUrl = options.workerUrl || "https://p2pcf.minddrop.workers.dev";
     if (this.workerUrl.endsWith("/")) {
       this.workerUrl = this.workerUrl.substring(0, this.workerUrl.length - 1);
@@ -2135,7 +2142,7 @@ var P2PCF = class extends import_events.default {
       fastPollingRateMs,
       slowPollingRateMs
     } = this;
-    const now = new Date().getTime();
+    const now = Date.now();
     if (finish) {
       if (this.finished)
         return;
@@ -2262,7 +2269,7 @@ var P2PCF = class extends import_events.default {
       turnIceServers
     } = this;
     const [localSessionId, , localSymmetric] = localPeerData;
-    const now = new Date().getTime();
+    const now = Date.now();
     for (const remotePeerData of remotePeerDatas) {
       const [
         remoteSessionId,
@@ -2280,7 +2287,7 @@ var P2PCF = class extends import_events.default {
       const iceServers = localSymmetric || remoteSymmetric ? turnIceServers : stunIceServers;
       const delaySetRemoteUntilReceiveCandidates = isFirefox;
       const remotePackage = remotePackages.find((p) => p[1] === remoteSessionId);
-      const peerOptions = { iceServers };
+      const peerOptions = { ...this.peerOptions, iceServers };
       if (localDtlsCert) {
         peerOptions.certificates = [localDtlsCert];
       }
@@ -2311,6 +2318,7 @@ var P2PCF = class extends import_events.default {
           config: peerOptions,
           initiator: false,
           iceCompleteTimeout: 3e3,
+          proprietaryConstraints: this.peerProprietaryConstraints,
           sdpTransform: (sdp) => {
             const lines = [];
             for (const l of sdp.split("\r\n")) {
@@ -2322,7 +2330,7 @@ var P2PCF = class extends import_events.default {
                 lines.push(l);
               }
             }
-            return lines.join("\r\n");
+            return this.peerSdpTransform(lines.join("\r\n"));
           }
         });
         peer.id = remoteSessionId;
@@ -2376,8 +2384,10 @@ var P2PCF = class extends import_events.default {
           const remotePwd = randomstring(32);
           const peer2 = new import_tiny_simple_peer.default({
             config: peerOptions,
+            proprietaryConstraints: this.rtcPeerConnectionProprietaryConstraints,
             iceCompleteTimeout: 3e3,
-            initiator: true
+            initiator: true,
+            sdpTransform: this.peerSdpTransform
           });
           peer2.id = remoteSessionId;
           peer2.client_id = remoteClientId;
@@ -2477,11 +2487,13 @@ var P2PCF = class extends import_events.default {
     for (const [sessionId, peer] of peers.entries()) {
       if (remoteSessionIds.includes(sessionId))
         continue;
-      this._removePeer(peer, true);
+      if (!peer.connected) {
+        this._removePeer(peer, true);
+      }
     }
   }
   async start() {
-    this.startedAtTimestamp = new Date().getTime();
+    this.startedAtTimestamp = Date.now();
     await this._init();
     const [
       udpEnabled,
@@ -2489,6 +2501,8 @@ var P2PCF = class extends import_events.default {
       reflexiveIps,
       dtlsFingerprint
     ] = await this._getNetworkSettings(this.dtlsCert);
+    if (this.finished)
+      return;
     this.udpEnabled = udpEnabled;
     this.isSymmetric = isSymmetric;
     this.reflexiveIps = reflexiveIps;
@@ -2511,7 +2525,7 @@ var P2PCF = class extends import_events.default {
     this._step = this._step.bind(this);
     this.stepInterval = setInterval(this._step, 500);
     this.destroyOnUnload = () => this.destroy();
-    for (const ev of iOSSafari ? ["pagehide"] : ["beforeunload", "unload"]) {
+    for (const ev of iOSSafari ? ["pagehide"] : ["unload"]) {
       window.addEventListener(ev, this.destroyOnUnload);
     }
   }
@@ -2704,7 +2718,7 @@ var P2PCF = class extends import_events.default {
       }
     }
     const u8 = new Uint8Array(msg, SIGNAL_MESSAGE_HEADER_WORDS.length * 2);
-    let payload = new TextDecoder("utf-8").decode(u8);
+    let payload = arrToText(u8);
     if (payload.endsWith("\0")) {
       payload = payload.substring(0, payload.length - 1);
     }
@@ -2748,9 +2762,19 @@ var P2PCF = class extends import_events.default {
       this._removePeer(peer);
       this._updateConnectedSessions();
     });
+    let timedOut = false;
+    peer.on("iceTimeout", () => {
+      console.warn("ICE timeout for peer", peer.id);
+      timedOut = true;
+    });
     peer.once("_iceComplete", () => {
+      if (timedOut) {
+        this._removePeer(peer);
+        this._updateConnectedSessions();
+        return;
+      }
       peer.on("signal", (signalData) => {
-        const payloadBytes = new TextEncoder().encode(
+        const payloadBytes = textToArr(
           JSON.stringify(signalData)
         );
         let len = payloadBytes.byteLength + SIGNAL_MESSAGE_HEADER_WORDS.length * 2;
