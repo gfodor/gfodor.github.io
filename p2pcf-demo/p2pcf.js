@@ -1923,7 +1923,7 @@ var decode = function(base64) {
 // src/p2pcf.js
 var import_convert_hex = __toESM(require_convert_hex());
 var import_array_buffer_to_hex = __toESM(require_array_buffer_to_hex());
-var CONNECT_TIMEOUT = 1e4;
+var CONNECT_TIMEOUT = 15e3;
 var MAX_MESSAGE_LENGTH_BYTES = 16e3;
 var CHUNK_HEADER_LENGTH_BYTES = 12;
 var CHUNK_MAGIC_WORD = 8121;
@@ -2370,7 +2370,7 @@ var P2PCF = class extends import_events.default {
         setTimeout(() => {
           if (!peer._iceComplete && peer.connected)
             return;
-          console.war("peer A didn't finish ICE", peer.id);
+          console.warn("peer A didn't finish ICE", peer.id);
           peer._iceComplete = true;
           this._removePeer(peer, true);
           this._updateConnectedSessions();
@@ -2435,7 +2435,7 @@ var P2PCF = class extends import_events.default {
           setTimeout(() => {
             if (!peer2._iceComplete && peer2.connected)
               return;
-            console.war("peer B didn't finish ICE", peer2.id);
+            console.warn("peer B didn't finish ICE", peer2.id);
             peer2._iceComplete = true;
             this._removePeer(peer2, true);
             this._updateConnectedSessions();
