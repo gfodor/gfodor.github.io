@@ -1923,6 +1923,7 @@ var decode = function(base64) {
 // src/p2pcf.js
 var import_convert_hex = __toESM(require_convert_hex());
 var import_array_buffer_to_hex = __toESM(require_array_buffer_to_hex());
+var CONNECT_TIMEOUT = 1e4;
 var MAX_MESSAGE_LENGTH_BYTES = 16e3;
 var CHUNK_HEADER_LENGTH_BYTES = 12;
 var CHUNK_MAGIC_WORD = 8121;
@@ -2318,7 +2319,7 @@ var P2PCF = class extends import_events.default {
         const peer = new import_tiny_simple_peer.default({
           config: peerOptions,
           initiator: false,
-          iceCompleteTimeout: 3e3,
+          iceCompleteTimeout: 1e5,
           proprietaryConstraints: this.peerProprietaryConstraints,
           sdpTransform: (sdp) => {
             const lines = [];
@@ -2357,6 +2358,7 @@ var P2PCF = class extends import_events.default {
         };
         peer.on("signal", initialCandidateSignalling);
         const finishIce = () => {
+          console.log("peer A finish ICE");
           peer.removeListener("signal", initialCandidateSignalling);
           if (localPackages.includes(pkg))
             return;
@@ -2365,6 +2367,14 @@ var P2PCF = class extends import_events.default {
           localPackages.push(pkg);
         };
         peer.once("_iceComplete", finishIce);
+        setTimeout(() => {
+          if (!peer._iceComplete && peer.connected)
+            return;
+          console.war("peer A didn't finish ICE", peer.id);
+          peer._iceComplete = true;
+          this._removePeer(peer, true);
+          this._updateConnectedSessions();
+        }, CONNECT_TIMEOUT);
         const remoteSdp = createSdp(
           true,
           remoteIceUFrag,
@@ -2386,7 +2396,7 @@ var P2PCF = class extends import_events.default {
           const peer2 = new import_tiny_simple_peer.default({
             config: peerOptions,
             proprietaryConstraints: this.rtcPeerConnectionProprietaryConstraints,
-            iceCompleteTimeout: 8e3,
+            iceCompleteTimeout: 1e5,
             initiator: true,
             sdpTransform: this.peerSdpTransform
           });
@@ -2413,6 +2423,7 @@ var P2PCF = class extends import_events.default {
           };
           peer2.on("signal", initialCandidateSignalling);
           const finishIce = () => {
+            console.log("peer B finish ICE");
             peer2.removeListener("signal", initialCandidateSignalling);
             if (localPackages.includes(pkg))
               return;
@@ -2421,6 +2432,14 @@ var P2PCF = class extends import_events.default {
             localPackages.push(pkg);
           };
           peer2.once("_iceComplete", finishIce);
+          setTimeout(() => {
+            if (!peer2._iceComplete && peer2.connected)
+              return;
+            console.war("peer B didn't finish ICE", peer2.id);
+            peer2._iceComplete = true;
+            this._removePeer(peer2, true);
+            this._updateConnectedSessions();
+          }, CONNECT_TIMEOUT);
           const enqueuePackageFromOffer = (e) => {
             if (e.type !== "offer")
               return;
@@ -2761,20 +2780,7 @@ var P2PCF = class extends import_events.default {
       this._removePeer(peer);
       this._updateConnectedSessions();
     });
-    let timedOutIce = false;
-    let completedIce = false;
-    peer.on("iceTimeout", () => {
-      if (!completedIce) {
-        timedOutIce = true;
-      }
-    });
     peer.once("_iceComplete", () => {
-      if (timedOutIce && !completedIce && !peer.connected) {
-        timedOutIce = false;
-        console.warn("ICE timeout for peer, not removing", peer.id);
-      }
-      console.log("ICE complete for", peer.id);
-      completedIce = true;
       peer.on("signal", (signalData) => {
         const payloadBytes = textToArr(
           JSON.stringify(signalData)
