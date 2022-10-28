@@ -2368,7 +2368,7 @@ var P2PCF = class extends import_events.default {
         };
         peer.once("_iceComplete", finishIce);
         setTimeout(() => {
-          if (!peer._iceComplete && peer.connected)
+          if (peer._iceComplete || peer.connected)
             return;
           console.warn("peer A didn't finish ICE", peer.id);
           peer._iceComplete = true;
@@ -2433,7 +2433,7 @@ var P2PCF = class extends import_events.default {
           };
           peer2.once("_iceComplete", finishIce);
           setTimeout(() => {
-            if (!peer2._iceComplete && peer2.connected)
+            if (peer2._iceComplete || peer2.connected)
               return;
             console.warn("peer B didn't finish ICE", peer2.id);
             peer2._iceComplete = true;
