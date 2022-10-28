@@ -2488,7 +2488,7 @@ var P2PCF = class extends import_events.default {
       if (remoteSessionIds.includes(sessionId))
         continue;
       if (!peer.connected) {
-        console.warn("removing unconnected peer not in peer list");
+        console.warn("Removing unconnected peer not in peer list", peer.id);
         this._removePeer(peer, true);
       }
     }
