@@ -2725,6 +2725,7 @@ var P2PCF = class extends import_events.default {
     peer.signal(payload);
   }
   _wireUpCommonPeerEvents(peer) {
+    console.log("wiring up events for ", peer.id);
     peer.on("connect", () => {
       this.emit("peerconnect", peer);
       removeInPlace(this.packages, (pkg) => pkg[0] === peer.id);
