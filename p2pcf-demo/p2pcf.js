@@ -2385,7 +2385,7 @@ var P2PCF = class extends import_events.default {
           const peer2 = new import_tiny_simple_peer.default({
             config: peerOptions,
             proprietaryConstraints: this.rtcPeerConnectionProprietaryConstraints,
-            iceCompleteTimeout: 3e3,
+            iceCompleteTimeout: 15e3,
             initiator: true,
             sdpTransform: this.peerSdpTransform
           });
