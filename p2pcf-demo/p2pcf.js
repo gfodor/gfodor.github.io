@@ -2770,10 +2770,7 @@ var P2PCF = class extends import_events.default {
     peer.once("_iceComplete", () => {
       if (timedOutIce && !completedIce && !peer.connected) {
         timedOutIce = false;
-        console.warn("ICE timeout for peer, removing", peer.id);
-        this._removePeer(peer, true);
-        this._updateConnectedSessions();
-        return;
+        console.warn("ICE timeout for peer, not removing", peer.id);
       }
       console.log("ICE complete for", peer.id);
       completedIce = true;
