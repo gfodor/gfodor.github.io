@@ -2773,13 +2773,14 @@ var P2PCF = class extends import_events.default {
       }
     });
     peer.once("_iceComplete", () => {
-      completedIce = true;
-      if (timedOutIce) {
+      if (timedOutIce && !completedIce) {
         timedOutIce = false;
+        completedIce = false;
         this._removePeer(peer, true);
         this._updateConnectedSessions();
         return;
       }
+      completedIce = true;
       peer.on("signal", (signalData) => {
         const payloadBytes = textToArr(
           JSON.stringify(signalData)
