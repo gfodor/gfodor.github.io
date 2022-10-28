@@ -8,7 +8,8 @@ if (!document.location.hash) {
 
 const p2pcf = new P2PCF(
   'user-' + Math.floor(Math.random() * 100000),
-  document.location.hash.substring(1)
+  document.location.hash.substring(1),
+  { workerUrl: "https://webspace-worker.minddrop.workers.dev" }
 )
 window.p2pcf = p2pcf
 
