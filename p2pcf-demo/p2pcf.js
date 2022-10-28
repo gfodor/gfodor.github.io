@@ -2488,6 +2488,7 @@ var P2PCF = class extends import_events.default {
       if (remoteSessionIds.includes(sessionId))
         continue;
       if (!peer.connected) {
+        console.warn("removing unconnected peer not in peer list");
         this._removePeer(peer, true);
       }
     }
@@ -2763,14 +2764,19 @@ var P2PCF = class extends import_events.default {
       this._removePeer(peer);
       this._updateConnectedSessions();
     });
-    let timedOut = false;
+    let timedOutIce = false;
+    let completedIce = false;
     peer.on("iceTimeout", () => {
       console.warn("ICE timeout for peer", peer.id);
-      timedOut = true;
+      if (!completedIce) {
+        timedOutIce = true;
+      }
     });
     peer.once("_iceComplete", () => {
-      if (timedOut) {
-        this._removePeer(peer);
+      completedIce = true;
+      if (timedOutIce) {
+        timedOutIce = false;
+        this._removePeer(peer, true);
         this._updateConnectedSessions();
         return;
       }
