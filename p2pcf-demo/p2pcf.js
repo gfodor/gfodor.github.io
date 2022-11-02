@@ -1726,7 +1726,6 @@ var require_tiny_simple_peer = __commonJS({
         this.emit("signalingStateChange", this._pc.signalingState);
       }
       _onIceCandidate(event) {
-        console.log("on ice candidate", this.trickle, event.candidate);
         if (this.destroyed)
           return;
         if (event.candidate && this.trickle) {
@@ -1923,7 +1922,6 @@ var decode = function(base64) {
 // src/p2pcf.js
 var import_convert_hex = __toESM(require_convert_hex());
 var import_array_buffer_to_hex = __toESM(require_array_buffer_to_hex());
-var CONNECT_TIMEOUT = 15e3;
 var MAX_MESSAGE_LENGTH_BYTES = 16e3;
 var CHUNK_HEADER_LENGTH_BYTES = 12;
 var CHUNK_MAGIC_WORD = 8121;
@@ -2319,7 +2317,7 @@ var P2PCF = class extends import_events.default {
         const peer = new import_tiny_simple_peer.default({
           config: peerOptions,
           initiator: false,
-          iceCompleteTimeout: 1e5,
+          iceCompleteTimeout: 3e3,
           proprietaryConstraints: this.peerProprietaryConstraints,
           sdpTransform: (sdp) => {
             const lines = [];
@@ -2358,7 +2356,6 @@ var P2PCF = class extends import_events.default {
         };
         peer.on("signal", initialCandidateSignalling);
         const finishIce = () => {
-          console.log("peer A finish ICE");
           peer.removeListener("signal", initialCandidateSignalling);
           if (localPackages.includes(pkg))
             return;
@@ -2367,14 +2364,6 @@ var P2PCF = class extends import_events.default {
           localPackages.push(pkg);
         };
         peer.once("_iceComplete", finishIce);
-        setTimeout(() => {
-          if (peer._iceComplete || peer.connected)
-            return;
-          console.warn("peer A didn't finish ICE", peer.id);
-          peer._iceComplete = true;
-          this._removePeer(peer, true);
-          this._updateConnectedSessions();
-        }, CONNECT_TIMEOUT);
         const remoteSdp = createSdp(
           true,
           remoteIceUFrag,
@@ -2396,7 +2385,7 @@ var P2PCF = class extends import_events.default {
           const peer2 = new import_tiny_simple_peer.default({
             config: peerOptions,
             proprietaryConstraints: this.rtcPeerConnectionProprietaryConstraints,
-            iceCompleteTimeout: 1e5,
+            iceCompleteTimeout: 3e3,
             initiator: true,
             sdpTransform: this.peerSdpTransform
           });
@@ -2423,7 +2412,6 @@ var P2PCF = class extends import_events.default {
           };
           peer2.on("signal", initialCandidateSignalling);
           const finishIce = () => {
-            console.log("peer B finish ICE");
             peer2.removeListener("signal", initialCandidateSignalling);
             if (localPackages.includes(pkg))
               return;
@@ -2432,14 +2420,6 @@ var P2PCF = class extends import_events.default {
             localPackages.push(pkg);
           };
           peer2.once("_iceComplete", finishIce);
-          setTimeout(() => {
-            if (peer2._iceComplete || peer2.connected)
-              return;
-            console.warn("peer B didn't finish ICE", peer2.id);
-            peer2._iceComplete = true;
-            this._removePeer(peer2, true);
-            this._updateConnectedSessions();
-          }, CONNECT_TIMEOUT);
           const enqueuePackageFromOffer = (e) => {
             if (e.type !== "offer")
               return;
@@ -2507,10 +2487,7 @@ var P2PCF = class extends import_events.default {
     for (const [sessionId, peer] of peers.entries()) {
       if (remoteSessionIds.includes(sessionId))
         continue;
-      if (!peer.connected) {
-        console.warn("Removing unconnected peer not in peer list", peer.id);
-        this._removePeer(peer, true);
-      }
+      this._removePeer(peer, true);
     }
   }
   async start() {
@@ -2563,55 +2540,59 @@ var P2PCF = class extends import_events.default {
     this.emit("peerclose", peer);
   }
   send(peer, msg) {
-    if (!peer.connected)
-      return;
-    let dataArrBuffer = null;
-    let messageId = null;
-    if (msg instanceof ArrayBuffer) {
-      dataArrBuffer = msg;
-    } else if (msg instanceof Uint8Array) {
-      if (msg.buffer.byteLength === msg.length) {
-        dataArrBuffer = msg.buffer;
-      } else {
-        dataArrBuffer = msg.buffer.slice(msg.byteOffset, msg.byteOffset + msg.byteLength);
-      }
-    } else {
-      throw new Error("Unsupported send data type", msg);
-    }
-    if (dataArrBuffer.byteLength > MAX_MESSAGE_LENGTH_BYTES || new Uint16Array(dataArrBuffer, 0, 1) === CHUNK_MAGIC_WORD) {
-      messageId = Math.floor(Math.random() * 256 * 128);
-    }
-    if (messageId !== null) {
-      for (let offset = 0, chunkId = 0; offset < dataArrBuffer.byteLength; offset += CHUNK_MAX_LENGTH_BYTES, chunkId++) {
-        const chunkSize = Math.min(
-          CHUNK_MAX_LENGTH_BYTES,
-          dataArrBuffer.byteLength - offset
-        );
-        let bufSize = CHUNK_HEADER_LENGTH_BYTES + chunkSize;
-        while (bufSize % 4 !== 0) {
-          bufSize++;
+    return new Promise((resolve, reject) => {
+      let dataArrBuffer = null;
+      let messageId = null;
+      if (msg instanceof ArrayBuffer) {
+        dataArrBuffer = msg;
+      } else if (msg instanceof Uint8Array) {
+        if (msg.buffer.byteLength === msg.length) {
+          dataArrBuffer = msg.buffer;
+        } else {
+          dataArrBuffer = msg.buffer.slice(msg.byteOffset, msg.byteOffset + msg.byteLength);
         }
-        const buf = new ArrayBuffer(bufSize);
-        new Uint8Array(buf, CHUNK_HEADER_LENGTH_BYTES).set(
-          new Uint8Array(dataArrBuffer, offset, chunkSize)
-        );
-        const u16 = new Uint16Array(buf);
-        const u32 = new Uint32Array(buf);
-        u16[0] = CHUNK_MAGIC_WORD;
-        u16[1] = messageId;
-        u16[2] = chunkId;
-        u16[3] = offset + CHUNK_MAX_LENGTH_BYTES >= dataArrBuffer.byteLength ? 1 : 0;
-        u32[2] = dataArrBuffer.byteLength;
-        peer.send(buf);
+      } else {
+        throw new Error("Unsupported send data type", msg);
       }
-    } else {
-      peer.send(dataArrBuffer);
-    }
+      if (dataArrBuffer.byteLength > MAX_MESSAGE_LENGTH_BYTES || new Uint16Array(dataArrBuffer, 0, 1) === CHUNK_MAGIC_WORD) {
+        messageId = Math.floor(Math.random() * 256 * 128);
+      }
+      if (messageId !== null) {
+        for (let offset = 0, chunkId = 0; offset < dataArrBuffer.byteLength; offset += CHUNK_MAX_LENGTH_BYTES, chunkId++) {
+          const chunkSize = Math.min(
+            CHUNK_MAX_LENGTH_BYTES,
+            dataArrBuffer.byteLength - offset
+          );
+          let bufSize = CHUNK_HEADER_LENGTH_BYTES + chunkSize;
+          while (bufSize % 4 !== 0) {
+            bufSize++;
+          }
+          const buf = new ArrayBuffer(bufSize);
+          new Uint8Array(buf, CHUNK_HEADER_LENGTH_BYTES).set(
+            new Uint8Array(dataArrBuffer, offset, chunkSize)
+          );
+          const u16 = new Uint16Array(buf);
+          const u32 = new Uint32Array(buf);
+          u16[0] = CHUNK_MAGIC_WORD;
+          u16[1] = messageId;
+          u16[2] = chunkId;
+          u16[3] = offset + CHUNK_MAX_LENGTH_BYTES >= dataArrBuffer.byteLength ? 1 : 0;
+          u32[2] = dataArrBuffer.byteLength;
+          peer.send(buf);
+        }
+      } else {
+        peer.send(dataArrBuffer);
+      }
+    });
   }
   broadcast(msg) {
+    const ps = [];
     for (const peer of this.peers.values()) {
-      this.send(peer, msg);
+      if (!peer.connected)
+        continue;
+      ps.push(this.send(peer, msg));
     }
+    return Promise.all(ps);
   }
   destroy() {
     if (this._step) {
@@ -2742,7 +2723,6 @@ var P2PCF = class extends import_events.default {
     peer.signal(payload);
   }
   _wireUpCommonPeerEvents(peer) {
-    console.log("wiring up events for ", peer.id);
     peer.on("connect", () => {
       this.emit("peerconnect", peer);
       removeInPlace(this.packages, (pkg) => pkg[0] === peer.id);
