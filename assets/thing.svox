@@ -1,5 +1,5 @@
 model
-name = Thing
+name = Another Thing
 revision = 28
 size = 3 4 3
 origin = -y
