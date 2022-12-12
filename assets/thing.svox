@@ -1,14 +1,17 @@
 model
 name = Another Thing
-revision = 28
-size = 3 4 3
+revision = 38
+size = 6
 origin = -y
 shell = Outline 0.25
 material type = toon, lighting = smooth, deform = 1 1
-  colors = B:#E12D39
+  colors = B:#E12D39 C:#620042
 material type = basic, lighting = smooth, roughness = 0, refractionRatio = 1, side = back
   colors = Outline:#000
 voxels
---- BBB BBB BBB 
---- BBB BBB BBB 
---- BBB BBB BBB 
+------ ------ ------ ------ ------ ------ 
+------ ------ -BBB-- -BBB-- -BBB-- ------ 
+------ ------ -BBB-- -BBB-- -BBB-- ------ 
+------ ------ -BBB-- -BBBC- -BBBC- ------ 
+------ ------ ------ ------ --CCC- ---CC- 
+------ ------ ------ ------ ----B- ----BB 
