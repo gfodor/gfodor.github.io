@@ -3,8 +3,11 @@ name = main
 size = 21
 scale = 0.05
 origin = -y
-material type = toon, lighting = smooth, deform = 1 1 
+shell = Outline 0.25
+material type = toon, lighting = smooth, deform = 1 1
   colors = A:#FC9
+material type = basic, lighting = smooth, roughness = 0, refractionRatio = 1, side = back
+  colors = Outline:#000
 voxels
 --------------------- --------------------- --------------------- --------------------- --------------------- --------------------- --------------------- --AAAAA-------AAAAA-- --------------------- --------------------- --------------------- --------------------- --------------------- -AAAAAAAAAAAAAAAAAAA- --A-A-A-A-A-A-A-A-A-- --------------------- AAAAA-----------AAAAA AAAAA-----------AAAAA A-A-A-----------A-A-A AAAAA-----------AAAAA A-A-A-----------A-A-A 
 --AAAAA-------AAAAA-- --AAAAA-------AAAAA-- --AAAAA-------AAAAA-- --AAAAA-------AAAAA-- --AAAAA-------AAAAA-- --AAAAA-------AAAAA-- --AAAAA-------AAAAA-- -AAAAAAA-----AAAAAAA- --AAAAA-------AAAAA-- --AAAAAA-----AAAAAA-- --AAAAAAA---AAAAAAA-- --A-A-AAAAAAAAA-A-A-- --AAAAAAAAAAAAAAAAA-- -AAA-------------AAA- -AAA-------------AAA- --A---------------A-- AAAAA-----------AAAAA A---A-----------A---A --------------------- A---A-----------A---A --------------------- 
