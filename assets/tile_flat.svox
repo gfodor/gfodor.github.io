@@ -3,8 +3,11 @@ name = main
 size = 16 3 16
 scale = 0.05
 origin = -y
-material type = toon, lighting = smooth, deform = 1 1 
+shell = Outline 0.25
+material type = toon, lighting = smooth, deform = 1 1
   colors = A:#7B5480 B:#A6859F C:#D9BDC8 D:#4A3052
+material type = basic, lighting = smooth, roughness = 0, refractionRatio = 1, side = back
+  colors = Outline:#000
 voxels
 AAAAAAAAAAAAAAAA AAAAAAAAAAAAAAAA AAAAAAADAAAAAAAD 
 AAAAAAAAAAAAAAAA AAAAAAAAAAAAAAAA BBBBBBBABBBBBBBA 
