@@ -1,0 +1,16 @@
+model
+name = main
+size = 3 8 8
+scale = 0.05
+origin = -y
+material type = toon, lighting = smooth, deform = 1 1 
+  colors = A:#FCEF8D B:#FFB879 C:#FFF
+voxels
+--- --- --- AAA AAA --- --- --- 
+--- AAA AAA ABA ABA AAA AAA --- 
+--- AAA -B- -B- -B- -B- AAA --- 
+AAA AAA -B- -A- -A- -A- AAA AAA 
+AAA AAA -B- -A- -A- -C- AAA AAA 
+--- AAA -B- -A- -C- -C- AAA --- 
+--- AAA AAA ABA ABA AAA AAA --- 
+--- --- --- AAA AAA --- --- --- 
