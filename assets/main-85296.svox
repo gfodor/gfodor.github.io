@@ -1,0 +1,24 @@
+size     = 10
+scale    = 0.1 0.12 0.1
+origin   = -y
+clamp = -y
+ao = 2 2 // Ambient Occlusion mainly for the top of the trunk
+
+material lighting = flat, roughness = 1, deform =  2, scatter = 0.15
+  colors = T:#A20
+
+// Light top and dark bottom foliage with fade for added contrast
+// Warp the foliage, regenerate gives a different looking tree every time
+material lighting = smooth, roughness = 1, deform =  2, scatter = 0.15, warp = 1 0.2, fade = true
+  colors = L:#060 M:#0A0 
+voxels
+---------- ---------- ---------- ---------- ---------- ---------- ---MMMM--- ---MMMM--- ---------- ----------
+---------- ---------- ---------- ---------- ---------- ---LLLL--- --MMMMMM-- --MMMMMM-- ---MMMM--- ----------
+------T--- ---------- ---------- ---------- ---LLLL--- --LLLLLL-- -MMMMMMMM- -MMMMMMMM- --MMMMMM-- ---MMMM---
+------T--- ---------- ---------- ---------- --LLLLLL-- -LLLLLLLL- MMMMMMMMMM MMMMMMMMMM -MMMMMMMM- --MMMMMM--
+-TTTTTT--- ----TT---- ----TT---- ----TT---- --LLLLLL-- -LLLLLLLL- MMMMMMMMMM MMMMMMMMMM -MMMMMMMM- --MMMMMM--
+----TT---- ----TT---- ----TT---- ----TT---- --LLLLLL-- -LLLLLLLL- MMMMMMMMMM MMMMMMMMMM -MMMMMMMM- --MMMMMM--
+-----T---- ---------- ---------- ---------- --LLLLLL-- -LLLLLLLL- MMMMMMMMMM MMMMMMMMMM -MMMMMMMM- --MMMMMM--
+-----T---- ---------- ---------- ---------- ---LLLL--- --LLLLLL-- -MMMMMMMM- -MMMMMMMM- --MMMMMM-- ---MMMM---
+---------- ---------- ---------- ---------- ---------- ---LLLL--- --MMMMMM-- --MMMMMM-- ---MMMM--- ----------
+---------- ---------- ---------- ---------- ---------- ---------- ---MMMM--- ---MMMM--- ---------- ----------
