@@ -1,22 +1,22 @@
 model
 name = main
-revision = 6
+revision = 12
 size = 7
 scale = 0.15 0.17 0.15
 origin = -y
 ao = 5 3
 shell = Outline 0.25
 material lighting = smooth, roughness = 0.25, fade = true, deform = 3 1
-  colors = G:#014D40 H:#27AB83 C:#F93 B:#F60 D:#000
+  colors = G:#014D40 H:#27AB83 I:#C6F7E2 D:#000 J:#F9703E
 material lighting = smooth, fade = true, deform = 3 1
-  colors = E:#840 F:#000
+  colors = F:#000
 material type = basic, lighting = smooth, roughness = 0, refractionRatio = 1, side = back
   colors = Outline:#000
 voxels
 ------- --GGG-- --GGG-- --GGG-- ------- ------- ------- 
 --GGG-- -HGGGG- -HGGGG- -HGGGG- -HGGGG- ------- ------- 
--HGDGG- BGGGGGG BGGGGGG BGGGGGG -H---G- ------- ------- 
--HDDDG- BGGGGGG CGGGGGG CGHGGGG -H-E-G- ---E--- ---FF-- 
--HHDHG- BGGGGGG CGGGGGG CGHHGGG -C---G- ------- ------- 
---HHH-- -BGGGH- -CGGGH- -CGGGH- -CCHHH- ------- ------- 
-------- --HHH-- --CCH-- --CCH-- ------- ------- ------- 
+-HGDGG- IGGGGGG IGGGGGG IGGGGGG -H---G- ------- ------- 
+-HDDDG- IGGGGGG IGGGGGG IGHGGGG -H-J-G- ---J--- ---FF-- 
+-HHDHG- IGGGGGG IGGGGGG IGHHGGG -I---G- ------- ------- 
+--HHH-- -HGGGH- -IGGGH- -IGGGH- -IIHHH- ------- ------- 
+------- --HHH-- --IIH-- --IIH-- ------- ------- ------- 
