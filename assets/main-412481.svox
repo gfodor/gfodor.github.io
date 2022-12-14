@@ -1,0 +1,16 @@
+size = 8 8 8
+scale = 0.125
+origin = -y
+clamp = y
+skip = none
+material lighting = both, wireframe = false, roughness = 0.5, metalness = 0, emissive = #000 0, opacity = 1.0, deform = 4 
+  colors = A:#006040 B:#0040A0
+voxels
+AAAAAAAA AAAAAAAA AAAAAAAA -------- -------- -----BBB -----BBB -----BBB
+AAAAAAAA AAAAAAAA AAAAAAAA -------- -------- ---BBBB- ---BBBBB ---BBBB-
+AAAAAAAA AAAAAAAA AAAAAAAA -------- -------- --BBBB-- --BBBBBB --BBBB--
+AAAAAAAA AAAAAAAA AAAAAAAA -------- -------- -BBBB--- -BBBBBBB -BBBB---
+AAAAAAAA AAAAAAAA AAAAAAAA -------- -------- -BBB---B -BBBBBBB -BBB---B
+AAAAAAAA AAAAAAAA AAAAAAAA -------- -------- BBB---BB BBBBBBBB BBB---BB
+AAAAAAAA AAAAAAAA AAAAAAAA -------- -------- BB---BBB BBBBBBBB BB---BBB
+AAAAAAAA AAAAAAAA AAAAAAAA -------- -------- B---BBBB BBBBBBBB B---BBBB
