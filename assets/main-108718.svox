@@ -1,21 +1,16 @@
 model
-size     = 19 1 40
-scale    = 0.04
-origin   = -y 
-material lighting = both, roughness = 0.4, metalness = 1, deform = 6
+name = main
+size = 19 1 40
+scale = 0.04
+origin = -y
+shell = Outline 0.25
+material lighting = both, roughness = 0.4, metalness = 1, deform = 6 1
   colors = A:#DEF
-material lighting = both, roughness = 0.4, metalness = 1, deform = 1, clamp = y
+material lighting = both, roughness = 0.4, metalness = 1, deform = 1 1, clamp = y
   colors = B:#445
-material lighting = both, roughness = 0.4, metalness = 1, deform = 1
+material lighting = both, roughness = 0.4, metalness = 1, deform = 1 1
   colors = C:#864
+material type = basic, lighting = smooth, roughness = 0, refractionRatio = 1, side = back
+  colors = Outline:#000
 voxels
-   ---------A---------
-   --------AAA--------
-   -------AAAAA-------
-   -------AAAAA-------
-25(-------AABAA-------)
-   BBCCCCCBBBBBCCCCCBB
-   BBCCCCCCCCCCCCCCCBB
-   -------CCCCC-------
- 6(--------CCC--------)
- 2(-------BBBBB-------)
+9-A17-3A15-2(5A14-)24(2AB2A14-)2AB2A7-2B5C5B5C4B15C2B7-5C15-5(3C16-)3C15-5B14-5B7-
