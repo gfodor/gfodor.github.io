@@ -1,11 +1,16 @@
+model
+name = main
 size = 7
 scale = 0.15 0.17 0.15
 origin = -y
 ao = 5 3
-material lighting = smooth, roughness = 0.25, fade = true, deform = 3
-  colors = A:#C11 B:#F60 D:#000 C:#F93
-material lighting = smooth, roughness = 1, fade = true, deform = 3
+shell = Outline 0.25
+material lighting = smooth, roughness = 0.25, fade = true, deform = 3 1
+  colors = A:#C11 B:#F60 C:#F93 D:#000
+material lighting = smooth, fade = true, deform = 3 1
   colors = E:#840 F:#000
+material type = basic, lighting = smooth, roughness = 0, refractionRatio = 1, side = back
+  colors = Outline:#000
 voxels
 ------- --AAA-- --AAA-- --AAA-- ------- ------- ------- 
 --AAA-- -BAAAA- -BAAAA- -BAAAA- -BAAAA- ------- ------- 
@@ -13,4 +18,4 @@ voxels
 -BDDDA- BAAAAAA CAAAAAA CABAAAA -B-E-A- ---E--- ---FF-- 
 -BBDBA- BAAAAAA CAAAAAA CABBAAA -C---A- ------- ------- 
 --BBB-- -BAAAB- -CAAAB- -CAAAB- -CCBBB- ------- ------- 
-------- --BBB-- --CCB-- --CCB-- ------- ------- -------
+------- --BBB-- --CCB-- --CCB-- ------- ------- ------- 
