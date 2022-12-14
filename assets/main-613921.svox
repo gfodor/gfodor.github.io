@@ -1,0 +1,24 @@
+size = 9 9 9 
+scale = 0.11 0.09 0.11
+shape = cylinder-y
+resize = model
+origin = -y
+rotation = 0 0 0
+wireframe = false
+
+material lighting = smooth, deform = 2 0.7, roughness = 0.75, fade = true
+  colors = A:#A30 D:#820
+material lighting = smooth, deform = 1 0.5, roughness = 0.75, fade = true
+  colors = B:#A30 S:#040
+material lighting = smooth, deform = 2 0.7, roughness = 0.75, fade = true, ao = #000 3 -6, emissive = #420, fog = false 
+  colors = C:#A30
+voxels
+--------- DAAADAAAD DAAADAAAD DAAADAAAD DAAADAAAD DAAADAAAD DAAADAAAD --------- --------- 
+-DAADAAD- ACCCCCCCA ACCCCCCCA ACCCCCCCA ACCCCCCCA ACCCCCCCA ACCCCCCCA -DAADAAD- ---------
+-ADADADA- ACCCCCCCA ACCCCCCCA ACCCCCCCA ACCCCCCCA ACCCCCCCA ACCCCCCCA -ADADDAA- ---------
+-AADDDAA- ACCCCCCCA ACCCCCCCA ACCCCCCCA ACCCCCCCA ACCCCCCCA ACCCCCCCA -AADDDAA- --SSS----
+-DDDDDDD- DCCCCCCCD DCCCCCCCD DCC---CCD DCC---CCD DCCCCCCCD DCCCCCCCD -DDDDDDD- ---SS----
+-AADDDAA- ACCCCCCCA ACC---CCA AC-----CA AC-----CA ACC---CCA ACCCCCCCA -AADDDAA- ---------
+-ADADADA- ACCCCCCCA AC-----CA AC-----CA AC-----CA AC-----CA ACCCCCCCA -ADADADA- ---------
+-DAADAAD- ACCCCCCCA AC-----CA AC-----CA AC-----CA AC-----CA ACCCCCCCA -DAADAAD- ---------
+--------- AAAADAAAA DA-B---AD DA---B-AD DAAADAAAD DA--D--AD DAAADAAAD --------- ---------
