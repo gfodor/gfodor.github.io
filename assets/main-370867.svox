@@ -1,0 +1,16 @@
+size = 7
+scale = 0.15 0.17 0.15
+origin = -y
+ao = 5 3
+material lighting = smooth, roughness = 0.25, fade = true, deform = 3
+  colors = A:#C11 B:#F60 D:#000 C:#F93
+material lighting = smooth, roughness = 1, fade = true, deform = 3
+  colors = E:#840 F:#000
+voxels
+------- --AAA-- --AAA-- --AAA-- ------- ------- ------- 
+--AAA-- -BAAAA- -BAAAA- -BAAAA- -BAAAA- ------- ------- 
+-BADAA- BAAAAAA BAAAAAA BAAAAAA -B---A- ------- ------- 
+-BDDDA- BAAAAAA CAAAAAA CABAAAA -B-E-A- ---E--- ---FF-- 
+-BBDBA- BAAAAAA CAAAAAA CABBAAA -C---A- ------- ------- 
+--BBB-- -BAAAB- -CAAAB- -CAAAB- -CCBBB- ------- ------- 
+------- --BBB-- --CCB-- --CCB-- ------- ------- -------
