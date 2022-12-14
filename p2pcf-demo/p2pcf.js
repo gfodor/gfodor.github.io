@@ -1922,7 +1922,9 @@ var decode = function(base64) {
 // src/p2pcf.js
 var import_convert_hex = __toESM(require_convert_hex());
 var import_array_buffer_to_hex = __toESM(require_array_buffer_to_hex());
+var CONNECT_TIMEOUT = 15e3;
 var MAX_MESSAGE_LENGTH_BYTES = 16e3;
+var TRICKLE_ICE_TIMEOUT = 3e3;
 var CHUNK_HEADER_LENGTH_BYTES = 12;
 var CHUNK_MAGIC_WORD = 8121;
 var CHUNK_MAX_LENGTH_BYTES = MAX_MESSAGE_LENGTH_BYTES - CHUNK_HEADER_LENGTH_BYTES;
@@ -2317,7 +2319,7 @@ var P2PCF = class extends import_events.default {
         const peer = new import_tiny_simple_peer.default({
           config: peerOptions,
           initiator: false,
-          iceCompleteTimeout: 3e3,
+          iceCompleteTimeout: Infinity,
           proprietaryConstraints: this.peerProprietaryConstraints,
           sdpTransform: (sdp) => {
             const lines = [];
@@ -2349,12 +2351,7 @@ var P2PCF = class extends import_events.default {
           []
         ];
         const pkgCandidates = pkg[pkg.length - 1];
-        const initialCandidateSignalling = (e) => {
-          if (!e.candidate?.candidate)
-            return;
-          pkgCandidates.push(e.candidate.candidate);
-        };
-        peer.on("signal", initialCandidateSignalling);
+        let finishIceTimeout = null;
         const finishIce = () => {
           peer.removeListener("signal", initialCandidateSignalling);
           if (localPackages.includes(pkg))
@@ -2363,7 +2360,26 @@ var P2PCF = class extends import_events.default {
             return;
           localPackages.push(pkg);
         };
-        peer.once("_iceComplete", finishIce);
+        const initialCandidateSignalling = (e) => {
+          if (!e.candidate)
+            return;
+          clearTimeout(finishIceTimeout);
+          if (e.candidate.candidate) {
+            pkgCandidates.push(e.candidate.candidate);
+            finishIceTimeout = setTimeout(finishIce, TRICKLE_ICE_TIMEOUT);
+          } else {
+            finishIce();
+          }
+        };
+        peer.on("signal", initialCandidateSignalling);
+        setTimeout(() => {
+          if (peer._iceComplete || peer.connected)
+            return;
+          console.warn("Peer A didn't connect in time", peer.id);
+          peer._iceComplete = true;
+          this._removePeer(peer, true);
+          this._updateConnectedSessions();
+        }, CONNECT_TIMEOUT);
         const remoteSdp = createSdp(
           true,
           remoteIceUFrag,
@@ -2385,7 +2401,7 @@ var P2PCF = class extends import_events.default {
           const peer2 = new import_tiny_simple_peer.default({
             config: peerOptions,
             proprietaryConstraints: this.rtcPeerConnectionProprietaryConstraints,
-            iceCompleteTimeout: 3e3,
+            iceCompleteTimeout: Infinity,
             initiator: true,
             sdpTransform: this.peerSdpTransform
           });
@@ -2405,12 +2421,7 @@ var P2PCF = class extends import_events.default {
             []
           ];
           const pkgCandidates = pkg[pkg.length - 1];
-          const initialCandidateSignalling = (e) => {
-            if (!e.candidate?.candidate)
-              return;
-            pkgCandidates.push(e.candidate.candidate);
-          };
-          peer2.on("signal", initialCandidateSignalling);
+          let finishIceTimeout = null;
           const finishIce = () => {
             peer2.removeListener("signal", initialCandidateSignalling);
             if (localPackages.includes(pkg))
@@ -2419,7 +2430,26 @@ var P2PCF = class extends import_events.default {
               return;
             localPackages.push(pkg);
           };
-          peer2.once("_iceComplete", finishIce);
+          const initialCandidateSignalling = (e) => {
+            if (!e.candidate)
+              return;
+            clearTimeout(finishIceTimeout);
+            if (e.candidate.candidate) {
+              pkgCandidates.push(e.candidate.candidate);
+              finishIceTimeout = setTimeout(finishIce, TRICKLE_ICE_TIMEOUT);
+            } else {
+              finishIce();
+            }
+          };
+          peer2.on("signal", initialCandidateSignalling);
+          setTimeout(() => {
+            if (peer2._iceComplete || peer2.connected)
+              return;
+            console.warn("Peer B failed to connect in time", peer2.id);
+            peer2._iceComplete = true;
+            this._removePeer(peer2, true);
+            this._updateConnectedSessions();
+          }, CONNECT_TIMEOUT);
           const enqueuePackageFromOffer = (e) => {
             if (e.type !== "offer")
               return;
@@ -2487,7 +2517,10 @@ var P2PCF = class extends import_events.default {
     for (const [sessionId, peer] of peers.entries()) {
       if (remoteSessionIds.includes(sessionId))
         continue;
-      this._removePeer(peer, true);
+      if (!peer.connected) {
+        console.warn("Removing unconnected peer not in peer list", peer.id);
+        this._removePeer(peer, true);
+      }
     }
   }
   async start() {
@@ -2540,59 +2573,55 @@ var P2PCF = class extends import_events.default {
     this.emit("peerclose", peer);
   }
   send(peer, msg) {
-    return new Promise((resolve, reject) => {
-      let dataArrBuffer = null;
-      let messageId = null;
-      if (msg instanceof ArrayBuffer) {
-        dataArrBuffer = msg;
-      } else if (msg instanceof Uint8Array) {
-        if (msg.buffer.byteLength === msg.length) {
-          dataArrBuffer = msg.buffer;
-        } else {
-          dataArrBuffer = msg.buffer.slice(msg.byteOffset, msg.byteOffset + msg.byteLength);
-        }
+    if (!peer.connected)
+      return;
+    let dataArrBuffer = null;
+    let messageId = null;
+    if (msg instanceof ArrayBuffer) {
+      dataArrBuffer = msg;
+    } else if (msg instanceof Uint8Array) {
+      if (msg.buffer.byteLength === msg.length) {
+        dataArrBuffer = msg.buffer;
       } else {
-        throw new Error("Unsupported send data type", msg);
+        dataArrBuffer = msg.buffer.slice(msg.byteOffset, msg.byteOffset + msg.byteLength);
       }
-      if (dataArrBuffer.byteLength > MAX_MESSAGE_LENGTH_BYTES || new Uint16Array(dataArrBuffer, 0, 1) === CHUNK_MAGIC_WORD) {
-        messageId = Math.floor(Math.random() * 256 * 128);
-      }
-      if (messageId !== null) {
-        for (let offset = 0, chunkId = 0; offset < dataArrBuffer.byteLength; offset += CHUNK_MAX_LENGTH_BYTES, chunkId++) {
-          const chunkSize = Math.min(
-            CHUNK_MAX_LENGTH_BYTES,
-            dataArrBuffer.byteLength - offset
-          );
-          let bufSize = CHUNK_HEADER_LENGTH_BYTES + chunkSize;
-          while (bufSize % 4 !== 0) {
-            bufSize++;
-          }
-          const buf = new ArrayBuffer(bufSize);
-          new Uint8Array(buf, CHUNK_HEADER_LENGTH_BYTES).set(
-            new Uint8Array(dataArrBuffer, offset, chunkSize)
-          );
-          const u16 = new Uint16Array(buf);
-          const u32 = new Uint32Array(buf);
-          u16[0] = CHUNK_MAGIC_WORD;
-          u16[1] = messageId;
-          u16[2] = chunkId;
-          u16[3] = offset + CHUNK_MAX_LENGTH_BYTES >= dataArrBuffer.byteLength ? 1 : 0;
-          u32[2] = dataArrBuffer.byteLength;
-          peer.send(buf);
+    } else {
+      throw new Error("Unsupported send data type", msg);
+    }
+    if (dataArrBuffer.byteLength > MAX_MESSAGE_LENGTH_BYTES || new Uint16Array(dataArrBuffer, 0, 1) === CHUNK_MAGIC_WORD) {
+      messageId = Math.floor(Math.random() * 256 * 128);
+    }
+    if (messageId !== null) {
+      for (let offset = 0, chunkId = 0; offset < dataArrBuffer.byteLength; offset += CHUNK_MAX_LENGTH_BYTES, chunkId++) {
+        const chunkSize = Math.min(
+          CHUNK_MAX_LENGTH_BYTES,
+          dataArrBuffer.byteLength - offset
+        );
+        let bufSize = CHUNK_HEADER_LENGTH_BYTES + chunkSize;
+        while (bufSize % 4 !== 0) {
+          bufSize++;
         }
-      } else {
-        peer.send(dataArrBuffer);
+        const buf = new ArrayBuffer(bufSize);
+        new Uint8Array(buf, CHUNK_HEADER_LENGTH_BYTES).set(
+          new Uint8Array(dataArrBuffer, offset, chunkSize)
+        );
+        const u16 = new Uint16Array(buf);
+        const u32 = new Uint32Array(buf);
+        u16[0] = CHUNK_MAGIC_WORD;
+        u16[1] = messageId;
+        u16[2] = chunkId;
+        u16[3] = offset + CHUNK_MAX_LENGTH_BYTES >= dataArrBuffer.byteLength ? 1 : 0;
+        u32[2] = dataArrBuffer.byteLength;
+        peer.send(buf);
       }
-    });
+    } else {
+      peer.send(dataArrBuffer);
+    }
   }
   broadcast(msg) {
-    const ps = [];
     for (const peer of this.peers.values()) {
-      if (!peer.connected)
-        continue;
-      ps.push(this.send(peer, msg));
+      this.send(peer, msg);
     }
-    return Promise.all(ps);
   }
   destroy() {
     if (this._step) {
@@ -2655,7 +2684,7 @@ var P2PCF = class extends import_events.default {
       peerOptions.certificates = [this.dtlsCert];
     }
     const pc = new this.wrtc.RTCPeerConnection(peerOptions);
-    pc.createDataChannel("x");
+    const dc = pc.createDataChannel("x");
     const p = new Promise((resolve) => {
       setTimeout(() => resolve(), 5e3);
       pc.onicecandidate = (e) => {
@@ -2675,6 +2704,7 @@ var P2PCF = class extends import_events.default {
       pc.setLocalDescription(offer);
     });
     await p;
+    dc.close();
     pc.close();
     let isSymmetric = false;
     let udpEnabled = false;
@@ -2760,24 +2790,22 @@ var P2PCF = class extends import_events.default {
       this._removePeer(peer);
       this._updateConnectedSessions();
     });
-    peer.once("_iceComplete", () => {
-      peer.on("signal", (signalData) => {
-        const payloadBytes = textToArr(
-          JSON.stringify(signalData)
-        );
-        let len = payloadBytes.byteLength + SIGNAL_MESSAGE_HEADER_WORDS.length * 2;
-        if (len % 2 !== 0) {
-          len++;
-        }
-        const buf = new ArrayBuffer(len);
-        const u8 = new Uint8Array(buf);
-        const u16 = new Uint16Array(buf);
-        u8.set(payloadBytes, SIGNAL_MESSAGE_HEADER_WORDS.length * 2);
-        for (let i = 0; i < SIGNAL_MESSAGE_HEADER_WORDS.length; i++) {
-          u16[i] = SIGNAL_MESSAGE_HEADER_WORDS[i];
-        }
-        this.send(peer, buf);
-      });
+    peer.on("signal", (signalData) => {
+      const payloadBytes = textToArr(
+        JSON.stringify(signalData)
+      );
+      let len = payloadBytes.byteLength + SIGNAL_MESSAGE_HEADER_WORDS.length * 2;
+      if (len % 2 !== 0) {
+        len++;
+      }
+      const buf = new ArrayBuffer(len);
+      const u8 = new Uint8Array(buf);
+      const u16 = new Uint16Array(buf);
+      u8.set(payloadBytes, SIGNAL_MESSAGE_HEADER_WORDS.length * 2);
+      for (let i = 0; i < SIGNAL_MESSAGE_HEADER_WORDS.length; i++) {
+        u16[i] = SIGNAL_MESSAGE_HEADER_WORDS[i];
+      }
+      this.send(peer, buf);
     });
   }
 };
