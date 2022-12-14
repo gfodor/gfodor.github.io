@@ -1,0 +1,19 @@
+size = 11 11 11
+scale = 0.0909
+origin = -y
+shape = box
+ao = 5 -1.5 // Note the negative AO
+material lighting = flat, metalness = 1
+  colors = A:#FC4
+voxels
+--A--A--A-- --A--A--A-- AAAAAAAAAAA --A--A--A-- --A--A--A-- AAAAAAAAAAA --A--A--A-- --A--A--A-- AAAAAAAAAAA --A--A--A-- --A--A--A-- 
+--A--A--A-- ----------- A---------A ----------- ----------- A---------A ----------- ----------- A---------A ----------- --A--A--A-- 
+AAAAAAAAAAA A---------A A---A-A---A A---A-A---A A-AAAAAAA-A A---A-A---A A-AAAAAAA-A A---A-A---A A---A-A---A A---------A AAAAAAAAAAA 
+--A--A--A-- ----------- A---A-A---A ----------- --A-----A-- A---------A --A-----A-- ----------- A---A-A---A ----------- --A--A--A-- 
+--A--A--A-- ----------- A-AAAAAAA-A --A-----A-- --A-AAA-A-- A-A-A-A-A-A --A-AAA-A-- --A-----A-- A-AAAAAAA-A ----------- --A--A--A-- 
+AAAAAAAAAAA A---------A A---A-A---A A---------A A-A-A-A-A-A A---------A A-A-A-A-A-A A---------A A---A-A---A A---------A AAAAAAAAAAA 
+--A--A--A-- ----------- A-AAAAAAA-A --A-----A-- --A-AAA-A-- A-A-A-A-A-A --A-AAA-A-- --A-----A-- A-AAAAAAA-A ----------- --A--A--A-- 
+--A--A--A-- ----------- A---A-A---A ----------- --A-----A-- A---------A --A-----A-- ----------- A---A-A---A ----------- --A--A--A-- 
+AAAAAAAAAAA A---------A A---A-A---A A---A-A---A A-AAAAAAA-A A---A-A---A A-AAAAAAA-A A---A-A---A A---A-A---A A---------A AAAAAAAAAAA 
+--A--A--A-- ----------- A---------A ----------- ----------- A---------A ----------- ----------- A---------A ----------- --A--A--A-- 
+--A--A--A-- --A--A--A-- AAAAAAAAAAA --A--A--A-- --A--A--A-- AAAAAAAAAAA --A--A--A-- --A--A--A-- AAAAAAAAAAA --A--A--A-- --A--A--A--
