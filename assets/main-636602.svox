@@ -1,0 +1,36 @@
+model
+size = 20 4 22
+scale = 0.06
+resize = model
+origin = -y
+wireframe = false
+clamp = none
+material lighting = smooth, roughness = 1, deform = 3 1
+  colors = A:#E9BE6D 
+material lighting = smooth, roughness = 0.4, deform = 3 1, fade = true
+  colors = B:#FF7070 C:#FF9090 D:#502000 E:#803000 F:#508050 G:#80A080
+material lighting = smooth, roughness = 1, deform = 3 1, scatter = 0.15, fade = true
+  colors = H:#E9BE6D I:#FFFFFF
+voxels
+-------------------- --------AAAA-------- --------FFFF-------- --------------------
+--------AAAA-------- -------AAAAAA------- -------FFFFFF------- --------GGGG--------
+-------AA--AA------- ------AAAAAAAA------ ------FFFFFFFF------ -------GG--GG-------
+-------A----A------- ------AAA--AAA------ ------FFF--FFF------ -------G----G-------
+-------A----A------- ------AAA--AAA------ ------FFF--FFF------ -------G----G-------
+-------AA--AA------- ------AAAAAAAA------ ------FFFFFFFF------ -------GG--GG-------
+--------AAAA-------- -------AAAAAA------- -------FFFFFF------- --------GGGG--------
+-------------------- --AAAA--AAAA--AAAA-- --BBBB--FFFF--DDDD-- --------------------
+--AAAA--------AAAA-- -AAAAAA------AAAAAA- -BBBBBB------DDDDDD- --CCCC--------EEEE--
+-AA--AA------AA--AA- AAAAAAAA----AAAAAAAA BBBBBBBB----DDDDDDDD -CC--CC------EE--EE-
+-A----A------A----A- AAA--AAA----AAA--AAA BBB--BBB----DDD--DDD -C----C------E----E-
+-A----A------A----A- AAA--AAA----AAA--AAA BBB--BBB----DDD--DDD -C----C------E----E-
+-AA--AA------AA--AA- AAAAAAAA----AAAAAAAA BBBBBBBB----DDDDDDDD -CC--CC------EE--EE-
+--AAAA--------AAAA-- -AAAAAA------AAAAAA- -BBBBBB------DDDDDD- --CCCC--------EEEE--
+-------------------- --AAAA--AAAA--AAAA-- --BBBB--HHHH--DDDD-- --------------------
+--------AAAA-------- -------AAAAAA------- -------HHHHHH------- --------IIII--------
+-------AAAAAA------- ------AAAAAAAA------ ------HHHHHHHH------ -------IIIIII-------
+-------AAAAAA------- ------AAAAAAAA------ ------HHHHHHHH------ -------IIIIII-------
+-------AAAAAA------- ------AAAAAAAA------ ------HHHHHHHH------ -------IIIIII-------
+-------AAAAAA------- ------AAAAAAAA------ ------HHHHHHHH------ -------IIIIII-------
+--------AAAA-------- -------AAAAAA------- -------HHHHHH------- --------IIII--------
+-------------------- --------AAAA-------- --------HHHH-------- --------------------
