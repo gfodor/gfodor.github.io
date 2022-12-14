@@ -1,0 +1,12 @@
+model
+name = Table
+revision = 94
+size = 18 34 31
+origin = -y
+shell = Outline 0.25
+material type = toon, lighting = smooth, deform = 1 1
+  colors = E:#841003 D:#C52707
+material type = basic, lighting = smooth, roughness = 0, refractionRatio = 1, side = back
+  colors = Outline:#000
+voxels
+289-9(2D11-2D3-)15D3-15E417-9(2D11-2D3-)15D3-27(15E597-)2(15E417-9(2D11-2D3-)15D3-)15E128-

@@ -1,0 +1,22 @@
+model
+name = Cool Sphere
+size = 10
+scale = 0.1
+resize = model
+origin = -y
+shell = Outline 0.25
+material lighting = smooth, roughness = 0.1, metalness = 1, deform = 4 1
+  colors = A:#FC4
+material type = basic, lighting = smooth, roughness = 0, refractionRatio = 1, side = back
+  colors = Outline:#000
+voxels
+---------- ---------- ---------- ---AAAA--- ---AAAA--- ---AAAA--- ---AAAA--- ---------- ---------- ---------- 
+---------- ----AA---- --AAAAAA-- --AAAAAA-- -AAAAAAAA- -AAAAAAAA- --AAAAAA-- --AAAAAA-- ----AA---- ---------- 
+---------- --AAAAAA-- -AAAAAAAA- -AAAAAAAA- -AAAAAAAA- -AAAAAAAA- -AAAAAAAA- -AAAAAAAA- --AAAAAA-- ---------- 
+---AAAA--- --AAAAAA-- -AAAAAAAA- AAAAAAAAAA AAAAAAAAAA AAAAAAAAAA AAAAAAAAAA -AAAAAAAA- --AAAAAA-- ---AAAA--- 
+---AAAA--- -AAAAAAAA- -AAAAAAAA- AAAAAAAAAA AAAAAAAAAA AAAAAAAAAA AAAAAAAAAA -AAAAAAAA- -AAAAAAAA- ---AAAA--- 
+---AAAA--- -AAAAAAAA- -AAAAAAAA- AAAAAAAAAA AAAAAAAAAA AAAAAAAAAA AAAAAAAAAA -AAAAAAAA- -AAAAAAAA- ---AAAA--- 
+---AAAA--- --AAAAAA-- -AAAAAAAA- AAAAAAAAAA AAAAAAAAAA AAAAAAAAAA AAAAAAAAAA -AAAAAAAA- --AAAAAA-- ---AAAA--- 
+---------- --AAAAAA-- -AAAAAAAA- -AAAAAAAA- -AAAAAAAA- -AAAAAAAA- -AAAAAAAA- -AAAAAAAA- --AAAAAA-- ---------- 
+---------- ----AA---- --AAAAAA-- --AAAAAA-- -AAAAAAAA- -AAAAAAAA- --AAAAAA-- --AAAAAA-- ----AA---- ---------- 
+---------- ---------- ---------- ---AAAA--- ---AAAA--- ---AAAA--- ---AAAA--- ---------- ---------- ---------- 
