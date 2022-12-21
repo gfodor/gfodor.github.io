@@ -1,0 +1,12 @@
+model
+name = My Voxel Object
+revision = 8403
+size = 20 40 20
+origin = -y
+shell = Outline 0.25
+material type = toon, lighting = smooth, deform = 1 1
+  colors = B:#620042
+material type = basic, lighting = smooth, roughness = 0, refractionRatio = 1, side = back
+  colors = Outline:#000
+voxels
+12(380-420B)380-212B10(8-12B)6(388-199B-10(12B8-)12B)388-212B10(8-12B)8-
