@@ -1,0 +1,21 @@
+size = 160 5 160
+scale = 0.02 0.1 0.02
+origin = -y
+
+material type = basic, lighting = smooth, fade = true, warp = 2 0.5, skip = x y, clamp = -y, side = double
+  colors = A:#020 B:#060 C:#0A0
+material type = basic, lighting = smooth, fade = true, warp = 2 0.5, skip = z y, clamp = -y, side = double
+  colors = E:#020 F:#070 G:#0C0
+material type = basic, lighting = flat, side = double, skip = x z -y
+  colors = X:#020
+voxels 
+20(
+  20(XXXXXXXX) 20(--------) 20(A---E---) 20(B---F---) 20(C-------)
+  20(XXXXXXXX) 20(--------) 20(--------) 20(--------) 20(--------)
+  20(XXXXXXXX) 20(--------) 20(--F---B-) 20(--G---C-) 20(--------)
+  20(XXXXXXXX) 20(--------) 20(--------) 20(--------) 20(--------)
+  20(XXXXXXXX) 20(--------) 20(A---E---) 20(B---F---) 20(----G---)
+  20(XXXXXXXX) 20(--------) 20(--------) 20(--------) 20(--------)
+  20(XXXXXXXX) 20(--------) 20(--E---B-) 20(--F---C-) 20(--------)
+  20(XXXXXXXX) 20(--------) 20(--------) 20(--------) 20(--------)
+)

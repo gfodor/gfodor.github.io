@@ -1,0 +1,20 @@
+model
+name = main
+size = 8
+scale = 0.125
+origin = -y
+clamp = y
+shell = Outline 0.25
+material lighting = both, roughness = 0.5, deform = 4 1
+  colors = A:#006040 B:#0040A0
+material type = basic, lighting = smooth, roughness = 0, refractionRatio = 1, side = back
+  colors = Outline:#000
+voxels
+AAAAAAAA AAAAAAAA AAAAAAAA -------- -------- -----BBB -----BBB -----BBB 
+AAAAAAAA AAAAAAAA AAAAAAAA -------- -------- ---BBBB- ---BBBBB ---BBBB- 
+AAAAAAAA AAAAAAAA AAAAAAAA -------- -------- --BBBB-- --BBBBBB --BBBB-- 
+AAAAAAAA AAAAAAAA AAAAAAAA -------- -------- -BBBB--- -BBBBBBB -BBBB--- 
+AAAAAAAA AAAAAAAA AAAAAAAA -------- -------- -BBB---B -BBBBBBB -BBB---B 
+AAAAAAAA AAAAAAAA AAAAAAAA -------- -------- BBB---BB BBBBBBBB BBB---BB 
+AAAAAAAA AAAAAAAA AAAAAAAA -------- -------- BB---BBB BBBBBBBB BB---BBB 
+AAAAAAAA AAAAAAAA AAAAAAAA -------- -------- B---BBBB BBBBBBBB B---BBBB 

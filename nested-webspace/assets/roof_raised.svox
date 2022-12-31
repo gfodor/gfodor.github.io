@@ -1,0 +1,27 @@
+model
+name = main
+size = 16 3 16
+scale = 0.05
+origin = -y
+shell = Outline 0.25
+material type = toon, lighting = smooth, deform = 1 1
+  colors = A:#A32858 B:#CC425E
+material type = basic, lighting = smooth, roughness = 0, refractionRatio = 1, side = back
+  colors = Outline:#000
+voxels
+AAAAAAAAAAAAAAAA AAAAAAAAAAAAAAAA AAAAAAAAAAAAAAAA 
+AA--AAA--AAA--AA AABBAAABBAAABBAA AA--AAA--AAA--AA 
+A----A----A----A ABBBBABBBBABBBBA A----A----A----A 
+A----A----A----A ABBBBABBBBABBBBA A----A----A----A 
+AA---A----A---AA AABBBABBBBABBBAA AA---A----A---AA 
+AAAAAAAAAAAAAAAA AAAAAAAAAAAAAAAA AAAAAAAAAAAAAAAA 
+AA---A----A---AA AABBBABBBBABBBAA AA---A----A---AA 
+A----A----A----A ABBBBABBBBABBBBA A----A----A----A 
+A----A----A----A ABBBBABBBBABBBBA A----A----A----A 
+AA---A----A---AA AABBBABBBBABBBAA AA---A----A---AA 
+AAAAAAAAAAAAAAAA AAAAAAAAAAAAAAAA AAAAAAAAAAAAAAAA 
+AA---A----A---AA AABBBABBBBABBBAA AA---A----A---AA 
+A----A----A----A ABBBBABBBBABBBBA A----A----A----A 
+A----A----A----A ABBBBABBBBABBBBA A----A----A----A 
+AA--AAA--AAA--AA AABBAAABBAAABBAA AA--AAA--AAA--AA 
+AAAAAAAAAAAAAAAA AAAAAAAAAAAAAAAA AAAAAAAAAAAAAAAA 

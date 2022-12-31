@@ -1,0 +1,18 @@
+size = 15 8 8
+shape = cylinder-x
+scale = 0.100
+origin = -y
+wireframe = false
+clamp = none
+ao = 3
+material lighting = smooth, deform = 1 1, roughness = 0.15, metalness = 1, clamp = +x -x, skip = -x +x, side = double
+  colors = C:#CDF
+voxels
+--CC-CC-CC----- --CC-CC-CC----- --CC-CC-CC----- --CC-CC-CC----- --CC-CC-CC----- --CC-CC-CC----- --CC-CC-CC----- --CC-CC-CC----- 
+--CC-CC-CC----- --CC-CC-CC----- --CC-CC-CC----- --CC-CC-CC----- --CC-CC-CC----- --CC-CC-CC----- --CC-CC-CC----- --CC-CC-CC-----
+--CC-CC-CC----- --CC-CC-CC----- --------------- --------------- --------------- --------------- --CC-CC-CC----- --CC-CC-CC-----
+CCCC-CC-CC--CCC CCCC-CC-CC--CCC --------------- CCCCCCCCCCCCCCC CCCCCCCCCCCCCCC --------------- --CC-CC-CC----- --CC-CC-CC-----
+CCC--CC-CC-CCCC CCC--CC-CC-CCCC --------------- CCCCCCCCCCCCCCC CCCCCCCCCCCCCCC --------------- --CC-CC-CC----- --CC-CC-CC-----
+-----CC-CC-CC-- -----CC-CC-CC-- --------------- --------------- --------------- --------------- --CC-CC-CC----- --CC-CC-CC-----
+---CCCC-CC-CC-- --CCCCC-CC-CC-- --CC----CC-CC-- --CC--CCCC-CC-- --CC-CCCC--CC-- --CC-CC----CC-- --CC-CC-CCCCC-- --CC-CC-CCCC--- 
+---CCC--CC-CC-- --CCCC--CC-CC-- --CC----CC-CC-- --CC--CCCC-CC-- --CC-CCCC--CC-- --CC-CC----CC-- --CC-CC--CCCC-- --CC-CC--CCC---

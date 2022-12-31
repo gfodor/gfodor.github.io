@@ -1,0 +1,26 @@
+model
+name = main
+size = 9
+shape = cylinder-y
+scale = 0.11 0.09 0.11
+resize = model
+origin = -y
+shell = Outline 0.25
+material lighting = smooth, roughness = 0.75, fade = true, deform = 2 0.7
+  colors = A:#A30 D:#820
+material lighting = smooth, roughness = 0.75, fade = true, deform = 1 0.5
+  colors = S:#040 B:#A30
+material lighting = smooth, roughness = 0.75, fade = true, emissive = #420 1, fog = false, deform = 2 0.7, ao = #000 3 -6
+  colors = C:#A30
+material type = basic, lighting = smooth, roughness = 0, refractionRatio = 1, side = back
+  colors = Outline:#000
+voxels
+--------- DAAADAAAD DAAADAAAD DAAADAAAD DAAADAAAD DAAADAAAD DAAADAAAD --------- --------- 
+-DAADAAD- ACCCCCCCA ACCCCCCCA ACCCCCCCA ACCCCCCCA ACCCCCCCA ACCCCCCCA -DAADAAD- --------- 
+-ADADADA- ACCCCCCCA ACCCCCCCA ACCCCCCCA ACCCCCCCA ACCCCCCCA ACCCCCCCA -ADADDAA- --------- 
+-AADDDAA- ACCCCCCCA ACCCCCCCA ACCCCCCCA ACCCCCCCA ACCCCCCCA ACCCCCCCA -AADDDAA- --SSS---- 
+-DDDDDDD- DCCCCCCCD DCCCCCCCD DCC---CCD DCC---CCD DCCCCCCCD DCCCCCCCD -DDDDDDD- ---SS---- 
+-AADDDAA- ACCCCCCCA ACC---CCA AC-----CA AC-----CA ACC---CCA ACCCCCCCA -AADDDAA- --------- 
+-ADADADA- ACCCCCCCA AC-----CA AC-----CA AC-----CA AC-----CA ACCCCCCCA -ADADADA- --------- 
+-DAADAAD- ACCCCCCCA AC-----CA AC-----CA AC-----CA AC-----CA ACCCCCCCA -DAADAAD- --------- 
+--------- AAAADAAAA DA-B---AD DA---B-AD DAAADAAAD DA--D--AD DAAADAAAD --------- --------- 

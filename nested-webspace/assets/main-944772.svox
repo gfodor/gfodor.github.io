@@ -1,0 +1,21 @@
+model
+size = 9 3 8
+rotation = 90 0 0
+position = 0 0.5 0
+scale = 0.111 0.111 0.111
+resize = model
+wireframe = false
+clamp = none
+material lighting = smooth, deform = 5, roughness = 0.5, metalness = 1
+  colors = A:#D00 
+material lighting = smooth, deform = 5, roughness = 0.75, metalness = 1
+  colors = B:#F00
+voxels
+3(AAAA-AAAA)
+3(BBBB-BBBB)
+3(AAAAAAAAA)
+3(BBBBBBBBB)
+3(-AAAAAAA-)
+3(--BBBBB--)
+3(---AAA---)
+3(----B----)

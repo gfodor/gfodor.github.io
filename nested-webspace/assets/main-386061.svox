@@ -1,0 +1,30 @@
+model
+name = main
+size = 11 15 14
+scale = 0.067
+origin = -y
+ao = 5 1
+shell = Outline 0.25
+material lighting = smooth, deform = 2 1, scatter = 0.15
+  colors = A:#480
+material lighting = smooth, roughness = 0.2, emissive = #FFF 0.3, deform = 1 1
+  colors = T:#FFF
+material lighting = smooth, roughness = 0.1, metalness = 0.7, deform = 1 1
+  colors = E:#FFF I:#000
+material type = basic, lighting = smooth, roughness = 0, refractionRatio = 1, side = back
+  colors = Outline:#000
+voxels
+----------- ----------- ----------- ----------- ----------- ----------- ----------- ---AAAAA--- ---AAAAA--- ---AAAAA--- ---AAAAA--- ---AAAAA--- ---AA-AA--- ----------- ----------- 
+----------- ----------- ----------- ----------- ----------- ----------- --AAAAAAA-- -AAAAAAAAA- -AAAAAAAAA- -AAAAAAAAA- -AAAAAAAAA- --AAAAAAA-- --AAAAAAA-- ---AA-AA--- ----------- 
+--AAAAAAA-- ----------- ----------- ----------- ----------- --AAAAAAA-- -AAAAAAAAA- AAAAAAAAAAA AAAAAAAAAAA AAAAAAAAAAA AAAAAAAAAAA -AAAAAAAAA- -AAAAAAAAA- --AAAAAAA-- ----A-A---- 
+AAAAAAAAAAA ----AAA---- ----AAA---- ----AAA---- ---AAAAA--- -AAAAAAAAA- AAAAAAAAAAA AAAAAAAAAAA AAAAAAAAAAA AAAAAAAAAAA AAAAAAAAAAA AAAAAAAAAAA -AAAAAAAAA- --AAAAAAA-- ---AA-AA--- 
+AAAAAAAAAAA ---AAAAA--- ---AAAAA--- ---AAAAA--- --AAAAAAA-- -AAAAAAAAA- AAAAAAAAAAA AAAAAAAAAAA AAAAAAAAAAA AAAAAAAAAAA AAAAAAAAAAA AAAAAAAAAAA -AAAAAAAAA- --AAAAAAA-- ---AA-AA--- 
+AAAAAAAAAAA --AAAAAAA-- --AAAAAAA-- --AAAAAAA-- --AAAAAAA-- -AAAAAAAAA- AAAAAAAAAAA AAAAAAAAAAA AAAAAAAAAAA AAAAAAAAAAA AAAAAAAAAAA AAAAAAAAAAA -AAAAAAAAA- --AAAAAAA-- ---AA-AA--- 
+AAAAAAAAAAA --AAAAAAA-- -AA-----AA- -AA-----AA- -AAAAAAAAA- -AAAAAAAAA- AAAAAAAAAAA AAAAAAAAAAA AAAAAAAAAAA AAAAAAAAAAA AAAAAAAAAAA AAAAAAAAAAA -AAAAAAAAA- --AAAAAAA-- ---AA-AA--- 
+AAAAAAAAAAA --AAAAAAA-- -AA-----AA- -AA-----AA- -AA-----AA- -AA-----AA- AAAAAAAAAAA AAAAAAAAAAA AAAAAAAAAAA AAAAAAAAAAA AAAAAAAAAAA AAAAAAAAAAA -AAAAAAAAA- --AAAAAAA-- ---AA-AA--- 
+---AAAAA--- ---A---A--- -AAA---AAA- -AA-----AA- -AAA---AAA- -AA-----AA- AAAAAAAAAAA AAAAAAAAAAA AAAAAAAAAAA AAAAAAAAAAA AAAAAAAAAAA AAAAAAAAAAA -AAAAAAAAA- --AAAAAAA-- ---AA-AA--- 
+---AAAAA--- ---A---A--- -AAA---AAA- --A-----A-- -AAA---AAA- -AAA---AAA- AAAAAAAAAAA AEEEAAAEEEA AEEEAAAEEEA AEEEAAAEEEA AAAAAAAAAAA AAAAAAAAAAA -AAAAAAAAA- --AAAAAAA-- ----A-A---- 
+---AAAAA--- ---A---A--- -AAA---AAA- ----------- --AA---AA-- --AA---AA-- AAAAAAAAAAA -EEEAAAEEE- -EEEAAAEEE- -EEEAAAEEE- AAAAAAAAAAA -AAAAAAAAA- --AAAAAAA-- ---AA-AA--- ----------- 
+---AAAAA--- --AAAAAAA-- -AAAAAAAAA- ----------- ---AAAAA--- --AAAAAAA-- -AAAAAAAAA- -EEAAAAAEE- -IEAAAAAEI- --EAAAAAE-- AAAAAAAAAAA -AAAAAAAAA- ---AA-AA--- ----------- ----------- 
+----------- ----------- -T-------T- ----------- ---TATAT--- ---AAAAA--- ---A---A--- ---AA-AA--- ---AAAAA--- ---AAAAA--- -AAAAAAAAA- --AAA-AAA-- ----------- ----------- ----------- 
+----------- ----------- -T-T---T-T- -T-T-T-T-T- -T-T-T-T-T- -T-AAAAA-T- -----A----- ----AAA---- ----AAA---- ----------- --AAA-AAA-- ----------- ----------- ----------- ----------- 
