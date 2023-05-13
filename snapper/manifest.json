@@ -1,0 +1,8 @@
+{
+  "name": "Snapper",
+  "short_name": "Snapper",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#000",
+  "description": "Snapper"
+}
