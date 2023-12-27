@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../src/index.js"],
+  "sourcesContent": ["console.log(\"Hello via Bun!\");"],
+  "mappings": "MAAA,QAAQ,IAAI,gBAAgB",
+  "names": []
+}
