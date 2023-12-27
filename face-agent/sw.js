@@ -44,7 +44,7 @@ self.addEventListener("fetch", function(event) {
       })()
     );
   } else {
-    event.respondWith(fetch(event.request));
+    event.respondWith(addCoepHeaders(fetch(event.request)));
   }
 });
 
