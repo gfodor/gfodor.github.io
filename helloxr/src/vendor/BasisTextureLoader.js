@@ -43,8 +43,8 @@ const DXT_FORMAT_MAP = {
   [BASIS_FORMAT.cTFBC3]: DXT_FORMAT.COMPRESSED_RGBA_S3TC_DXT5_EXT
 };
 
-const WORKER_CONSTANTS = `const BASIS_FORMAT = ${JSON.stringify(BASIS_FORMAT)};\n` +
-  `const DXT_FORMAT_MAP = Object.fromEntries(Object.entries(${JSON.stringify(DXT_FORMAT_MAP)}).map(([k,v]) => [Number(k), v]));`;
+const WORKER_CONSTANTS = `self.BASIS_FORMAT = ${JSON.stringify(BASIS_FORMAT)};\n` +
+  `self.DXT_FORMAT_MAP = Object.fromEntries(Object.entries(${JSON.stringify(DXT_FORMAT_MAP)}).map(([k,v]) => [Number(k), v]));`;
 
 class BasisTextureLoader extends Loader {
   constructor(manager) {
@@ -251,6 +251,8 @@ class BasisTextureLoader extends Loader {
 }
 
 function BasisTextureLoaderWorkerFunction() {
+  const BASIS_FORMAT = self.BASIS_FORMAT;
+  const DXT_FORMAT_MAP = self.DXT_FORMAT_MAP;
   let config;
   let transcoderPending;
   let BasisFileClass;
