@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Vignettes — A reading tool for codebases</title>
+<meta name="description" content="An exploratory series of literate-programming vignettes. Each piece walks one concrete thing through one specific repository.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300..900;1,8..60,300..900&family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;0,600;1,400;1,500&family=IBM+Plex+Sans+Condensed:wght@300;400;500;600;700&display=swap">
+<link rel="stylesheet" href="shared/styles.css">
+<style>
+  /* Landing-only layout. The shared stylesheet handles typography. */
+  .landing {
+    max-width: 88rem;
+    margin: 0 auto;
+    padding: clamp(3rem, 8vw, 6rem) clamp(1.5rem, 4vw, 4rem);
+  }
+  .landing__head {
+    border-bottom: 1px solid var(--rule);
+    padding-bottom: 1.6rem;
+    margin-bottom: 2.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-family: var(--sans);
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+  }
+  .landing__head .lead { color: var(--accent); }
+  .landing__title {
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: clamp(2.6rem, 6.5vw, 4.8rem);
+    font-variation-settings: "opsz" 48;
+    line-height: 0.96;
+    letter-spacing: -0.02em;
+    margin: 0 0 1.4rem;
+  }
+  .landing__intro {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: clamp(1.1rem, 1.7vw, 1.4rem);
+    font-variation-settings: "opsz" 24;
+    line-height: 1.5;
+    color: var(--ink-soft);
+    max-width: 44rem;
+    margin: 0 0 4rem;
+  }
+
+  .vignette-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 4rem;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  @media (min-width: 720px) {
+    .vignette-list { grid-template-columns: 1fr 1fr; }
+  }
+
+  .v-card {
+    background: var(--paper);
+    border: 1px solid var(--rule);
+    padding: 2rem 2rem 1.6rem;
+    text-decoration: none;
+    color: var(--ink);
+    position: relative;
+    transition: transform 320ms var(--ease-out-strong),
+                box-shadow 320ms var(--ease-out-strong),
+                border-color 320ms var(--ease-out-strong);
+    display: flex;
+    flex-direction: column;
+  }
+  .v-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+    box-shadow: 0 14px 36px -22px rgba(122, 37, 25, 0.4);
+  }
+
+  .v-card__meta {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--sans);
+    font-size: 0.7rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    margin-bottom: 1.2rem;
+  }
+  .v-card__num { color: var(--accent); font-weight: 600; }
+
+  .v-card__title {
+    font-family: var(--serif);
+    font-weight: 600;
+    font-variation-settings: "opsz" 36;
+    font-size: 2rem;
+    line-height: 1.05;
+    letter-spacing: -0.01em;
+    margin: 0 0 0.8rem;
+    color: var(--ink);
+  }
+  .v-card__sub {
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: var(--ink-soft);
+    margin: 0 0 1.6rem;
+    max-width: 32rem;
+  }
+  .v-card__foot {
+    margin-top: auto;
+    padding-top: 1rem;
+    border-top: 1px dotted var(--rule);
+    font-family: var(--sans);
+    font-size: 0.74rem;
+    color: var(--ink-faint);
+    letter-spacing: 0.04em;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .v-card__foot code { font-family: var(--mono); font-size: 0.85em; color: var(--ink-mute); }
+  .v-card__open {
+    font-family: var(--sans);
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+  }
+  .v-card__open::after { content: " →"; }
+
+  .v-card--ghost {
+    background: transparent;
+    border-style: dashed;
+    border-color: var(--rule);
+    color: var(--ink-mute);
+    cursor: default;
+  }
+  .v-card--ghost:hover { transform: none; box-shadow: none; border-color: var(--rule); }
+  .v-card--ghost .v-card__title { color: var(--ink-faint); font-style: italic; }
+
+  .landing__note {
+    font-family: var(--sans);
+    font-size: 0.85rem;
+    color: var(--ink-mute);
+    line-height: 1.6;
+    max-width: 44rem;
+    border-top: 1px solid var(--rule);
+    padding-top: 2rem;
+    margin-top: 2rem;
+  }
+  .landing__note p { margin: 0 0 0.8rem; }
+  .landing__note em { color: var(--ink-soft); }
+</style>
+</head>
+<body>
+
+<main class="landing">
+
+  <header class="landing__head">
+    <span class="lead">The Vignettes · An exploratory series</span>
+    <span>v0 · 2026-05-24</span>
+  </header>
+
+  <h1 class="landing__title">A reading tool<br>for codebases.</h1>
+  <p class="landing__intro">Each vignette walks one concrete thing through one specific repository — a hand-curated arc through real source code, top to bottom, with prose on the left and the actual implementation on the right. Built against the design brief in <code style="font-family:var(--mono);font-style:normal;font-size:0.82em;color:var(--ink-soft);background:var(--paper-recess);padding:0.05em 0.35em;border-radius:2px">vignette-design-brief.md</code>.</p>
+
+  <ul class="vignette-list">
+
+    <li>
+      <a class="v-card" href="greedy-meshing/">
+        <div class="v-card__meta">
+          <span class="v-card__num">№ 01</span>
+          <span>algorithmic · 25 min</span>
+        </div>
+        <h2 class="v-card__title">The Split Key</h2>
+        <p class="v-card__sub">An integer comparison, made to do work no one wrote it to do — and a quarter million voxels collapse into a few hundred quads in a few milliseconds.</p>
+        <div class="v-card__foot">
+          <span><code>webspace-engine</code> · <code>src/terra/</code></span>
+          <span class="v-card__open">Open</span>
+        </div>
+      </a>
+    </li>
+
+    <li>
+      <a class="v-card" href="the-document/">
+        <div class="v-card__meta">
+          <span class="v-card__num">№ 02</span>
+          <span>architectural · 25 min</span>
+        </div>
+        <h2 class="v-card__title">The Document</h2>
+        <p class="v-card__sub">An engine without a save subsystem — the runtime model and the file on disk are the same bytes, kept that way by one MutationObserver and a ten-second timer.</p>
+        <div class="v-card__foot">
+          <span><code>webspace-engine</code> · <code>src/systems/</code>, <code>src/utils/</code></span>
+          <span class="v-card__open">Open</span>
+        </div>
+      </a>
+    </li>
+
+    <li>
+      <div class="v-card v-card--ghost">
+        <div class="v-card__meta">
+          <span class="v-card__num" style="color: var(--ink-faint)">№ 03</span>
+          <span>tbd · ?? min</span>
+        </div>
+        <h2 class="v-card__title">In progress</h2>
+        <p class="v-card__sub">A third candidate — convergent peer conflict resolution in webspace-engine's voxel delta ring, or perhaps the voxmoji alpha-mask batching trick. Held in the agent's earlier survey, awaiting commitment.</p>
+        <div class="v-card__foot">
+          <span><code>webspace-engine</code> · tbd</span>
+          <span class="v-card__open" style="color: var(--ink-faint)">Soon</span>
+        </div>
+      </div>
+    </li>
+
+  </ul>
+
+  <div class="landing__note">
+    <p><em>The contrast between vignettes 01 and 02 is the design test.</em> The first is concentrated: one line of code, in one file, doing all the lifting. The second is the opposite shape: four files cooperating around the absence of a function. If the format works for both, it works.</p>
+    <p>The brief was deliberate that algorithmic vignettes would be the easier case. Vignette 02 is the empirical answer to whether the form survives weaker algorithmic spines.</p>
+  </div>
+
+</main>
+
+</body>
+</html>

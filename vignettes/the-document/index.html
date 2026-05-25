@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Document — A vignette on persistence in webspace-engine</title>
+<meta name="description" content="An engine without a save subsystem. The runtime model and the file on disk are the same bytes.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,300..900;1,8..60,300..900&family=IBM+Plex+Mono:ital,wght@0,300;0,400;0,500;0,600;1,400;1,500&family=IBM+Plex+Sans+Condensed:wght@300;400;500;600;700&display=swap">
+<link rel="stylesheet" href="../shared/styles.css">
+</head>
+<body>
+
+<!-- ============================================================
+     MASTHEAD
+     ============================================================ -->
+<header class="masthead">
+  <div class="masthead__meta">
+    <span class="masthead__series">Vignette · 02 · Architecture</span>
+    <span class="masthead__est">25 min · 6 beats · 1 simulation · 6 prompts</span>
+  </div>
+  <h1 class="masthead__title">The Document</h1>
+  <p class="masthead__sub">An engine without a save subsystem — the runtime model and the file on disk are the same bytes, kept that way by one MutationObserver and a ten-second timer.</p>
+  <p class="masthead__cite">Source: <code>webspace-sdk/webspace-engine</code> · <code>src/systems/</code>, <code>src/utils/</code> · <code>master</code> @ 2026-05-24 · MPL-2.0</p>
+</header>
+
+<!-- ============================================================
+     READER
+     ============================================================ -->
+<article class="reader">
+
+  <!-- ----- PROSE COLUMN ----- -->
+  <div class="prose">
+
+    <!-- Scene 1 — Premise -->
+    <section class="scene scene--opening" data-anchor="e-overview">
+      <h2 class="scene__head"><span>Premise</span><span class="scene__num">§ 1</span></h2>
+      <p class="lede">Most engines have a save function. The user clicks <em>Save</em>; the engine walks its in-memory scene graph; each entity is serialized into JSON, into a binary blob, into a database row. The file on disk and the runtime model are two representations of the same state, kept in sync by traversal — a function called <code>serialize</code>, with a counterpart called <code>deserialize</code>. The two functions exist precisely because the two representations are different.</p>
+      <p>The webspace engine does not have these functions.</p>
+    </section>
+
+    <!-- Scene 2 — The cast -->
+    <section class="scene" data-anchor="e-overview">
+      <h2 class="scene__head"><span>The cast</span><span class="scene__num">§ 2</span></h2>
+      <p>We follow <var>Alice</var>. She has just dragged a model duck two meters east in her browser. The duck is a tag in her HTML document — a <code>&lt;model id="abc1234" src="assets/duck.glb"&gt;</code> sitting as a direct child of <code>&lt;body&gt;</code>. Before she dragged it, its <code>style</code> attribute read <code>transform: translate3d(0, 50cm, 0)</code>. After she dragged it, the attribute will, in 250 milliseconds, read <code>transform: translate3d(220cm, 100cm, -50cm)</code>. That string is the change.</p>
+      <p>The engine's job, between the moment Alice releases the mouse and the moment a second user — <var>Bob</var>, opening the same world tomorrow — sees the duck in its new position, is to: write that string into the DOM, observe that the DOM has changed, base64-encode the document, push it to GitHub. That is the entire save subsystem.</p>
+    </section>
+
+    <!-- Scene 3 — The flush -->
+    <section class="scene" data-anchor="e-flush">
+      <h2 class="scene__head"><span>The flush · 250 ms</span><span class="scene__num">§ 3</span></h2>
+      <p>The system that does the writing is <code>DomSerializeSystem</code>. It runs at sixty frames a second. Every frame it scans the entities it has been told to watch — every <code>&lt;model&gt;</code>, <code>&lt;img&gt;</code>, <code>&lt;video&gt;</code> with a matching A-Frame entity. For each, it polls a flag the renderer sets when the entity's world matrix has been modified. If the flag is set, the entity is added to a flush queue and a 250-millisecond timer is started.</p>
+      <p>When the timer fires — which is when Alice has not moved the duck for a quarter second — the queue is drained. For each pending entity, the system reads its current matrix, decomposes it into position, rotation, and scale, formats those into a CSS transform string, and writes that string into the <code>style</code> attribute of the entity's DOM element via <code>setAttributeIfChanged</code>. There is no model layer being updated. The DOM is the model layer.</p>
+    </section>
+
+    <!-- Scene 4 — The observer -->
+    <section class="scene" data-anchor="e-observer">
+      <h2 class="scene__head"><span>The observer</span><span class="scene__num">§ 4</span></h2>
+      <p>In another file, a single <code>MutationObserver</code> has been waiting. It was registered against <code>document.documentElement</code> with everything turned on: <code>subtree</code>, <code>childList</code>, <code>attributes</code>, <code>characterData</code>. It has been firing for every mutation in the document since the page loaded.</p>
+      <p>Most of those mutations are noise. A React UI library called <var>styled-components</var> inserts and removes <code>&lt;style&gt;</code> tags in the head as components mount and unmount; the observer's callback walks each <code>MutationRecord</code> and discards records whose only removed nodes are styled-components <code>&lt;style&gt;</code> elements. Every other mutation — including Alice's <code>style</code> write on the <code>&lt;model&gt;</code> — sets a single flag: <code>documentIsDirty = true</code>.</p>
+    </section>
+
+    <!-- Scene 5 — Ten seconds -->
+    <section class="scene" data-anchor="e-observer">
+      <h2 class="scene__head"><span>Ten seconds</span><span class="scene__num">§ 5</span></h2>
+      <p>The same callback that sets the dirty flag also schedules a timeout, ten seconds out: <code>setTimeout(write, MAX_WRITE_RATE_MS)</code>. Every subsequent mutation cancels the previous timeout and reschedules. So as long as Alice keeps moving things, no save happens. The moment she stops — really stops, for ten consecutive seconds — the timer fires and the write begins.</p>
+      <p>The whole save subsystem is a debounce.</p>
+    </section>
+
+    <!-- Scene 6 — The write -->
+    <section class="scene" data-anchor="e-write">
+      <h2 class="scene__head"><span>The write</span><span class="scene__num">§ 6</span></h2>
+      <p>What <code>write()</code> does is what its name suggests, with no ceremony. It reads <code>document.documentElement.outerHTML</code> — the entire HTML document as a string. It runs three GitHub REST calls in sequence: create a blob containing the HTML bytes; create a tree referencing the blob in place of the old <code>index.html</code>; create a commit pointing at the tree, parented to the current branch tip. It updates the branch reference to the new commit.</p>
+      <p>There is no diff, no patch format, no schema migration. The whole file becomes a new whole file. The browser is the editor; the GitHub repository is the filesystem; the commit is the save.</p>
+    </section>
+
+    <!-- Scene 7 — CLIMAX -->
+    <section class="scene scene--climax" data-anchor="e-write">
+      <h2 class="scene__head"><span>The document, both times</span><span class="scene__num">§ 7 · climax</span></h2>
+
+      <p>What just happened is worth pausing on. There was no save function called. There was no walk of a scene graph. There was no serialization of an in-memory model into a format. The duck's new position was not <em>persisted</em> to anywhere — it was already there, the moment the <code>style</code> attribute changed. The DOM is the model. The DOM is the file. The two are not representations of the same state kept in sync; they are the same bytes, separated by an HTTP request and a base64 step.</p>
+
+      <p class="climax-key">There is no save function. There is only the document, and a ten-second timer.</p>
+
+      <p>The webspace engine is not above or below the document. The webspace engine is what runs while the document is being mutated, and the save is what happens when the document stops being mutated for ten seconds. That is the entire architecture, and it explains a great deal about the rest of the codebase. Most of the systems in <code>src/systems/</code> are not, on closer reading, about managing world state. They are about mutating the DOM correctly — and about reacting when someone else does so first.</p>
+    </section>
+
+    <!-- Scene 8 — Bob's side -->
+    <section class="scene" data-anchor="e-importer">
+      <h2 class="scene__head"><span>Bob, the next morning</span><span class="scene__num">§ 8</span></h2>
+      <p>Bob opens his browser to the same URL. The browser fetches the HTML file from GitHub Pages. The browser parses the HTML — the way browsers always have, since 1993. Webspace's <code>WorldImporter</code> runs immediately after, iterates the children of <code>&lt;body&gt;</code>, and for each one with a recognizable tag and a seven-character <code>id</code>, creates an A-Frame entity.</p>
+      <p>For Alice's duck, it finds the <code>&lt;model id="abc1234"&gt;</code>, reads <code>transform: translate3d(220cm, 100cm, -50cm)</code> from <code>style</code>, runs <code>parseTransformIntoThree</code> to convert that string into a <code>Vector3</code>, a <code>Quaternion</code>, and a <code>scale</code>, and sets the entity's matrix accordingly. There is no <em>load</em> function beyond <em>parse the file the browser already parsed</em>. The 3D model spawns at the right position because the position was always in the file — it was a CSS transform string sitting in an HTML attribute.</p>
+
+      <aside class="placeholder placeholder--focal">
+        <div class="placeholder__label">
+          <span class="placeholder__kind">Focal · Level 2</span>
+          <span class="placeholder__detail">sequence diagram · alice → DOM → observer → github → bob</span>
+        </div>
+        <div class="placeholder__art">
+          <svg viewBox="0 0 540 280" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Sequence diagram of the save path from Alice's drag to Bob's load">
+            <defs>
+              <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                <path d="M 0 0 L 10 5 L 0 10 z" fill="#6a5a48"/>
+              </marker>
+              <marker id="arrAccent" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                <path d="M 0 0 L 10 5 L 0 10 z" fill="#7a2519"/>
+              </marker>
+            </defs>
+
+            <!-- lifelines -->
+            <g font-family="IBM Plex Sans Condensed, sans-serif" font-size="10" fill="#3a2e23" font-weight="600">
+              <text x="48"  y="22" text-anchor="middle">Alice</text>
+              <text x="160" y="22" text-anchor="middle">DOM</text>
+              <text x="280" y="22" text-anchor="middle">Observer</text>
+              <text x="400" y="22" text-anchor="middle">GitHub</text>
+              <text x="500" y="22" text-anchor="middle">Bob</text>
+            </g>
+
+            <g stroke="#d5c7a4" stroke-width="1" stroke-dasharray="2 3">
+              <line x1="48"  y1="32" x2="48"  y2="260"/>
+              <line x1="160" y1="32" x2="160" y2="260"/>
+              <line x1="280" y1="32" x2="280" y2="260"/>
+              <line x1="400" y1="32" x2="400" y2="260"/>
+              <line x1="500" y1="32" x2="500" y2="260"/>
+            </g>
+
+            <!-- messages -->
+            <g font-family="IBM Plex Mono, monospace" font-size="9" fill="#3a2e23">
+              <line x1="48" y1="56" x2="156" y2="56" stroke="#6a5a48" stroke-width="1" marker-end="url(#arr)"/>
+              <text x="102" y="50" text-anchor="middle">drag (live)</text>
+
+              <line x1="48" y1="88" x2="156" y2="88" stroke="#6a5a48" stroke-width="1" marker-end="url(#arr)"/>
+              <text x="102" y="82" text-anchor="middle">+250ms · flush</text>
+              <text x="102" y="100" text-anchor="middle" font-style="italic" fill="#6a5a48">setAttribute("style", …)</text>
+
+              <line x1="160" y1="124" x2="276" y2="124" stroke="#6a5a48" stroke-width="1" marker-end="url(#arr)"/>
+              <text x="218" y="118" text-anchor="middle">MutationRecord</text>
+
+              <rect x="270" y="132" width="20" height="44" fill="#f9f4e7" stroke="#d5c7a4"/>
+              <text x="280" y="148" text-anchor="middle" font-size="8" fill="#6a5a48">dirty</text>
+              <text x="280" y="160" text-anchor="middle" font-size="8" fill="#6a5a48">=true</text>
+              <text x="280" y="172" text-anchor="middle" font-size="8" fill="#7a2519" font-weight="600">+10s</text>
+
+              <line x1="280" y1="200" x2="396" y2="200" stroke="#7a2519" stroke-width="1.2" marker-end="url(#arrAccent)"/>
+              <text x="338" y="194" text-anchor="middle" fill="#7a2519" font-weight="600">write()</text>
+              <text x="338" y="212" text-anchor="middle" font-style="italic" fill="#6a5a48">blob, tree, commit, ref</text>
+
+              <line x1="400" y1="244" x2="496" y2="244" stroke="#6a5a48" stroke-width="1" marker-end="url(#arr)"/>
+              <text x="448" y="238" text-anchor="middle">GET index.html</text>
+              <text x="448" y="256" text-anchor="middle" font-style="italic" fill="#6a5a48">tomorrow</text>
+            </g>
+          </svg>
+        </div>
+        <div class="placeholder__params">
+          <span class="k">throughline</span><span class="v">Alice drags duck id=abc1234 · 2.2m east · 50cm up</span>
+          <span class="k">timings</span><span class="v">FLUSH_DELAY=250ms · MAX_WRITE_RATE_MS=10s</span>
+          <span class="k">template</span><span class="v">sequence · 5 lifelines · animated message progression</span>
+          <span class="k">authored?</span><span class="v">v1 placeholder · animation wires to scroll position in production</span>
+        </div>
+      </aside>
+    </section>
+
+    <!-- Scene 9 — Beat 1 -->
+    <section class="scene" data-anchor="e-importer">
+      <h2 class="scene__head"><span>What if Alice closes her tab?</span><span class="scene__num">§ 9 · beat</span></h2>
+
+      <aside class="placeholder placeholder--beat">
+        <div class="placeholder__label">
+          <span class="placeholder__kind">Beat · predict-the-outcome</span>
+          <span class="placeholder__detail">7s commit window · grid (1 of 4)</span>
+        </div>
+        <p class="placeholder__body">Alice drags the duck, then immediately closes her browser tab. The drag's <code>style</code> mutation fired at <var>t = 0.25s</var>. The 10-second debounce had not yet elapsed. What does Bob see tomorrow when he opens the world?</p>
+        <div class="beat-candidates">
+          <div class="beat-candidate is-answer">The old position<br><span style="color:#a04738">(commit never fired)</span></div>
+          <div class="beat-candidate">The new position<br><span style="color:#978670">(window unload flushed it)</span></div>
+          <div class="beat-candidate">An error page<br><span style="color:#978670">(repo corrupted)</span></div>
+          <div class="beat-candidate">A merge conflict<br><span style="color:#978670">(partial commit)</span></div>
+        </div>
+        <p class="beat-revealed"><strong>Reveal · the old position.</strong> The architecture treats reliability as the user's problem: the debounce trades latency for save fidelity, and if the user kills the tab during the window, nothing commits. The <code>document-dirty-state-changed</code> event exists precisely so the UI can warn before unload — but the warning is the engine's only line of defense. There is no last-second flush.</p>
+      </aside>
+    </section>
+
+    <!-- Scene 10 — The honest version -->
+    <section class="scene" data-anchor="e-meta">
+      <h2 class="scene__head"><span>The honest version</span><span class="scene__num">§ 10</span></h2>
+      <p>It is worth being precise about what this architecture is and is not. If Alice and Bob are in the same world at the same time, with a live presence connection between their browsers, Bob does not see Alice's drag through the GitHub commit. He sees it over a WebRTC data channel, via a separate network protocol (NAF, Networked A-Frame) that updates his entity's transform every frame. The DOM mutation, the ten-second timer, the GitHub commit — those are for <em>persistence</em>. They are how the world survives Alice closing her browser. Real-time sync is a different layer with different code.</p>
+
+      <p>The architectural choice the webspace engine made is <em>selective</em>. It uses DOM-as-source-of-truth for everything that must survive a reload, and NAF for everything that must arrive in twenty milliseconds. The two stories are easy to confuse.</p>
+
+      <p>There is one place the two stories meet, and it is worth a margin note. When a peer changes a <em>hub-level setting</em> — the sky color, the spawn point, the permission list — the change does not ride NAF. It is broadcast as an <code>update_hub_meta</code> message, which the receiving client routes through <code>pushHubMetaUpdateIntoDOM</code>. That function does not modify any in-memory model. It modifies the DOM — specifically, it adds, removes, or updates <code>&lt;meta name="webspace.environment.terrain.colors.sky"&gt;</code> tags in <code>&lt;head&gt;</code>. A <em>second</em> <code>MutationObserver</code>, this one watching <code>&lt;head&gt;</code>, fires. It dispatches a <code>hub_meta_refresh</code> event. Every subsystem subscribed to that event — the atmosphere shader, the sky-beam renderer, the spawn-point indicator — updates. Local and remote hub-metadata changes converge at exactly the same line of code: an <code>append</code> on a <code>&lt;meta&gt;</code> tag. The DOM is, for this slice of state, the event bus.</p>
+
+      <aside class="margin-note">There are four <code>MutationObserver</code>s in the entire codebase. Two of them are the persistence pair just named (<code>documentElement</code>, <code>head</code>). The other two are scoped helpers — <code>pauseAllPlayableElements</code> on <code>&lt;body&gt;</code> for media auto-pause, and <code>CursorTargettingSystem</code> on <code>&lt;a-scene&gt;</code> for raycast-cache invalidation. The architectural cleverness lives in two of the four. The grand framing of "everything is observed" is romantic but inaccurate; the precise framing is "what must survive a reload is observed, and survives by being part of the document."</aside>
+    </section>
+
+    <!-- Scene 11 — Simulation -->
+    <section class="scene" data-anchor="e-meta">
+      <h2 class="scene__head"><span>Try it</span><span class="scene__num">§ 11 · simulation</span></h2>
+
+      <aside class="placeholder placeholder--sim">
+        <div class="placeholder__label">
+          <span class="placeholder__kind">Simulation · Level 3</span>
+          <span class="placeholder__detail">template: single-stepper · climax-adjacent · ~45s play</span>
+        </div>
+        <div class="placeholder__art">
+          <svg viewBox="0 0 520 220" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Mock simulation: dirty-document timer with mutation events">
+            <!-- timeline strip -->
+            <rect x="20" y="40" width="480" height="40" fill="#f9f4e7" stroke="#d5c7a4"/>
+            <g font-family="IBM Plex Mono, monospace" font-size="8" fill="#978670">
+              <text x="22" y="32">t = 0s</text>
+              <text x="248" y="32" text-anchor="middle">t = 5s</text>
+              <text x="500" y="32" text-anchor="end">t = 10s</text>
+            </g>
+            <!-- mutation pulses -->
+            <g>
+              <rect x="40"  y="44" width="2" height="32" fill="#7a2519"/>
+              <rect x="92"  y="44" width="2" height="32" fill="#7a2519"/>
+              <rect x="118" y="44" width="2" height="32" fill="#7a2519"/>
+              <rect x="170" y="44" width="2" height="32" fill="#7a2519"/>
+            </g>
+            <!-- timer bar -->
+            <g>
+              <rect x="170" y="84" width="320" height="6" fill="#a04738" opacity="0.25"/>
+              <rect x="170" y="84" width="180" height="6" fill="#7a2519"/>
+              <text x="354" y="92" font-family="IBM Plex Sans Condensed, sans-serif" font-size="9" fill="#3a2e23" font-weight="500">debounce window · 10s</text>
+            </g>
+            <!-- dirty flag -->
+            <g font-family="IBM Plex Sans Condensed, sans-serif" font-size="9">
+              <text x="20" y="118" font-weight="600" fill="#3a2e23">documentIsDirty</text>
+              <rect x="120" y="108" width="80" height="14" fill="#7a2519"/>
+              <text x="160" y="118" text-anchor="middle" fill="#f9f4e7" font-weight="600">true</text>
+              <text x="208" y="118" fill="#6a5a48">(since t=0.04s)</text>
+            </g>
+            <!-- legend -->
+            <g font-family="IBM Plex Sans Condensed, sans-serif" font-size="9" fill="#6a5a48">
+              <rect x="20" y="146" width="8" height="8" fill="#7a2519"/>
+              <text x="34" y="154">DOM mutation · each pulse resets the timer</text>
+              <rect x="20" y="162" width="8" height="8" fill="#a04738" opacity="0.25"/>
+              <text x="34" y="170">elapsed since last mutation</text>
+            </g>
+            <!-- affordance -->
+            <g>
+              <rect x="20" y="186" width="120" height="22" fill="#f9f4e7" stroke="#7a2519" rx="2"/>
+              <text x="80" y="201" text-anchor="middle" font-family="IBM Plex Sans Condensed, sans-serif" font-size="10" font-weight="600" fill="#7a2519">[ +mutation ]</text>
+              <rect x="148" y="186" width="120" height="22" fill="#f9f4e7" stroke="#7a2519" rx="2"/>
+              <text x="208" y="201" text-anchor="middle" font-family="IBM Plex Sans Condensed, sans-serif" font-size="10" font-weight="600" fill="#7a2519">[ step 1s ]</text>
+              <text x="280" y="201" font-family="IBM Plex Sans Condensed, sans-serif" font-size="10" font-style="italic" fill="#6a5a48">commits when bar finishes</text>
+            </g>
+          </svg>
+        </div>
+        <div class="sim-affordance">
+          <button class="sim-btn" disabled>+ mutation</button>
+          <button class="sim-btn" disabled>step 1s</button>
+          <span><em>Click to fire mutations; step time forward. The timer resets each mutation. The commit fires only when ten consecutive seconds pass with no mutation. Drag-spammers cost their owners zero commits per minute. Single-clickers cost six per minute.</em></span>
+        </div>
+        <div class="placeholder__params">
+          <span class="k">parameters</span><span class="v">mutations (manual) · time-step (1s per click)</span>
+          <span class="k">readouts</span><span class="v">documentIsDirty · debounce remaining · commits fired</span>
+          <span class="k">authored?</span><span class="v">no — v1 placeholder · author week 5 per the brief</span>
+        </div>
+      </aside>
+    </section>
+
+    <!-- Scene 12 — Beat 2 -->
+    <section class="scene" data-anchor="e-meta">
+      <h2 class="scene__head"><span>The pattern, elsewhere</span><span class="scene__num">§ 12 · beat</span></h2>
+      <p>The technique — let one system mutate a shared substrate, and another system observe the substrate rather than receive a function call — recurs in a couple of unexpected places.</p>
+
+      <aside class="placeholder placeholder--beat">
+        <div class="placeholder__label">
+          <span class="placeholder__kind">Beat · spot-the-beacon</span>
+          <span class="placeholder__detail">10s commit window · 4 snippets</span>
+        </div>
+        <p class="placeholder__body">Which of these other places in <code>webspace-engine</code> uses the same pattern: one component writes to a shared substrate, another observes the substrate, no direct function call between them?</p>
+        <div class="beat-candidates">
+          <div class="beat-candidate is-answer">Hub meta in <code>&lt;head&gt;</code><br><span style="color:#a04738">(second observer)</span></div>
+          <div class="beat-candidate">NAF position sync<br><span style="color:#978670">(direct subscribe)</span></div>
+          <div class="beat-candidate">A-Frame component events<br><span style="color:#978670">(componentchanged)</span></div>
+          <div class="beat-candidate">React props flow<br><span style="color:#978670">(direct render)</span></div>
+        </div>
+        <p class="beat-revealed"><strong>Reveal · the hub-meta observer.</strong> <code>atom-metadata.js:75</code> watches <code>&lt;head&gt;</code> for <code>webspace.*</code> meta-tag mutations; any change fires <code>hub_meta_refresh</code>, which fans out to atmosphere, sky, spawn-point, and permission subscribers. The other three options use direct event channels or props — they are conventional pub/sub. Only the hub-meta path replicates the document-as-substrate pattern. The A-Frame <code>componentchanged</code> path is the trap: it <em>looks</em> like the pattern but it is a direct emitter on the entity, not a substrate observation.</p>
+      </aside>
+    </section>
+
+  </div><!-- /.prose -->
+
+  <!-- ----- CODE PANE ----- -->
+  <aside class="codepane">
+    <div class="codepane__chrome">
+      <span class="codepane__path" data-codepath>webspace-engine <em>·</em> src/systems/</span>
+      <span class="codepane__lineinfo" data-codeline>overview</span>
+    </div>
+    <div class="codepane__stage">
+
+      <!-- E-OVERVIEW -->
+      <figure class="excerpt" id="e-overview" data-path="webspace-engine · src/" data-lines="overview" data-active>
+<pre><code><span class="cmt">// The four files this vignette traces:</span>
+
+<span class="cmt">// src/systems/dom-serialize-system.js</span>
+<span class="cmt">//   Watches entities. Every 250ms, writes their</span>
+<span class="cmt">//   pose as a CSS transform into the &lt;model&gt;'s style.</span>
+<span class="cmt">//   FLUSH_DELAY = 250ms (line 36).</span>
+
+<span class="cmt">// src/utils/atom-access-manager.js</span>
+<span class="cmt">//   The MutationObserver on document.documentElement.</span>
+<span class="cmt">//   Sets documentIsDirty, schedules write() in 10s.</span>
+<span class="cmt">//   MAX_WRITE_RATE_MS = 10000.</span>
+
+<span class="cmt">// src/utils/dom-utils.js  +  src/utils/atom-metadata.js</span>
+<span class="cmt">//   The &lt;head&gt; MutationObserver (the second one).</span>
+<span class="cmt">//   Where local and remote hub-metadata changes converge.</span>
+
+<span class="cmt">// src/utils/world-importer.js</span>
+<span class="cmt">//   Bob's side. Parses the HTML, walks &lt;body&gt;,</span>
+<span class="cmt">//   converts each child into an A-Frame entity by</span>
+<span class="cmt">//   reading style.transform.</span>
+
+<span class="cmt">// The throughline:</span>
+<span class="cmt">//   &lt;model id="abc1234" src="assets/duck.glb"</span>
+<span class="cmt">//          style="transform: translate3d(0, 50cm, 0)"&gt;</span>
+<span class="cmt">// becomes, 250ms after Alice's drag ends:</span>
+<span class="cmt">//   &lt;model id="abc1234" src="assets/duck.glb"</span>
+<span class="cmt">//          style="transform: translate3d(220cm, 100cm, -50cm)"&gt;</span>
+<span class="cmt">// becomes, 10s later, a commit on the world's branch.</span>
+</code></pre>
+        <figcaption>v1 sketch overview. Scroll to drive the right pane through the actual source.</figcaption>
+      </figure>
+
+      <!-- E-FLUSH -->
+      <figure class="excerpt" id="e-flush" data-path="webspace-engine · src/systems/dom-serialize-system.js" data-lines="310–334 · 421–453">
+<pre><code><span class="cmt">// The flush: read object3D matrix → format CSS → setAttribute.</span>
+<span class="cmt">// src/systems/dom-serialize-system.js  ·  ≈ line 310</span>
+
+<span class="kw">const</span> transform = <span class="fn">posRotScaleToCssTransform</span>(tmpPos, tmpQuat, tmpScale);
+
+<span class="kw">if</span> (transform) {
+  <span class="kw">const</span> transformMatch = domEl.<span class="fn">getAttribute</span>(<span class="str">"style"</span>)?.<span class="fn">match</span>(/transform: ([^;]*);/);
+  <span class="kw">const</span> existingTransform = transformMatch ? transformMatch[<span class="num">1</span>] : <span class="kw">null</span>;
+  <span class="cmt">// ... almost-equal short-circuit elided ...</span>
+  style += <span class="str">`transform: ${transform}; `</span>;
+}
+
+<span class="hl-line">  <span class="fn">setAttributeIfChanged</span>(domEl, <span class="str">"style"</span>, style);</span>
+
+<span class="cmt">// And the tick that drives it (every frame, every entity):</span>
+<span class="cmt">// src/systems/dom-serialize-system.js  ·  line 421</span>
+
+<span class="fn">tick</span>() {
+  <span class="kw">if</span> (!<span class="kw">this</span>.scene.<span class="fn">is</span>(<span class="str">"document-imported"</span>)) <span class="kw">return</span>;
+  <span class="kw">for</span> (<span class="kw">let</span> i = <span class="num">0</span>; i &lt;= <span class="kw">this</span>.maxRegisteredIndex; i++) {
+    <span class="kw">const</span> el = <span class="kw">this</span>.els[i];
+    <span class="kw">if</span> (el === <span class="kw">null</span>) <span class="kw">continue</span>;
+    <span class="kw">const</span> hasDirty = el.object3D.<span class="fn">consumeIfDirtyWorldMatrix</span>(
+      <span class="name">WORLD_MATRIX_CONSUMERS</span>.<span class="name">DOM_SERIALIZER</span>);
+    <span class="kw">if</span> (hasDirty) <span class="kw">this</span>.<span class="fn">enqueueFlushOf</span>(el);
+  }
+  <span class="kw">if</span> (<span class="name">Date</span>.<span class="fn">now</span>() &gt; <span class="kw">this</span>.nextFlushAt) {
+    <span class="kw">this</span>.nextFlushAt = <span class="kw">null</span>;
+    <span class="kw">this</span>.<span class="fn">flush</span>();
+  }
+}
+</code></pre>
+        <figcaption>The producer of mutations. The DOM is the model, written every 250 ms.</figcaption>
+      </figure>
+
+      <!-- E-OBSERVER -->
+      <figure class="excerpt" id="e-observer" data-path="webspace-engine · src/utils/atom-access-manager.js" data-lines="170–231">
+<pre><code><span class="cmt">// The first MutationObserver: the entire save subsystem.</span>
+<span class="cmt">// src/utils/atom-access-manager.js  ·  line 170</span>
+
+<span class="kw">this</span>.mutationObserver = <span class="kw">new</span> <span class="name">MutationObserver</span>(arr =&gt; {
+  <span class="kw">let</span> sawUnignoredRecord = <span class="kw">false</span>;
+  <span class="kw">for</span> (<span class="kw">const</span> record <span class="kw">of</span> arr) {
+    <span class="kw">if</span> (record.type === <span class="str">"attributes"</span>
+        <span class="op">||</span> record.type === <span class="str">"characterData"</span>
+        <span class="op">||</span> record.addedNodes.length &gt; <span class="num">0</span>) {
+      sawUnignoredRecord = <span class="kw">true</span>; <span class="kw">break</span>;
+    }
+    <span class="cmt">// (styled-components &lt;style&gt; removals filtered here)</span>
+  }
+  <span class="kw">if</span> (!sawUnignoredRecord) <span class="kw">return</span>;
+
+  <span class="kw">if</span> (<span class="kw">this</span>.writeTimeout) <span class="fn">clearTimeout</span>(<span class="kw">this</span>.writeTimeout);
+
+<span class="hl-line">  <span class="kw">this</span>.documentIsDirty = <span class="kw">true</span>;</span>
+<span class="hl-line">  <span class="kw">this</span>.<span class="fn">dispatchEvent</span>(<span class="kw">new</span> <span class="name">CustomEvent</span>(<span class="str">"document-dirty-state-changed"</span>));</span>
+<span class="hl-line">  <span class="kw">this</span>.writeTimeout = <span class="fn">setTimeout</span>(write, <span class="name">MAX_WRITE_RATE_MS</span>);</span>
+});
+
+<span class="cmt">// And the observe() call. Everything turned on.</span>
+<span class="cmt">// line ≈ 226</span>
+<span class="fn">waitForDOMContentLoaded</span>().<span class="fn">then</span>(() =&gt; {
+  <span class="kw">this</span>.mutationObserver.<span class="fn">observe</span>(document.documentElement, {
+    subtree: <span class="kw">true</span>, childList: <span class="kw">true</span>,
+    attributes: <span class="kw">true</span>, characterData: <span class="kw">true</span>
+  });
+});
+</code></pre>
+        <figcaption>atom-access-manager.js:170. Three lines, highlighted, are the save subsystem.</figcaption>
+      </figure>
+
+      <!-- E-WRITE -->
+      <figure class="excerpt" id="e-write" data-path="webspace-engine · src/writeback/github-writeback.js" data-lines="178–239">
+<pre><code><span class="cmt">// What write() does, in github-writeback.js:</span>
+<span class="cmt">//   1. base64-encode document.documentElement.outerHTML</span>
+<span class="cmt">//   2. POST /repos/:o/:r/git/blobs   → sha</span>
+<span class="cmt">//   3. POST /repos/:o/:r/git/trees   → sha (refs the blob)</span>
+<span class="cmt">//   4. POST /repos/:o/:r/git/commits → sha (refs the tree)</span>
+<span class="cmt">//   5. PATCH /repos/:o/:r/git/refs/heads/:branch</span>
+<span class="cmt">// No diff. No patch. The whole file becomes a new whole file.</span>
+
+<span class="kw">async</span> <span class="fn">write</span>(html) {
+  <span class="kw">const</span> repo = <span class="kw">this</span>.octokat.repos(<span class="kw">this</span>.org, <span class="kw">this</span>.repoName);
+
+  <span class="kw">const</span> { sha: blobSha } = <span class="kw">await</span> repo.git.blobs.<span class="fn">create</span>({
+    content: <span class="name">Base64</span>.<span class="fn">encode</span>(html),
+    encoding: <span class="str">"base64"</span>
+  });
+
+  <span class="kw">const</span> { sha: treeSha } = <span class="kw">await</span> repo.git.trees.<span class="fn">create</span>({
+    base_tree: <span class="kw">this</span>.headTreeSha,
+    tree: [{ path: <span class="kw">this</span>.docPath, mode: <span class="str">"100644"</span>,
+             type: <span class="str">"blob"</span>, sha: blobSha }]
+  });
+
+  <span class="kw">const</span> { sha: commitSha } = <span class="kw">await</span> repo.git.commits.<span class="fn">create</span>({
+    message: <span class="str">`Update ${this.docPath}`</span>,
+    tree: treeSha,
+    parents: [<span class="kw">this</span>.headCommitSha]
+  });
+
+  <span class="kw">await</span> repo.git.refs(<span class="str">`heads/${this.branch}`</span>).<span class="fn">update</span>({ sha: commitSha });
+}
+</code></pre>
+        <figcaption>github-writeback.js. Four API calls. No filesystem code. The browser is the editor.</figcaption>
+      </figure>
+
+      <!-- E-IMPORTER -->
+      <figure class="excerpt" id="e-importer" data-path="webspace-engine · src/utils/world-importer.js" data-lines="75–80 · 173–179">
+<pre><code><span class="cmt">// Bob's side: there is no "load" function. There is only parse.</span>
+<span class="cmt">// src/utils/world-importer.js  ·  line 38</span>
+
+<span class="kw">export default class</span> <span class="name">WorldImporter</span> {
+  <span class="fn">importHtmlToCurrentWorld</span>(html, replaceExisting = <span class="kw">true</span>) {
+    <span class="kw">const</span> doc = <span class="kw">new</span> <span class="name">DOMParser</span>().<span class="fn">parseFromString</span>(html, <span class="str">"text/html"</span>);
+    <span class="kw">return</span> <span class="kw">this</span>.<span class="fn">importWebspacesDocument</span>(doc, replaceExisting);
+  }
+
+  <span class="cmt">// ... line 173: walk &lt;body&gt;, materialize each child as an entity</span>
+  <span class="kw">for</span> (<span class="kw">const</span> el <span class="kw">of</span> doc.body.childNodes) {
+    <span class="kw">const</span> id = el.id;
+    <span class="kw">if</span> (!id <span class="op">||</span> id.length !== <span class="num">7</span>) <span class="kw">continue</span>;
+    <span class="kw">const</span> style = <span class="fn">getStyle</span>(el) <span class="op">||</span> {};
+    <span class="kw">const</span> { fontFamily, transform, color, width, height,
+            backgroundColor, webkitTextStrokeColor } = style;
+    <span class="cmt">// transform === "translate3d(220cm, 100cm, -50cm) ..."</span>
+    <span class="fn">parseTransformIntoThree</span>(transform, pos, quat, scale);
+    <span class="cmt">// ... spawn the A-Frame entity at (pos, quat, scale) ...</span>
+  }
+}
+</code></pre>
+        <figcaption>world-importer.js. The duck spawns at the right position because its position was always in the file.</figcaption>
+      </figure>
+
+      <!-- E-META -->
+      <figure class="excerpt" id="e-meta" data-path="webspace-engine · src/init.js · src/utils/atom-metadata.js" data-lines="161–167 · 75–106">
+<pre><code><span class="cmt">// The second observer — &lt;head&gt;, hub metadata.</span>
+<span class="cmt">// src/init.js  ·  line 161</span>
+
+<span class="name">NAF</span>.connection.<span class="fn">subscribeToDataChannel</span>(<span class="str">"update_hub_meta"</span>,
+  (_type, { body: hub }, fromSessionId) =&gt; {
+    <span class="kw">if</span> (!atomAccessManager.<span class="fn">hubCan</span>(<span class="str">"update_hub_meta"</span>,
+                                  <span class="kw">null</span>, fromSessionId)) <span class="kw">return</span>;
+<span class="hl-line">    <span class="fn">pushHubMetaUpdateIntoDOM</span>(hub);   <span class="cmt">// not an in-memory model. The DOM.</span></span>
+});
+
+<span class="cmt">// src/utils/atom-metadata.js  ·  line 75</span>
+
+<span class="kw">this</span>.mutationObserver = <span class="kw">new</span> <span class="name">MutationObserver</span>(<span class="kw">async</span> mutationList =&gt; {
+  <span class="kw">for</span> (<span class="kw">const</span> mutation <span class="kw">of</span> mutationList) {
+    <span class="kw">const</span> modifiedMetatag =
+      (mutation.target.tagName === <span class="str">"META"</span> &amp;&amp;
+       mutation.target.<span class="fn">getAttribute</span>(<span class="str">"name"</span>)?.<span class="fn">startsWith</span>(<span class="name">META_TAG_PREFIX</span>))
+      <span class="op">||</span> <span class="cmt">/* added/removed META variants */</span>;
+    <span class="kw">if</span> (modifiedMetatag) {
+      <span class="fn">setTimeout</span>(<span class="kw">async</span> () =&gt; {
+        <span class="kw">this</span>.<span class="fn">dispatchEvent</span>(<span class="kw">new</span> <span class="name">CustomEvent</span>(<span class="str">"hub_meta_refresh"</span>, {
+          detail: { metas: [<span class="kw">await</span> <span class="fn">getHubMetaFromDOM</span>()] }
+        }));
+      }, <span class="num">0</span>);
+      <span class="kw">break</span>;
+    }
+  }
+});
+
+<span class="kw">this</span>.mutationObserver.<span class="fn">observe</span>(document.head, {
+  subtree: <span class="kw">true</span>, childList: <span class="kw">true</span>, attributes: <span class="kw">true</span>
+});
+</code></pre>
+        <figcaption>The convergence point: remote <code>update_hub_meta</code> messages write the DOM; the existing observer fires; all subscribers update. No special "remote update" code path.</figcaption>
+      </figure>
+
+    </div>
+  </aside>
+</article>
+
+<!-- ============================================================
+     CODA
+     ============================================================ -->
+<footer class="coda">
+  <h2 class="coda__head">In summary · review queue · § 13</h2>
+  <p class="coda__summary">Webspace-engine elides the boundary between runtime model and save file. The DOM is both. To save the world, the engine waits ten seconds and pushes the document to GitHub. To load it, the engine asks the browser to parse it. The &lsquo;engine&rsquo; is the system that runs while the document is being mutated and that knows when to stop mutating long enough to commit. There is no in-memory scene graph behind the scenes. There are no <code>serialize</code> and <code>deserialize</code> functions. There is the document. Most of the code in <code>src/systems/</code> is not, on closer reading, about managing world state; it is about mutating the DOM correctly — and about reacting when someone else does so first. The architectural cleverness lives in two of the codebase&rsquo;s four <code>MutationObserver</code>s, both of which fit inside a single screen of source.</p>
+
+  <p class="coda__sched"><em>Six prompts have been scheduled into your review queue. The first will return tomorrow; the rest at expanding intervals.</em></p>
+
+  <div class="prompts">
+    <article class="prompt">
+      <span class="prompt__num">01 · in 1 day</span>
+      <p class="prompt__type">Function contract</p>
+      <p class="prompt__q">When <code>AtomAccessManager</code>'s <code>MutationObserver</code> processes a batch whose only mutations are styled-components <code>&lt;style&gt;</code> removals, what does it do?</p>
+    </article>
+    <article class="prompt">
+      <span class="prompt__num">02 · in 2 days</span>
+      <p class="prompt__type">Counterfactual</p>
+      <p class="prompt__q">Suppose the <code>setTimeout(write, MAX_WRITE_RATE_MS)</code> line were replaced with a direct call to <code>write()</code>. What property of the system would break first, and how would Alice notice?</p>
+    </article>
+    <article class="prompt">
+      <span class="prompt__num">03 · in 4 days</span>
+      <p class="prompt__type">Timing</p>
+      <p class="prompt__q">After Alice's final drag (assume no further mutations), how many seconds elapse before the GitHub commit fires? Account for both timers in the chain.</p>
+    </article>
+    <article class="prompt">
+      <span class="prompt__num">04 · in 7 days</span>
+      <p class="prompt__type">Throughline retention</p>
+      <p class="prompt__q">For Alice's duck <code>id="abc1234"</code> after the drag completes, what is the value of the <code>style</code> attribute's <code>transform</code> field?</p>
+    </article>
+    <article class="prompt">
+      <span class="prompt__num">05 · in 12 days</span>
+      <p class="prompt__type">Pattern recognition</p>
+      <p class="prompt__q">Name the architectural pattern: the in-memory runtime model and the on-disk save format are not two representations of the same state, but the same data structure — keeping them identical requires no traversal, only an observer and a commit.</p>
+    </article>
+    <article class="prompt">
+      <span class="prompt__num">06 · in 21 days</span>
+      <p class="prompt__type">Beacon recognition</p>
+      <p class="prompt__q">In <code>webspace-engine</code>, where else does one component write to a shared substrate and another component observe the substrate (rather than receive a function call)? Cite a file and the approximate line.</p>
+    </article>
+  </div>
+</footer>
+
+<!-- ============================================================
+     COLOPHON
+     ============================================================ -->
+<aside class="colophon">
+  <div class="colophon__hr"></div>
+  <p>Vignette · 02 of an exploratory series. Set in Source Serif 4 by Frank Grießhammer, with IBM Plex Mono and IBM Plex Sans Condensed by Mike Abbink &amp; Bold Monday. Source excerpts © the respective authors of <code>webspace-sdk/webspace-engine</code>, used under MPL-2.0. The honest version of the framing is on display in §10 — the &ldquo;DOM is the event bus&rdquo; claim, popular in conference talks, is too strong for what the codebase actually does. The precise claim — &ldquo;what must survive a reload is observed, and survives by being part of the document&rdquo; — is what the vignette argues.</p>
+</aside>
+
+<script src="../shared/sketch.js"></script>
+</body>
+</html>
