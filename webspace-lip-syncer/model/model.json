@@ -1,0 +1,41 @@
+{
+  "schema_version": 1,
+  "name": "distilled-stride2-gru256x2-16k-la100",
+  "format": "onnx",
+  "opset_version": 18,
+  "file": "model.onnx",
+  "bytes": 2617811,
+  "sha256": "4e0e1489635cfa878ce01273a1e921aac36bb7f8dec81809a809688064426695",
+  "license": "Apache-2.0",
+  "copyright": "Copyright 2026 Greg Fodor",
+  "architecture": {
+    "name": "stride2-gru-256x2",
+    "parameter_count": 653516,
+    "estimated_macs_per_second": 31500000,
+    "input_names": ["projection_window", "hidden"],
+    "input_shapes": [[1, 3, 40], [2, 1, 256]],
+    "output_names": ["logits", "next_hidden"],
+    "output_shapes": [[1, 1, 12], [2, 1, 256]]
+  },
+  "frontend": {
+    "training_input_sample_rate": 48000,
+    "sample_rate": 16000,
+    "window_samples": 400,
+    "hop_samples": 160,
+    "mel_bins": 40,
+    "causal": true,
+    "statistics_sha256": "5e6fd3c89d3e8842c0c7e11cfc3d9896d272122268bc0b2c54c7d482c04759d5"
+  },
+  "training": {
+    "run_id": "distilled-stride2-gru256x2-16k-la100-seed1337-001",
+    "checkpoint_epoch": 20,
+    "checkpoint_sha256": "eaf0e7bbe0a8ee957654dfcf5a9a8068529639a9e140fc865419af5380db8c69",
+    "training_commit": "b805b395592e8ef2f47c8d9ca12b3bc94915c125",
+    "target_lookahead_ms": 100,
+    "validation_macro_f1": 0.6191265384851697,
+    "validation_accuracy": 0.747648260575717,
+    "validation_non_neutral_accuracy": 0.6280695542672762,
+    "validation_balanced_accuracy": 0.6411168029026838,
+    "validation_transition_error_ms": 34.4365302429446
+  }
+}
